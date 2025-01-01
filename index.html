@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>My Website</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pridi:wght@200;300;400;500;600;700&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="./style.css">
+    <link rel="icon" href="./favicon.ico" type="image/x-icon">
+    <style>
+        /* -- IMG Handling -- */
+        img {
+          max-width: 100%;
+        }
+        /* -- SECTIONS -- */
+        .gray-band {
+          background: #1f1f1f;
+        }
+        /* -- TYPOGRAPHY -- */
+        p, h1, h2, h3, h4, h5, h6, blockquote, ul, ol, li {
+            font-smooth: always;
+        }
+        .all-caps {
+          text-transform: uppercase;
+        }
+        h1, h2 {
+          font-size: 48px;
+          line-height: 38px;
+          margin-bottom: 20px;
+        }
+        h1 .subtitle {
+          font-size: 20px;
+          line-height: 20px;
+          margin-bottom: 20px;
+        }
+        /* -- END -- TYPOGRAPHY -- */
+        body {
+            background: #000000;
+            font-family: 'Roboto', 'Montserrat', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            color: #FFFFFF;
+        }
+        body h1, body h2 {
+          font-family: 'Roboto', 'Montserrat', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-weight: 700;
+            font-style: normal;
+        }
+        body .reversed {
+            background: #FFFFFF;
+            color: #000000;
+        }
+        /* -- Main Navigation -- */
+        .navbar-toggler, .navbar-toggler-icon {
+          color: #FFFFFF;
+        }
+        nav .navbar-brand img{
+          width: 200px;
+        }
+        nav .nav-link:not(.disabled) {
+          color: #FFFFFF;
+        }
+        nav .nav-link.disabled {
+          color: #666;
+        }
+        .navbar-nav .nav-link.active {
+          color: #999999;
+          font-weight: bold;
+          text-decoration: underline;
+        }
+        /* -- BUTTONS -- */
+        .btn {
+          border-radius: 0;
+          font-family: 'Roboto', 'Montserrat', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+          font-weight: 700;
+          padding-top: 8px;
+        }
+        .btn-danger {
+          background: #E91D2D;
+        }
+        .btn-secondary {
+          background: #f1f1f1;
+          border: none;
+          color: #666666;
+        }
+        .btn-row {
+          display: flex;
+          flex-basis: 100%;
+          flex-wrap: wrap;
+          max-width: 550px;
+          margin: 0 auto;
+        }
+        .btn-row .btn {
+          width: 50%;
+        }
+        /* -- NAV + HERO WRAP -- 
+              NOTE:This element wraps both areas to create more cohesive design that connects the main navigation to the header. This is only implemented on the home page, but can be used elsewhere as well. -- */
+        #nav-plus-feature {
+          background: url(img/The-Gardener-Character-from-The-Path.jpg) no-repeat center right;
+          background-size: contain;
+        }      
+        /* -- FS HERO / FS AUTHOR -- */
+        .fs-hero, .fs-author {
+          min-height: 400px;
+          align-items: center;
+          display: flex;
+          padding: 40px 0;
+          text-align: center;
+        }
+        .hero-text {
+          max-width: 550px;
+        }
+        .fs-hero .hero-text .hero-logo {
+          margin-bottom: 20px;
+        }
+        .fs-hero .btn-row {
+          margin: 0 0;
+        }
+        .fs-author {
+          background: url('img/Stephen-Fox-feature-Img.jpg') no-repeat center left;
+          background-size: contain;
+        }
+        .fs-author .hero-text {
+          text-align: left;
+        }
+        /* -- HOME QUAD FUNNEL (4 card row beneath Hero) -- */
+        #home-quad-funnel {
+          padding: 40px;
+        }
+        #home-quad-funnel .card {
+          border: none;
+          border-radius: 0;
+        }
+        #home-quad-funnel .card .card-body {
+          padding: 0 0;
+        }
+        #home-quad-funnel .card .card-body .card-text {
+          padding: 20px;
+        }
+        #home-quad-funnel .card .card-body .card-title {
+          padding: 0 20px;
+          text-transform: uppercase;
+        }
+        #home-quad-funnel h2 {
+          text-transform: uppercase;
+        }
+        #home-quad-funnel .card .card-body .card-title-image {
+          padding: 20px;
+        }
+        #home-quad-funnel .card {
+          height: 100%;
+        }
+        #home-quad-funnel .card .card-body .card-text {
+          margin-bottom: 40px;
+        }
+        #home-quad-funnel .card .card-body .btn-row {
+          position: absolute;
+          width: 100%;
+          bottom: 0;
+        }
+        #home-quad-funnel .card .card-body .card-title-image {
+          max-height: 100px;
+          object-fit: fill;
+          margin: 0 auto;
+          display: block;
+        }
+        #home-quad-funnel .card .card-img, #home-quad-funnel .card .card-img-top {
+          border-radius: 0 0 0 0;
+        }
+        /* -- STEPHEN BIO -- */
+        /* -- FOOTER -- */
+        .footer-logo {
+          width: 200px;
+          margin: 20px 0;
+        }
+        footer {
+          padding: 40px 20px;
+        }
+        footer a {
+          color: #FFFFFF;
+          padding: 0 10px;
+        }
+        footer p a:first-of-type {
+          padding: 0 10px 0 0;
+        }
+        /* -- MEDIA QUERIES -- */
+        /* -- Tablet Landscape < Small Desktop -- */
+          @media screen and (min-width: 1499px) {
+            .fs-hero {
+              height: 50vh;
+              align-items: center;
+              display: flex;
+            }
+          }
+        /* -- < Tablet Landscape -- */
+          @media screen and (max-width: 1199px){
+            .hero-text {
+              text-align: center;
+            }
+            .hero-text .hero-logo {
+              max-width: 400px;
+            }
+            .navbar {
+              background-color:rgba(0, 0, 0, 0.5)
+            }
+            .fs-hero {
+              background-color:rgba(0, 0, 0, 0.5);
+              text-align: center;
+            }
+            .fs-hero .hero-text {
+              margin: 0 auto;
+            }
+            .hero-image-overlay {
+              display: none;
+            }
+          }
+          @media screen and (max-width: 990px){
+            .card-wrap {
+              margin-bottom: 20px;
+            }
+          }
+    </style>
+  </head>
+  <body>
+    <main>
+      <section id="nav-plus-feature" class="container">
+        <nav class="navbar navbar-dark navbar-expand-lg fs-main-nav container">
+          <div class="container-fluid">
+            <a class="navbar-brand" href="#">
+              <img src="img/Fox-Storytelling-Logo_Stephen-Fox.svg" alt="Fox Storytelling is the creative home of Nashville based artist and writer, Stephen Fox" />
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+              <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                <li class="nav-item">
+                  <a class="nav-link active" aria-current="page" href="#">Home</a>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link" href="#">Link</a>
+                </li>
+                <li class="nav-item dropdown">
+                  <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    Dropdown
+                  </a>
+                  <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="#">Action</a></li>
+                    <li><a class="dropdown-item" href="#">Another action</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="#">Something else here</a></li>
+                  </ul>
+                </li>
+                <li class="nav-item">
+                  <a class="nav-link disabled" aria-disabled="true">Disabled</a>
+                </li>
+              </ul>
+              <form class="d-flex" role="search">
+                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                <button class="btn btn-primary" type="submit">Search</button>
+              </form>
+            </div>
+          </div>
+        </nav>
+        <div class="fs-hero featured hero row">
+          <div class="col hero-text">
+            <img class="hero-logo" alt="The Path: Rae's Crusade -- a modern fantasy epic by Stephen L. Fox" src="img/The-Path-Raes-Crusade_reversed-logo.svg"/>
+            <!-- Not used in this iteration
+              <h1>Hero Title</h1>
+              <p class="subtitle">Hero Subtitle</p>
+            -->
+            <p class="hero-body-copy">A young girl &ndash; armed with a talking shield and flaming sword &ndash; is thrust into a dangerous adventure that threatens to upend every rule and ruler she's ever known.</p>
+            <div class="btn-row">
+              <a class="btn btn-secondary" href="#">More About "The Path"</a>
+              <a class="btn btn-danger" href="#">Buy "The Path"</a>
+            </div>
+          </div>
+          <div class="col hero-image-overlay"></div>
+        </div>
+      </section>
+      <section id="home-quad-funnel" class="container-fluid gray-band">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-12 section-title">
+              <h2>Featured Projects</h2>
+            </div>
+            <div class="col-lg-3 col-md-6 card-wrap">
+              <div class="card">
+                <img src="img/Thumbnail-The-Gardener-Character-from-The-Path.jpg" alt="Thumbnail Image for The Path: Rae's Crusade -- a high fantasy illustrated novella by Stephen L. Fox" class="card-img-top">
+                <div class="card-body">
+                  <h5 class="card-title"></h5>
+                  <img class="card-title-image" src="img/The-Path-Raes-Crusade.svg" alt="The Path: Rae's Crusade is a high-concept fantasy novella featuring 20 hand-drawn (handdrawn) illustrations by artist and author, Stephen Fox." />
+                  <p class="card-text">A young girl &ndash; armed with a talking shield and flaming sword &ndash; is thrust into a dangerous adventure that threatens to upend every rule and ruler she's ever known.</p>
+                  <div class="btn-row">
+                    <a class="btn btn-secondary" href="#">Learn More</a>
+                    <a class="btn btn-primary all-caps" href="#">Buy Now</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-3 col-md-6 card-wrap">
+              <div class="card">
+                <img src="img/Thumbnail-ND-Riot-independent-comics-short-stories.jpg" alt="Thumbnail for ND Riot -- A quarterly magazine delivering the best content from independent artists and writers" class="card-img-top">
+                <div class="card-body">
+                  <img class="card-title-image" src="img/ND-Riot-Logo_vertical-logo.svg" alt="The Path: Rae's Crusade is a high-concept fantasy novella featuring 20 hand-drawn (handdrawn) illustrations by artist and author, Stephen Fox." />
+                  <p class="card-text">Short-form comics, short stories, and other creative work by unique storytellers. Published quarterly, ND Riot works to support independent artists, writers - unique storytellers of all sorts.</p>
+                  <div class="btn-row">
+                    <a class="btn btn-secondary" href="#">Learn More</a>
+                    <a class="btn btn-primary all-caps" href="#">Buy Now</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-3 col-md-6 card-wrap">
+              <div class="card">
+                <img src="img/Thumbnail-Natural-Whimsy-Handdrawn-Nature-Coloring-Book.jpg" alt="Thumbnail for Natural Whimsy -- A coloring book featuring hand-drawn nature themed illustrations by Stephen Fox" class="card-img-top">
+                <div class="card-body">
+                  <img class="card-title-image" src="img/Natural-Whimsy-Logo_nature-themed-coloring-book.svg" alt="The Path: Rae's Crusade is a high-concept fantasy novella featuring 20 hand-drawn (handdrawn) illustrations by artist and author, Stephen Fox." />
+                  <p class="card-text">Natural Whimsy is a hand-drawn coloring book featuring one-of-a-kind illustrations of everything from pugs to dolphins, to baby pigs (some might say piglets).</p>
+                  <div class="btn-row">
+                    <a class="btn btn-secondary" href="#">Learn More</a>
+                    <a class="btn btn-primary all-caps" href="#">Buy Now</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-3 col-md-6 card-wrap">
+              <div class="card">
+                <img src="img/Thumbnail-NEX-Southern-Superheroes.jpg" class="card-img-top" alt="Thumbnail for NEX: Heroes for the Rest of Us -- a quarterly comic book about southern superheroes by Stephen Fox">
+                <div class="card-body">
+                  <img class="card-title-image" src="img/NEX-Logo_2020-southern-superheroes.svg" alt="The Path: Rae's Crusade is a high-concept fantasy novella featuring 20 hand-drawn (handdrawn) illustrations by artist and author, Stephen Fox." />
+                  <p class="card-text">Four life-long friends are abducted by aliens and accidentally injected with a serum designed for Martian super-soldiers. Stupidity ensues. Issues 1 and 2 available at the link.</p>
+                  <div class="btn-row">
+                    <a class="btn btn-secondary" href="#">Learn More</a>
+                    <a class="btn btn-primary all-caps" href="#">Buy Now</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="stephen-bio container">
+        <div class="fs-author row">
+          <div class="col hero-image-overlay"></div>
+          <div class="col hero-text">
+            <h1>Stephen L. Fox<br><span class="subtitle">Independent artist and writer from Nashville, TN</span></h1>
+            <p>I'm Stephen, a middle-aged dude who grew up in a  fairly humble part of Tennessee where my unsporty demeanor frequently  left me the subject of monosyllabic jeers from monosyllabic folks. I  spent hundreds (maybe thousands) of evenings laying belly-down on old  burbur: with a couch pillow under my chest, and plain typing paper in  front of my face – always filled with excited scrawls and  unsophisticated doodles.
+            </p>
+            <p>
+              I’ve written and drawn professionally, but these days I’m focused on my own stories. My taste is eclectic, and so are my books. From Southern superheroes to life-giving elementals, creating characters and the worlds they inhabit has been my passion since I was old enough to worry about Luke falling into the carbonite chamber.</p>
+            <div class="btn-row">
+              <a class="btn btn-secondary" href="#">Media Inquiries</a>
+              <a class="btn btn-danger" href="#">Who is Stephen?</a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer class="container-fluid gray-band">
+      <div class="container">
+        <div class="row">
+          <div class="col">
+            <img class="footer-logo" src="img/Fox-Storytelling-Logo_Stephen-Fox.svg" alt="Footer logo for Fox Storytelling, the online creative world of Stephen Fox" />
+            <p>Fox Storytelling is © Stephen L. Fox, and has been since May 2012.</p>
+            <p><a href="/media-queries">Media Queries</a> | <a href="/who-is-stephen">Who is Stephen?</a> | <a href="/books-by-stephen-fox">Books by Stephen Fox</a></p>
+          </div>
+        </div>
+      </div>
+    </footer>
+    <script src="index.js"></script>
+  </body>
+</html>
