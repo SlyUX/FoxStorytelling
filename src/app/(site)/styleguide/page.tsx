@@ -122,7 +122,7 @@ const RULES: [string, string][] = [
   ['Every list has an empty state.', 'It’s written for readers, not editors.'],
   ['Content lives in Sanity.', 'Display copy is edited in the Studio, with defaults in src/lib/site-settings.ts. Exceptions are text only assistive technology hears, and this page.'],
   ['Behavior comes from shadcn.', 'Need a dialog or a menu? npx shadcn@latest add it, then restyle to the tokens. Button and badge here are ours: don’t let the CLI overwrite them.'],
-  ['Motion is slow, and it stops.', 'The home art breathes on a 20-second cycle, swelling past its frame and settling back, never shrinking enough to show an edge, and brightening from 50% to full opacity as it swells. A dark cloud that’s never the same twice fades with it, black unless the Studio picks a color. Books change only as a breath ends, at the art’s dimmest, by crossfade; the rotation holds while someone is reading. A pause button stops it all; reduced motion holds the art still and drops the cloud. Hover lifts a cover 4px.'],
+  ['Motion is slow, and it stops.', 'The home art breathes on a 20-second cycle, swelling past its frame and settling back, never shrinking enough to show an edge, and brightening from 50% to full opacity as it swells. A dark cloud that’s never the same twice fades with it, black unless the Studio picks a color. Books change only as a breath ends, at the art’s dimmest, by crossfade; the rotation holds while someone is reading. As the first screen scrolls away, the art fades into the night. A pause button stops the breath, the cloud, and the rotation; reduced motion holds the art still and drops the cloud, but keeps the fade, which isn’t motion. Hover lifts a cover 4px.'],
 ]
 
 const VOICE: [string, React.ReactNode][] = [
@@ -393,6 +393,7 @@ export default async function StyleguidePage() {
             'Books with “Show on the home page” on and home page art rotate in Books order, one per breath: as each breath ends, with the art at its dimmest, the next book crossfades in. With none, the site’s home art (Site settings) stands beside the first book, its cover beside the details.',
             'The art breathes every 20 seconds, swelling and brightening from 50% to full opacity, under a cloud drawn from noise that moves through time, from a new seed on each visit. The cloud is black unless Site settings or the book picks a color, and it eases into a new book’s color as the book changes. The hotspot set in the Studio stays in view and is where the breath grows from.',
             'The description sits at the top of the other column, the showing book’s details below it. Its first store is the page’s one red action. Nothing sits on the art.',
+            'Scrolling away, the art and its cloud fade into the night, gone by the time three quarters of the column has left (sooner on phones); the controls stay visible. CSS scroll-driven: browsers without it just scroll.',
             'The rotation holds while the pointer or keyboard focus is in it; pause stops it and the motion; previous, next, and a marker per book step through by hand. Reduced motion stills the art and never advances on its own.',
           ]}
         >

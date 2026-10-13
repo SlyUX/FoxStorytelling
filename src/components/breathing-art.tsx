@@ -9,7 +9,8 @@ import { cn } from '@/lib/utils'
  * seconds, brightening as it swells and fading as it settles (`--breath`,
  * `--breath-dim`, `--breath-bright`, and `.breathe` in globals.css), while a
  * dark cloud rolls over it (black, or the color picked in the Studio),
- * thickening and fading in step.
+ * thickening and fading in step. As the page scrolls away, art and cloud fade
+ * into the night (`.recede`).
  *
  * The cloud is never the same twice: it's drawn from noise that moves through
  * time, so each frame grows out of the one before, from a new random seed on
@@ -45,17 +46,20 @@ export function BreathingArt({
 
   return (
     <div data-paused={paused} className={cn('bg-background relative isolate overflow-hidden', className)}>
-      <div
-        ref={artRef}
-        onAnimationIteration={(event) => event.target === event.currentTarget && onBreath?.()}
-        className="breathe absolute inset-0"
-        style={{ '--focus': focus } as React.CSSProperties}
-      >
-        {art}
+      {/* The art and its cloud fade into the night as the first screen scrolls away; the controls stay. */}
+      <div className="recede absolute inset-0">
+        <div
+          ref={artRef}
+          onAnimationIteration={(event) => event.target === event.currentTarget && onBreath?.()}
+          className="breathe absolute inset-0"
+          style={{ '--focus': focus } as React.CSSProperties}
+        >
+          {art}
+        </div>
+        <CloudLayer artRef={artRef} paused={paused} color={cloud} />
+        {/* Vignette: holds the edges in shadow, so the art sinks into the page. */}
+        <div aria-hidden className="to-background/80 pointer-events-none absolute inset-0 bg-radial from-transparent from-45%" />
       </div>
-      <CloudLayer artRef={artRef} paused={paused} color={cloud} />
-      {/* Vignette: holds the edges in shadow, so the art sinks into the page. */}
-      <div aria-hidden className="to-background/80 pointer-events-none absolute inset-0 bg-radial from-transparent from-45%" />
       {controls && <div className="absolute bottom-3 left-3 z-10 flex items-center gap-1.5">{controls}</div>}
     </div>
   )
@@ -65,7 +69,7 @@ export function BreathingArt({
 const COLS = 72
 const FPS = 30
 /** How dense the cloud gets at the top of a breath. Keep it subtle. */
-const MAX_ALPHA = 0.75
+const MAX_ALPHA = 0.525
 /** Seconds for the cloud to take on a new color: about as long as the art's crossfade. */
 const COLOR_EASE = 0.6
 

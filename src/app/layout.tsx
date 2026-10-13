@@ -30,7 +30,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     // `dark`: the site is always dark (see globals.css).
     <html lang="en" className={cn('dark', geist.variable, crimson.variable, montserrat.variable)}>
-      <body className="bg-background text-foreground min-h-screen font-sans antialiased">{children}</body>
+      {/* Browser extensions (ColorZilla's cz-shortcut-listen, for one) add attributes to <body> before React
+          loads. This silences that mismatch for <body>'s own attributes only; the page inside is still checked. */}
+      <body suppressHydrationWarning className="bg-background text-foreground min-h-screen font-sans antialiased">
+        {children}
+      </body>
     </html>
   )
 }
