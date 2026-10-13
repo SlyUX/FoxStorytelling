@@ -29,6 +29,7 @@ export function BreathingArt({
   paused,
   onBreath,
   controls,
+  overlay,
   className,
 }: {
   art: React.ReactNode
@@ -41,14 +42,16 @@ export function BreathingArt({
   paused: boolean
   /** Called as each breath ends: the art is settled and at its dimmest. */
   onBreath?: () => void
-  /** Buttons in the bottom-left corner. */
+  /** Buttons in the top-right corner. */
   controls?: React.ReactNode
+  /** Over the foot of the art: the showing book's details. It never fades, and the column grows to fit it. */
+  overlay?: React.ReactNode
   className?: string
 }) {
   const artRef = useRef<HTMLDivElement>(null)
 
   return (
-    <div data-paused={paused} className={cn('bg-background relative isolate overflow-hidden', className)}>
+    <div data-paused={paused} className={cn('bg-background relative isolate flex flex-col justify-end overflow-hidden', className)}>
       {/* The art and its cloud fade into the night as the first screen scrolls away; the controls stay. */}
       <div className="recede absolute inset-0">
         <div
@@ -63,7 +66,8 @@ export function BreathingArt({
         {/* Vignette: holds the edges in shadow, so the art sinks into the page. */}
         <div aria-hidden className="to-background/80 pointer-events-none absolute inset-0 bg-radial from-transparent from-45%" />
       </div>
-      {controls && <div className="absolute bottom-3 left-3 z-10 flex items-center gap-1.5">{controls}</div>}
+      {overlay && <div className="relative z-10">{overlay}</div>}
+      {controls && <div className="absolute top-3 right-3 z-20 flex items-center gap-1.5">{controls}</div>}
     </div>
   )
 }

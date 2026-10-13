@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import { TransitionLink } from '@/components/transition-link'
 
 import { Eyebrow } from '@/components/ui/section'
 import { formatDate } from '@/lib/utils'
@@ -14,12 +14,12 @@ export function PostRow({ post, headingLevel: Heading = 'h3' }: { post: PostCard
     <article className="group relative py-6">
       {post.category && <Eyebrow className="mb-2">{post.category}</Eyebrow>}
       <Heading className="font-serif text-2xl leading-snug font-semibold">
-        <Link
+        <TransitionLink
           href={`/blog/${post.slug}`}
           className="group-hover:text-link visited:text-visited focus-visible:after:outline-ring after:absolute after:inset-0 focus-visible:outline-none focus-visible:after:outline-2 focus-visible:after:outline-offset-2"
         >
           {post.title}
-        </Link>
+        </TransitionLink>
       </Heading>
       {date && (
         <p className="text-muted-foreground mt-1 text-sm">
@@ -66,12 +66,12 @@ export function PostCard({
         {meta}
       </p>
       <Heading className="mt-1.5 font-serif text-xl leading-snug font-semibold">
-        <Link
+        <TransitionLink
           href={`/blog/${post.slug}`}
           className="group-hover:text-link visited:text-visited after:rounded-ui focus-visible:after:outline-ring after:absolute after:inset-0 focus-visible:outline-none focus-visible:after:outline-2 focus-visible:after:outline-offset-2"
         >
           {post.title}
-        </Link>
+        </TransitionLink>
       </Heading>
       {post.excerpt && <p className="text-muted-foreground mt-2 line-clamp-2 text-sm leading-relaxed">{post.excerpt}</p>}
     </article>

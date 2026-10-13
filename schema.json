@@ -1077,13 +1077,6 @@
         },
         "optional": true
       },
-      "featuredBookLabel": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "string"
-        },
-        "optional": true
-      },
       "bookDetailsLabel": {
         "type": "objectAttribute",
         "value": {
@@ -1098,28 +1091,14 @@
         },
         "optional": true
       },
+      "bioLabel": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
       "allBooksLabel": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "string"
-        },
-        "optional": true
-      },
-      "aboutLabel": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "string"
-        },
-        "optional": true
-      },
-      "aboutPreview": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "string"
-        },
-        "optional": true
-      },
-      "aboutLinkLabel": {
         "type": "objectAttribute",
         "value": {
           "type": "string"

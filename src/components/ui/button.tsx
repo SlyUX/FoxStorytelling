@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import { TransitionLink } from '@/components/transition-link'
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn, externalHref } from '@/lib/utils'
@@ -59,9 +59,9 @@ export function ButtonLink({
   const cls = cn(buttonVariants({ variant, size }), className)
   if (href?.startsWith('/')) {
     return (
-      <Link href={href} className={cls}>
+      <TransitionLink href={href} className={cls}>
         {children}
-      </Link>
+      </TransitionLink>
     )
   }
   const safe = externalHref(href)

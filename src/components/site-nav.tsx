@@ -1,6 +1,6 @@
 'use client'
 
-import Link from 'next/link'
+import { TransitionLink } from '@/components/transition-link'
 import { usePathname } from 'next/navigation'
 
 import { cn } from '@/lib/utils'
@@ -20,13 +20,13 @@ export function SiteNav({ links, label }: { links: Pick<CmsLink, 'label' | 'href
           const current = href !== '/' && (pathname === href || pathname.startsWith(`${href}/`))
           return (
             <li key={href}>
-              <Link
+              <TransitionLink
                 href={href}
                 aria-current={current ? 'page' : undefined}
                 className={cn('decoration-fox underline-offset-8 transition-colors hover:underline hover:decoration-2', current ? 'text-link' : 'text-foreground')}
               >
                 {label}
-              </Link>
+              </TransitionLink>
             </li>
           )
         })}
