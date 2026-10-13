@@ -183,6 +183,38 @@
 [data-paused='true'] .breathe {
   animation-play-state: paused;
 }
+/*
+  As the first screen scrolls away, the home art and its cloud fade into the
+  night, so the column dissolves into the page instead of sliding off as a
+  block. Scroll-driven, with no scroll listeners; browsers without
+  scroll-driven animations just scroll it with the page. A fade, not movement,
+  so it stays on with reduced motion. The controls don't fade: anything that
+  can be clicked stays visible.
+
+  The fade completes when about three quarters of the column has gone; on
+  phones and portrait tablets the art is half the screen, so sooner.
+*/
+:root {
+  --recede-range: 40svh;
+}
+@media (orientation: landscape) and (min-width: 48rem) {
+  :root {
+    --recede-range: 35svh;
+  }
+}
+@keyframes recede {
+  to {
+    opacity: 0;
+  }
+}
+@supports (animation-timeline: scroll()) {
+  .recede {
+    animation: recede linear both;
+    animation-timeline: scroll(root);
+    animation-range: 0 var(--recede-range);
+  }
+}
+
 /* Reduced motion: the art holds still at full brightness (and CloudLayer doesn't draw). */
 @media (prefers-reduced-motion: reduce) {
   .breathe {
@@ -205,7 +237,8 @@
     outline-offset: 3px;
   }
   @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
+    /* Not .recede: it follows the scroll, not the clock, and fading isn't motion. */
+    *:not(.recede), *::before, *::after {
       transition-duration: 0.01ms !important;
       animation-duration: 0.01ms !important;
       /* Without this, an infinite animation squeezed to 0.01ms would flicker. */

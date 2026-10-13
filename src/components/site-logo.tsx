@@ -1,5 +1,4 @@
-import Image from 'next/image'
-
+import { FoxBadge } from '@/components/fox-badge'
 import { cn } from '@/lib/utils'
 
 /**
@@ -12,7 +11,7 @@ import { cn } from '@/lib/utils'
 export function SiteLogo({ className }: { className?: string }) {
   return (
     <span className={cn('flex items-center gap-2.5', className)}>
-      <Image src="/brand/fox-badge.png" alt="" width={127} height={127} loading="eager" className="size-8 sm:size-9" />
+      <FoxBadge className="size-8 sm:size-9" />
       {/* The logo's letters: brand, not CMS copy. */}
       <span aria-hidden className="font-brand text-lg leading-none uppercase sm:text-xl">
         <span className="font-black">Fox</span>
