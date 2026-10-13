@@ -1,9 +1,7 @@
-import Link from 'next/link'
-
 import { HeaderHeight } from '@/components/header-height'
-import { SiteFooter } from '@/components/site-footer'
 import { SiteLogo } from '@/components/site-logo'
 import { SiteNav } from '@/components/site-nav'
+import { TransitionLink } from '@/components/transition-link'
 import { getSiteSettings } from '@/lib/site-settings'
 
 /**
@@ -12,7 +10,7 @@ import { getSiteSettings } from '@/lib/site-settings'
  */
 export const revalidate = 60
 
-/** Site chrome: skip link, header, footer. Kept off the full-screen Studio. */
+/** Site chrome: skip link and header, which holds still while pages move beneath it. Main and the footer are in the page template (template.tsx). Kept off the full-screen Studio. */
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
   const settings = await getSiteSettings()
   return (
@@ -21,20 +19,18 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
         {/* a11y-only text; not CMS-managed. */}
         Skip to content
       </a>
-      <header data-site-header className="border-border border-b px-4 sm:px-6">
+      {/* Named for view transitions, so it holds still while pages rise and lower beneath it. */}
+      <header data-site-header className="border-border bg-background relative z-40 border-b px-4 sm:px-6" style={{ viewTransitionName: 'site-header' }}>
         <HeaderHeight />
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-8 gap-y-3 py-4">
-          <Link href="/" aria-label={settings.title} className="shrink-0">
+          <TransitionLink href="/" aria-label={settings.title} className="shrink-0">
             <SiteLogo />
-          </Link>
+          </TransitionLink>
           {/* aria-label is a11y-only text, not CMS copy. */}
           <SiteNav links={settings.navigation} label="Main" />
         </div>
       </header>
-      <main id="main" className="flex-1">
-        {children}
-      </main>
-      <SiteFooter settings={settings} />
+      {children}
     </div>
   )
 }

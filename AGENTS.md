@@ -42,3 +42,4 @@ Stephen Fox's author site: redemptive horror, books and comics. Readers come to 
 6. **Red is for action, ember is for light.** One red (`default`) button per view. Ember marks links, focus, and what's on its way. The logo's red (`--fox`) is decoration and large display only.
 7. **Accessibility:** one `<h1>` per page, no skipped heading levels, real alt text from Sanity (blank for covers beside their title), visible focus, reduced motion respected.
 8. **American English** in copy and Studio labels.
+9. **Internal links use `TransitionLink`**, never `next/link` directly, so pages rise over and lower away from each other (`src/components/transition-link.tsx`, `route-transition.tsx`). Main and the footer live in `(site)/template.tsx` for the same reason; the header, in the layout, holds still.

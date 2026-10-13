@@ -58,6 +58,9 @@
     --fox on --background ................  4.34  large text and graphics only
     --primary on --background ............  3.37  FAILS for text — a ground, not a text color
     --ember on --primary .................  3.06  FAILS — never ember on red
+    Home art, the book over its foot: --background at 85% over pure white, the
+    worst case, holds --foreground at 10.54, --muted-foreground at 5.24, and
+    --link at 6.92 (AA), so the book reads over any part of any image.
 */
 :root {
   color-scheme: dark;
@@ -136,6 +139,92 @@
   --text-4xl: clamp(2rem, calc(1.625rem + 1.875vw), 3.125rem);
   --text-5xl: clamp(2.5rem, calc(2rem + 2.5vw), 4rem);
   --text-6xl: clamp(2.75rem, calc(2rem + 3.75vw), 5rem);
+}
+
+/*
+  Page transitions: pages stack like sheets (TransitionLink picks which).
+
+   - page-rise   going anywhere else: the new page rises from the bottom over
+                 the one you're on, which dims beneath it.
+   - page-lower  going back up a level: the page you're on lowers away,
+                 revealing the one beneath, which brightens.
+
+  Only transform and opacity move, so it runs on the compositor and stays
+  smooth. The page moves one window height, wherever it was scrolled, so its
+  edge always crosses the whole screen in the same time. The header holds
+  still above it all. Reduced motion: a quick crossfade, no travel.
+*/
+:root {
+  --page-duration: 550ms;
+  --page-ease: cubic-bezier(0.32, 0.72, 0, 1); /* a sheet: quick off the mark, settling slowly */
+}
+@keyframes page-rise {
+  from {
+    transform: translateY(100vh);
+  }
+}
+@keyframes page-lower {
+  to {
+    transform: translateY(100vh);
+  }
+}
+@keyframes page-dim {
+  to {
+    opacity: 0.35;
+  }
+}
+@keyframes page-undim {
+  from {
+    opacity: 0.35;
+  }
+}
+@keyframes page-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes page-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+/* Whichever page moves sits on top. */
+::view-transition-group(.page-rise-in),
+::view-transition-group(.page-lower-out) {
+  z-index: 1;
+}
+::view-transition-new(.page-rise-in) {
+  animation: page-rise var(--page-duration) var(--page-ease) both;
+}
+::view-transition-old(.page-rise-out) {
+  animation: page-dim var(--page-duration) var(--page-ease) both;
+}
+::view-transition-old(.page-lower-out) {
+  animation: page-lower var(--page-duration) var(--page-ease) both;
+}
+::view-transition-new(.page-lower-in) {
+  animation: page-undim var(--page-duration) var(--page-ease) both;
+}
+/* The header is the fixed point: it never moves during a page transition. */
+::view-transition-group(site-header) {
+  animation: none;
+  z-index: 100;
+}
+::view-transition-old(site-header) {
+  display: none;
+}
+::view-transition-new(site-header) {
+  animation: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-new(.page-rise-in),
+  ::view-transition-new(.page-lower-in) {
+    animation: page-fade-in 150ms ease-out both;
+  }
+  ::view-transition-old(.page-rise-out),
+  ::view-transition-old(.page-lower-out) {
+    animation: page-fade-out 150ms ease-out both;
+  }
 }
 
 /*

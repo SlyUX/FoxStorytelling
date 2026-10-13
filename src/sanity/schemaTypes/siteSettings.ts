@@ -65,7 +65,6 @@ export default defineType({
       description: 'The cloud that rolls over the home page art. Books can pick their own. Keep it very dark: it should be felt more than seen. Leave blank for black.',
     }),
     defineField({ name: 'homeIntro', title: 'Intro', type: 'text', rows: 2, group: 'home', description: 'Under the headline.' }),
-    defineField({ name: 'featuredBookLabel', title: 'Featured book label', type: 'string', group: 'home', description: 'Small capitals above the book on the first screen.' }),
     defineField({ name: 'bookDetailsLabel', title: '"About the book" link text', type: 'string', group: 'home', description: 'Beside the buy buttons, linking to the book’s page.' }),
     defineField({
       name: 'featuredLabel',
@@ -74,17 +73,8 @@ export default defineType({
       group: 'home',
       description: 'Marks posts set as Featured, which lead the home page’s list of posts.',
     }),
-    defineField({ name: 'allBooksLabel', title: '"All books" link text', type: 'string', group: 'home', description: 'Beside the featured book; glides down to the Books section.' }),
-    defineField({ name: 'aboutLabel', title: 'About preview heading', type: 'string', group: 'home', description: 'Small capitals above the About preview.' }),
-    defineField({
-      name: 'aboutPreview',
-      title: 'About preview',
-      type: 'text',
-      rows: 3,
-      group: 'home',
-      description: 'A sentence or two on the home page’s first screen, below the featured book. The default is placeholder copy: replace it.',
-    }),
-    defineField({ name: 'aboutLinkLabel', title: 'About link text', type: 'string', group: 'home', description: 'Shown once there’s an About page (slug "about").' }),
+    defineField({ name: 'bioLabel', title: 'Bio button text', type: 'string', group: 'home', description: 'Under the description; opens the About page (slug "about"), and shows once that page exists.' }),
+    defineField({ name: 'allBooksLabel', title: '"All books" button text', type: 'string', group: 'home', description: 'Under the description; opens the Books page.' }),
     defineField({ name: 'allPostsLabel', title: '"All posts" link text', type: 'string', group: 'home', description: 'Beside the Rejection Files previews.' }),
 
     // Books

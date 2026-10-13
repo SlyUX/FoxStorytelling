@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import Link from 'next/link'
+import { TransitionLink } from '@/components/transition-link'
 
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
@@ -75,12 +75,12 @@ export function BookCard({ book, headingLevel: Heading = 'h3' }: { book: BookCar
       <div className="flex flex-col gap-2">
         <StatusBadge status={book.status} />
         <Heading className="font-serif text-xl leading-snug font-semibold">
-          <Link
+          <TransitionLink
             href={`/books/${book.slug}`}
             className="group-hover:text-link after:rounded-ui focus-visible:after:outline-ring after:absolute after:inset-0 focus-visible:outline-none focus-visible:after:outline-2 focus-visible:after:outline-offset-4"
           >
             {book.title}
-          </Link>
+          </TransitionLink>
         </Heading>
         {book.series && <p className="text-muted-foreground text-sm">{book.series}</p>}
         {book.shortDescription && <p className="text-muted-foreground line-clamp-3 text-sm leading-relaxed">{book.shortDescription}</p>}

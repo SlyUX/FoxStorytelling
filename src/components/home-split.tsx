@@ -1,22 +1,21 @@
 import Image from 'next/image'
-import Link from 'next/link'
-import { ArrowDown } from 'lucide-react'
 
 import { BookCover, StatusBadge } from '@/components/book-card'
 import { BookSpotlight, type SpotlightSlide } from '@/components/book-spotlight'
 import { BuyLinks } from '@/components/buy-links'
 import { FillColumn } from '@/components/fill-column'
 import { PostCard } from '@/components/post-list'
+import { TransitionLink } from '@/components/transition-link'
 import { ButtonLink } from '@/components/ui/button'
-import { EmptyState, Eyebrow } from '@/components/ui/section'
+import { Eyebrow } from '@/components/ui/section'
 import type { SiteSettings } from '@/lib/site-settings'
 import type { BookCardData, HomePost, SanityImage, SpotlightBook } from '@/lib/types'
 import { cn } from '@/lib/utils'
 import { urlFor } from '@/sanity/image'
 
-/** Heading levels: the page's h1, block headings, and titles in blocks. */
-type Levels = { tagline: 'h1' | 'h4'; block: 'h2' | 'h5'; item: 'h3' | 'h6' }
-const PAGE_LEVELS: Levels = { tagline: 'h1', block: 'h2', item: 'h3' }
+/** Heading levels: the page's h1, the book's title, block headings, and titles in blocks. */
+type Levels = { tagline: 'h1' | 'h4'; book: 'h2' | 'h5'; block: 'h2' | 'h5'; item: 'h3' | 'h6' }
+const PAGE_LEVELS: Levels = { tagline: 'h1', book: 'h2', block: 'h2', item: 'h3' }
 /** Below `split:`, everything flows; this many post previews show there. */
 const POSTS_STACKED = 3
 
@@ -43,13 +42,13 @@ function Art({ image, lqip, focus, preload }: { image: SanityImage | null | unde
 
 /**
  * The home page's first screen (see BookSpotlight). Books set to show on the
- * home page, with their art, rotate one per breath in Books order. Without
- * any, the site's home art (Site settings) stands beside the first book.
+ * home page, with their art, rotate one per breath in Books order, each one's
+ * details over the foot of its art. Without any, the site's home art (Site
+ * settings) stands with the first book.
  *
- * The column beside the art flows: the description; the book, with "All books"
- * gliding down to the Books section; then the About preview and the Rejection
- * Files previews, as far as they fit (FillColumn), every block set off by a
- * rule.
+ * The other column, centered: the description, with Stephen's Bio (once
+ * there's an About page) and All books; then the Rejection Files previews, as
+ * many as fit (FillColumn).
  */
 export function HomeSplit({
   settings,
@@ -57,7 +56,6 @@ export function HomeSplit({
   fallbackBook,
   posts,
   aboutExists,
-  booksHref = '#books',
   levels = PAGE_LEVELS,
   preload = false,
   className,
@@ -68,10 +66,8 @@ export function HomeSplit({
   fallbackBook: BookCardData | null
   /** Featured posts first, then newest. */
   posts: HomePost[]
-  /** Whether there's an About page to link the preview to. */
+  /** Whether there's an About page for Stephen's Bio to open. */
   aboutExists: boolean
-  /** Where "All books" goes: the Books section below. */
-  booksHref?: string
   /** Heading levels: the page's, or nested ones on the styleguide. */
   levels?: Levels
   /** Preload the first art: it's the home page's largest image. */
@@ -91,7 +87,7 @@ export function HomeSplit({
           cloud: book.cloudHex ?? settings.cloudHex,
           cloudOn: book.cloudOn,
           art: <Art image={book.homeArt} lqip={book.homeArtLqip} focus={focus} preload={preload && i === 0} />,
-          details: <BookDetails book={book} settings={settings} level={levels.item} />,
+          details: <BookDetails book={book} settings={settings} level={levels.book} />,
         }
       })
     : [
@@ -101,7 +97,7 @@ export function HomeSplit({
           focus: homeFocus,
           cloud: settings.cloudHex,
           art: <Art image={settings.homeImage} lqip={settings.homeImageLqip} focus={homeFocus} preload={preload} />,
-          details: fallbackBook ? <BookDetails book={fallbackBook} settings={settings} level={levels.item} withCover /> : <EmptyState>{settings.booksEmpty}</EmptyState>,
+          details: fallbackBook && <BookDetails book={fallbackBook} settings={settings} level={levels.book} withCover />,
         },
       ]
   const hasBook = spotlight.length > 0 || !!fallbackBook
@@ -111,43 +107,33 @@ export function HomeSplit({
       className={className}
       label={settings.booksTitle}
       slides={slides}
-      intro={
-        <div>
-          <Tagline className="font-serif text-5xl leading-[1.05] font-semibold tracking-tight">{settings.tagline}</Tagline>
-          <p className="text-muted-foreground mt-3 max-w-md text-lg leading-relaxed">{settings.homeIntro}</p>
-        </div>
-      }
-      eyebrow={
-        <div className="mb-4 flex items-baseline justify-between gap-4">
-          <Eyebrow as={levels.block}>{hasBook ? settings.featuredBookLabel : settings.booksTitle}</Eyebrow>
-          {hasBook && (
-            <a href={booksHref} className="text-link inline-flex items-center gap-1 text-sm font-semibold underline-offset-4 hover:underline">
-              {settings.allBooksLabel}
-              <ArrowDown aria-hidden className="size-4" />
-            </a>
-          )}
-        </div>
-      }
-      more={
-        <FillColumn>
-          <div className="border-border mt-8 border-t pt-8">
-            <Eyebrow as={levels.block} className="mb-3">
-              {settings.aboutLabel}
-            </Eyebrow>
-            <p className="text-muted-foreground max-w-xl leading-relaxed">{settings.aboutPreview}</p>
-            {aboutExists && (
-              <ButtonLink href="/about" variant="link" className="mt-2 h-auto px-0">
-                {settings.aboutLinkLabel}
-              </ButtonLink>
+      column={
+        <FillColumn className="split:justify-center">
+          <div>
+            <Tagline className="font-serif text-5xl leading-[1.05] font-semibold tracking-tight">{settings.tagline}</Tagline>
+            <p className="text-muted-foreground mt-3 max-w-md text-lg leading-relaxed">{settings.homeIntro}</p>
+            {(aboutExists || hasBook) && (
+              <div className="mt-6 flex flex-wrap gap-3">
+                {aboutExists && (
+                  <ButtonLink href="/about" variant="outline">
+                    {settings.bioLabel}
+                  </ButtonLink>
+                )}
+                {hasBook && (
+                  <ButtonLink href="/books" variant="outline">
+                    {settings.allBooksLabel}
+                  </ButtonLink>
+                )}
+              </div>
             )}
           </div>
           {/* The heading travels with the first preview, so it never shows alone. */}
-          <div className="border-border mt-8 border-t pt-8">
+          <div className="border-border mt-10 border-t pt-8">
             <div className="mb-4 flex items-baseline justify-between gap-4">
               <Eyebrow as={levels.block}>{settings.blogTitle}</Eyebrow>
-              <Link href="/blog" className="text-link text-sm font-semibold underline-offset-4 hover:underline">
+              <TransitionLink href="/blog" className="text-link text-sm font-semibold underline-offset-4 hover:underline">
                 {settings.allPostsLabel}
-              </Link>
+              </TransitionLink>
             </div>
             {posts[0] ? (
               <PostCard post={posts[0]} featuredLabel={settings.featuredLabel} headingLevel={levels.item} />
@@ -167,18 +153,18 @@ export function HomeSplit({
 }
 
 /** A book's status, title, series, and blurb, then where to buy it. The cover joins when the art beside it isn't the book's own. */
-function BookDetails({ book, settings, level: Heading, withCover = false }: { book: BookCardData; settings: SiteSettings; level: Levels['item']; withCover?: boolean }) {
+function BookDetails({ book, settings, level: Heading, withCover = false }: { book: BookCardData; settings: SiteSettings; level: Levels['book']; withCover?: boolean }) {
   const href = `/books/${book.slug}`
   const text = (
     <div className="flex flex-col items-start gap-3">
       <StatusBadge status={book.status} />
       <Heading className="font-serif text-3xl leading-tight font-semibold">
-        <Link href={href} className="hover:text-link">
+        <TransitionLink href={href} className="hover:text-link">
           {book.title}
-        </Link>
+        </TransitionLink>
       </Heading>
       {book.series && <p className="text-muted-foreground text-sm">{book.series}</p>}
-      {book.shortDescription && <p className="text-muted-foreground line-clamp-3 leading-relaxed">{book.shortDescription}</p>}
+      {book.shortDescription && <p className="text-muted-foreground line-clamp-2 leading-relaxed sm:line-clamp-3">{book.shortDescription}</p>}
     </div>
   )
   return (
