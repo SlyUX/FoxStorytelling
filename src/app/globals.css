@@ -228,6 +228,29 @@
 }
 
 /*
+  The phone menu (SiteNav): rolls down from under the header, full width, and
+  back up. Clip only. Closed, it's inert and its visibility goes hidden once it
+  has rolled up, so closed links can't take focus or be read.
+*/
+:root {
+  --menu-duration: 320ms;
+}
+.menu-blind {
+  clip-path: inset(0 0 100% 0);
+  visibility: hidden;
+  transition:
+    clip-path var(--menu-duration) var(--page-ease),
+    visibility 0s linear var(--menu-duration);
+}
+.menu-blind[data-open='true'] {
+  clip-path: inset(0);
+  visibility: visible;
+  transition:
+    clip-path var(--menu-duration) var(--page-ease),
+    visibility 0s;
+}
+
+/*
   The home spotlight's controls panel (BookSpotlight): pause, previous, and
   next slide out leftward from under their toggle, and back. Clip and
   transform only. Closed, it's inert and its visibility goes hidden once the
@@ -257,17 +280,16 @@
 }
 
 /*
-  The header's height: this built default, then measured live (HeaderHeight),
-  so the home page's split fills exactly the rest of the first screen.
+  The header is sticky. --header-h is its height: this built default, then
+  measured live (HeaderHeight). The home page's split fills exactly the rest of
+  the first screen, and jump links and keyboard focus land just below the
+  header, never underneath it.
 */
 :root {
   --header-h: 69px;
 }
-/* Phones: the nav wraps under the logo. */
-@media (max-width: 30rem) {
-  :root {
-    --header-h: 97px;
-  }
+html {
+  scroll-padding-top: calc(var(--header-h) + 1rem);
 }
 
 /*
@@ -303,23 +325,17 @@
   animation-play-state: paused;
 }
 /*
-  As the first screen scrolls away, the home art and its cloud fade into the
-  night, so the column dissolves into the page instead of sliding off as a
-  block. Scroll-driven, with no scroll listeners; browsers without
+  On split screens, as the first screen scrolls away, the home art and its
+  cloud fade into the night, so the column dissolves into the page instead of
+  sliding off as a block. Stacked, the art sits below the description, so it
+  doesn't fade. Scroll-driven, with no scroll listeners; browsers without
   scroll-driven animations just scroll it with the page. A fade, not movement,
   so it stays on with reduced motion. The controls don't fade: anything that
-  can be clicked stays visible.
-
-  The fade completes after --recede-range of scroll: 35svh with the art beside
-  its column, 40svh on phones and portrait tablets.
+  can be clicked stays visible. The fade completes after --recede-range of
+  scroll.
 */
 :root {
-  --recede-range: 40svh;
-}
-@media (orientation: landscape) and (min-width: 48rem) and (min-height: 36rem) {
-  :root {
-    --recede-range: 35svh;
-  }
+  --recede-range: 35svh;
 }
 @keyframes recede {
   to {
@@ -327,10 +343,12 @@
   }
 }
 @supports (animation-timeline: scroll()) {
-  .recede {
-    animation: recede linear both;
-    animation-timeline: scroll(root);
-    animation-range: 0 var(--recede-range);
+  @media (orientation: landscape) and (min-width: 48rem) and (min-height: 36rem) {
+    .recede {
+      animation: recede linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 var(--recede-range);
+    }
   }
 }
 

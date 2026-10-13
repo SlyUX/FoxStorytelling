@@ -19,8 +19,8 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
         {/* a11y-only text; not CMS-managed. */}
         Skip to content
       </a>
-      {/* Named for view transitions, so it holds still while pages rise and lower beneath it. */}
-      <header data-site-header className="border-border bg-background relative z-40 border-b px-4 sm:px-6" style={{ viewTransitionName: 'site-header' }}>
+      {/* Sticky: pinned to the top as the page scrolls. Named for view transitions, so it holds still while pages rise and lower beneath it. */}
+      <header data-site-header className="border-border bg-background sticky top-0 z-40 border-b px-4 sm:px-6" style={{ viewTransitionName: 'site-header' }}>
         <HeaderHeight />
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-8 gap-y-3 py-4">
           <TransitionLink href="/" aria-label={settings.title} className="shrink-0">
