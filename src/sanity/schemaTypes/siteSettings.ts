@@ -16,7 +16,7 @@ export default defineType({
     { name: 'general', title: 'General', default: true },
     { name: 'nav', title: 'Navigation' },
     { name: 'home', title: 'Home page' },
-    { name: 'books', title: 'Books' },
+    { name: 'books', title: 'Stories' },
     { name: 'blog', title: 'Rejection Files' },
     { name: 'newsletter', title: 'Newsletter' },
   ],
@@ -54,7 +54,7 @@ export default defineType({
       type: 'imageWithAlt',
       group: 'home',
       description:
-        'Fills the left half of the first screen (the top half on phones) when no book is set to show on the home page (Books → Show on the home page), and slowly breathes. Tall art on black works best. Set the hotspot on the part that must stay in view.',
+        'Fills the left half of the first screen (the top half on phones) when no book is set to show on the home page (Stories → Show on the home page), and slowly breathes. Tall art on black works best. Set the hotspot on the part that must stay in view.',
     }),
     defineField({
       name: 'cloudColor',
@@ -62,9 +62,24 @@ export default defineType({
       type: 'color',
       group: 'home',
       options: CLOUD_COLOR_OPTIONS,
-      description: 'The cloud that rolls over the home page art. Books can pick their own. Keep it very dark: it should be felt more than seen. Leave blank for black.',
+      description: 'The cloud that rolls over the home page art. Stories can pick their own. Keep it very dark: it should be felt more than seen. Leave blank for black.',
     }),
     defineField({ name: 'homeIntro', title: 'Intro', type: 'text', rows: 2, group: 'home', description: 'Under the headline.' }),
+    defineField({
+      name: 'authorPhoto',
+      title: 'Author photo',
+      type: 'imageWithAlt',
+      group: 'home',
+      description:
+        'A portrait, shown in a circle to the left of the intro. Set the hotspot on your face. Leave the alt text blank: the intro beside it already names you.',
+    }),
+    defineField({
+      name: 'featuredStoriesLabel',
+      title: 'Featured Stories label',
+      type: 'string',
+      group: 'home',
+      description: 'Names the rotating books: shown above them on phones, and read to screen readers everywhere.',
+    }),
     defineField({ name: 'bookDetailsLabel', title: '"About the book" link text', type: 'string', group: 'home', description: 'Beside the buy buttons, linking to the book’s page.' }),
     defineField({
       name: 'featuredLabel',
@@ -74,12 +89,12 @@ export default defineType({
       description: 'Marks posts set as Featured, which lead the home page’s list of posts.',
     }),
     defineField({ name: 'bioLabel', title: 'Bio button text', type: 'string', group: 'home', description: 'Under the description; opens the About page (slug "about"), and shows once that page exists.' }),
-    defineField({ name: 'allBooksLabel', title: '"All books" button text', type: 'string', group: 'home', description: 'Under the description; opens the Books page.' }),
+    defineField({ name: 'allBooksLabel', title: '"All stories" button text', type: 'string', group: 'home', description: 'Under the description; opens the Stories page.' }),
     defineField({ name: 'allPostsLabel', title: '"All posts" link text', type: 'string', group: 'home', description: 'Beside the Rejection Files previews.' }),
 
-    // Books
-    defineField({ name: 'booksTitle', title: 'Books page title', type: 'string', group: 'books' }),
-    defineField({ name: 'booksIntro', title: 'Books page intro', type: 'text', rows: 2, group: 'books' }),
+    // Stories (the fields keep their `books` names, so saved values stay put)
+    defineField({ name: 'booksTitle', title: 'Stories page title', type: 'string', group: 'books' }),
+    defineField({ name: 'booksIntro', title: 'Stories page intro', type: 'text', rows: 2, group: 'books', description: 'Also the page’s description for search engines: worth saying “books”. The default is placeholder copy.' }),
     defineField({ name: 'booksEmpty', title: 'No books yet', type: 'string', group: 'books', description: 'Shown where books would be, before there are any.' }),
     defineField({ name: 'buyLabel', title: 'Buy button text', type: 'string', group: 'books', description: '{store} becomes the store’s name, e.g. "Buy on {store}".' }),
 

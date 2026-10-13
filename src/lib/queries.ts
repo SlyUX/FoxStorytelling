@@ -16,7 +16,7 @@ export async function safeFetch<T>(query: string, params: Record<string, unknown
   }
 }
 
-const BOOK_CARD = `_id,title,"slug":slug.current,series,status,shortDescription,cover,buyLinks`
+const BOOK_CARD = `_id,title,"slug":slug.current,series,status,format,shortDescription,cover,buyLinks`
 const POST_CARD = `_id,title,"slug":slug.current,category,excerpt,publishedAt`
 
 export const SITE_SETTINGS_QUERY = defineQuery(`*[_type=="siteSettings" && _id=="siteSettings"][0]{
@@ -25,7 +25,7 @@ export const SITE_SETTINGS_QUERY = defineQuery(`*[_type=="siteSettings" && _id==
   "cloudHex": cloudColor.hex
 }`)
 
-/** Books that rotate through the home page's first screen: toggled on, with their art, in Books order. */
+/** Stories that rotate through the home page's first screen: toggled on, with their art, in Stories order. */
 export const HOME_SPOTLIGHT_QUERY = defineQuery(
   `*[_type=="book" && showOnHome == true && defined(homeArt.asset) && defined(slug.current)]|order(order asc, title asc){${BOOK_CARD},homeArt,"homeArtLqip": homeArt.asset->metadata.lqip,"cloudHex": cloudColor.hex,"cloudOn": coalesce(showCloud, true)}`,
 )

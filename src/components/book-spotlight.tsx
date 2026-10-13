@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight, Pause, Play, SlidersHorizontal } from 'lucid
 
 import { BreathingArt } from '@/components/breathing-art'
 import { buttonVariants } from '@/components/ui/button'
+import { Eyebrow } from '@/components/ui/section'
 import { cn } from '@/lib/utils'
 
 export type SpotlightSlide = {
@@ -58,7 +59,7 @@ export function BookSpotlight({
   intro: React.ReactNode
   /** What follows the description (a FillColumn): beside the art on split screens, below it stacked. */
   rest: React.ReactNode
-  /** What the rotation is, for screen readers. */
+  /** What the rotation is called: shown above the art on phones, and its name for screen readers everywhere. */
   label: string
   className?: string
 }) {
@@ -72,6 +73,7 @@ export function BookSpotlight({
   const [controlsOpen, setControlsOpen] = useState(false)
   const toggleRef = useRef<HTMLButtonElement>(null)
   const panelId = useId()
+  const labelId = useId()
   const sectionRef = useRef<HTMLElement>(null)
   // Set when the arrow keys leave a book that had focus: its links go inert, so focus follows to the new one's.
   const refocus = useRef(false)
@@ -149,13 +151,18 @@ export function BookSpotlight({
         ref={sectionRef}
         // a11y-only text; not CMS-managed.
         aria-roledescription={many ? 'carousel' : undefined}
-        aria-label={many ? label : undefined}
-        className="split:absolute split:inset-y-0 split:left-0 split:w-1/2! grid"
+        aria-labelledby={labelId}
+        // Stacked, a band between the description and the posts, ruled top and bottom like the header (--border).
+        className="border-border split:absolute split:inset-y-0 split:left-0 split:w-1/2! split:border-0 relative grid border-y"
         onPointerEnter={(event) => event.pointerType === 'mouse' && setHover(true)}
         onPointerLeave={(event) => event.pointerType === 'mouse' && setHover(false)}
         onFocus={() => setFocusWithin(true)}
         onBlur={(event) => !event.currentTarget.contains(event.relatedTarget) && setFocusWithin(false)}
       >
+        {/* Stacked, the name sits across from the controls, on night at 85% so it reads over any art (see globals.css). */}
+        <Eyebrow id={labelId} className="bg-background/85 rounded-ui split:hidden absolute top-3 left-3 z-20 flex h-9 items-center px-3">
+          {label}
+        </Eyebrow>
         <BreathingArt
           focus={origin}
           cloud={current.cloud}

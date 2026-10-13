@@ -15,11 +15,27 @@ const STATUS_VARIANT: Record<BookStatus, React.ComponentProps<typeof Badge>['var
   Available: 'secondary',
   Upcoming: 'ember',
   'On Kickstarter': 'default',
+  'In development': 'outline',
 }
 
 export function StatusBadge({ status }: { status: BookStatus | null }) {
   if (!status) return null
   return <Badge variant={STATUS_VARIANT[status]}>{status}</Badge>
+}
+
+/**
+ * A story's status and format side by side: the status filled (what it asks of
+ * the reader), the format outlined (what it is: Novel, Comic). Together they
+ * say "this is a book, and here's how to get it."
+ */
+export function BookBadges({ status, format }: { status: BookStatus | null; format?: string | null }) {
+  if (!status && !format) return null
+  return (
+    <span className="flex flex-wrap gap-2">
+      <StatusBadge status={status} />
+      {format && <Badge variant="outline">{format}</Badge>}
+    </span>
+  )
 }
 
 /**
@@ -73,10 +89,10 @@ export function BookCard({ book, headingLevel: Heading = 'h3' }: { book: BookCar
     <article className="group relative flex flex-col gap-4">
       <BookCover cover={book.cover} title={book.title} series={book.series} className="transition-transform group-hover:-translate-y-1" />
       <div className="flex flex-col gap-2">
-        <StatusBadge status={book.status} />
+        <BookBadges status={book.status} format={book.format} />
         <Heading className="font-serif text-xl leading-snug font-semibold">
           <TransitionLink
-            href={`/books/${book.slug}`}
+            href={`/stories/${book.slug}`}
             className="group-hover:text-link after:rounded-ui focus-visible:after:outline-ring after:absolute after:inset-0 focus-visible:outline-none focus-visible:after:outline-2 focus-visible:after:outline-offset-4"
           >
             {book.title}
@@ -89,7 +105,7 @@ export function BookCard({ book, headingLevel: Heading = 'h3' }: { book: BookCar
   )
 }
 
-/** Books in a grid: two across on phones, up to four on wide screens. */
+/** Stories in a grid: two across on phones, up to four on wide screens. */
 export function BookGrid({ children }: { children: React.ReactNode }) {
   return <div className="grid grid-cols-2 gap-x-6 gap-y-12 md:grid-cols-3 lg:grid-cols-4">{children}</div>
 }

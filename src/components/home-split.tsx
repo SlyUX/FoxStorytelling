@@ -1,6 +1,6 @@
 import Image from 'next/image'
 
-import { BookCover, StatusBadge } from '@/components/book-card'
+import { BookBadges, BookCover } from '@/components/book-card'
 import { BookSpotlight, type SpotlightSlide } from '@/components/book-spotlight'
 import { BuyLinks } from '@/components/buy-links'
 import { FillColumn } from '@/components/fill-column'
@@ -40,8 +40,8 @@ function Art({ image, lqip, focus, preload }: { image: SanityImage | null | unde
 }
 
 /**
- * The home page's first screen (see BookSpotlight). Books set to show on the
- * home page, with their art, rotate one per breath in Books order, each one's
+ * The home page's first screen (see BookSpotlight). Stories set to show on the
+ * home page, with their art, rotate one per breath in Stories order, each one's
  * details over the foot of its art. Without any, the site's home art (Site
  * settings) stands with the first book.
  *
@@ -104,12 +104,25 @@ export function HomeSplit({
   return (
     <BookSpotlight
       className={className}
-      label={settings.booksTitle}
+      label={settings.featuredStoriesLabel}
       slides={slides}
       intro={
         <>
           <Tagline className="font-serif text-5xl leading-[1.05] font-semibold tracking-tight">{settings.tagline}</Tagline>
-          <p className="text-muted-foreground mt-3 max-w-md text-lg leading-relaxed">{settings.homeIntro}</p>
+          <div className="mt-4 flex items-center gap-4">
+            {/* The author's portrait, round: the one exception to the 2px corners. Blank alt by default: the intro names him. */}
+            {settings.authorPhoto?.asset && (
+              <Image
+                src={urlFor(settings.authorPhoto).width(192).height(192).fit('crop').url()}
+                alt={settings.authorPhoto.alt ?? ''}
+                width={96}
+                height={96}
+                loading="eager"
+                className="bg-card size-14 shrink-0 rounded-full sm:size-16"
+              />
+            )}
+            <p className="text-muted-foreground max-w-md text-lg leading-relaxed">{settings.homeIntro}</p>
+          </div>
           {(aboutExists || hasBook) && (
             <div className="mt-6 flex flex-wrap gap-3">
               {aboutExists && (
@@ -118,7 +131,7 @@ export function HomeSplit({
                 </ButtonLink>
               )}
               {hasBook && (
-                <ButtonLink href="/books" variant="outline">
+                <ButtonLink href="/stories" variant="outline">
                   {settings.allBooksLabel}
                 </ButtonLink>
               )}
@@ -128,8 +141,9 @@ export function HomeSplit({
       }
       rest={
         <FillColumn>
-          {/* The heading travels with the first preview, so it never shows alone. */}
-          <div className="border-border mt-10 border-t pt-8">
+          {/* The heading travels with the first preview, so it never shows alone. Ruled off from the description on split
+              screens; stacked, the art's band above already draws that line. */}
+          <div className="border-border split:border-t split:pt-8 mt-10">
             <div className="mb-4 flex items-baseline justify-between gap-4">
               <Eyebrow as={levels.block}>{settings.blogTitle}</Eyebrow>
               <TransitionLink href="/blog" className="text-link text-sm font-semibold underline-offset-4 hover:underline">
@@ -151,10 +165,10 @@ export function HomeSplit({
 
 /** A book's status, title, series, and blurb, then where to buy it. The cover joins when the art beside it isn't the book's own. */
 function BookDetails({ book, settings, level: Heading, withCover = false }: { book: BookCardData; settings: SiteSettings; level: Levels['book']; withCover?: boolean }) {
-  const href = `/books/${book.slug}`
+  const href = `/stories/${book.slug}`
   const text = (
     <div className="flex flex-col items-start gap-3">
-      <StatusBadge status={book.status} />
+      <BookBadges status={book.status} format={book.format} />
       <Heading className="font-serif text-3xl leading-tight font-semibold">
         <TransitionLink href={href} className="hover:text-link">
           {book.title}

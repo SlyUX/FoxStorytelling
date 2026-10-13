@@ -40,7 +40,7 @@ Point foxstorytelling.com at Vercel in HostGator Zone Editor — **leave MX + th
 - `src/components/ui/`: shadcn-style primitives (`button`, `badge`, `section`). Add more with `npx shadcn@latest add <name>`.
 - `src/components/`: site components: `book-card`, `post-list`, `buy-links` (retail links out, no checkout), `newsletter`, `rich-text`, header and footer.
 - `src/sanity/schemaTypes/`: content model: `book`, `post` (Rejection Files), `page`, `siteSettings` (singleton: all site copy), plus `link`, `imageWithAlt`, `richText`, `buyLink`.
-- `src/app/`: routes: `/`, `/books`, `/books/[slug]`, `/blog`, `/blog/[slug]`, `/[slug]` (About and other pages), `/styleguide`, `/studio`.
+- `src/app/`: routes: `/`, `/stories`, `/stories/[slug]`, `/blog`, `/blog/[slug]`, `/[slug]` (About and other pages), `/styleguide`, `/studio`.
 - `npm run typegen`: regenerates `sanity.types.ts` from the schema and queries (also runs before every build).
 
 ## Content to add in the Studio
@@ -48,5 +48,5 @@ Point foxstorytelling.com at Vercel in HostGator Zone Editor — **leave MX + th
 - **Newsletter:** paste your MailerLite hosted form address into Site settings → Newsletter. The site never collects emails; the sign-up panel stays hidden until this is set.
 - **About:** create a Page with the slug `about`. Once it exists, a **Stephen's Bio** button appears under the home page's description.
 - **Rejection Files on the home page:** the newest posts preview beside the art, as many as fit; mark a post **Featured** to pin it first.
-- **Home page rotation:** on a book, turn on **Show on the home page** and add its **Home page art** (tall, on black, at least 2000px tall), with the hotspot on what must stay in view. Those books rotate through the home page's first screen, one per breath, in your Books order. Each can turn its **Cloud** off (for art that's better left clear) or pick a **Cloud color** for the cloud that rolls over its art; Site settings → Home page → Cloud color sets the default (blank is black).
-- **Home page art (fallback):** Site settings → Home page → Art is shown when no book is set to show on the home page, beside the first book.
+- **Home page rotation:** on a story (Studio → Stories), turn on **Show on the home page** and add its **Home page art** (tall, on black, at least 2000px tall), with the hotspot on what must stay in view. Those books rotate through the home page's first screen, one per breath, in your Stories order. Each can turn its **Cloud** off (for art that's better left clear) or pick a **Cloud color** for the cloud that rolls over its art; Site settings → Home page → Cloud color sets the default (blank is black).
+- **Home page art (fallback):** Site settings → Home page → Art is shown when no book is set to show on the home page, beside the first story.
