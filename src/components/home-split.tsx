@@ -20,8 +20,7 @@ const PAGE_LEVELS: Levels = { tagline: 'h1', book: 'h2', block: 'h2', item: 'h3'
 const POSTS_STACKED = 3
 
 /** The hotspot as a CSS position; without one, a little above center. */
-const focusOf = (image: SanityImage | null | undefined) =>
-  image?.hotspot ? `${(image.hotspot.x * 100).toFixed(1)}% ${(image.hotspot.y * 100).toFixed(1)}%` : '50% 40%'
+const focusOf = (image: SanityImage | null | undefined) => (image?.hotspot ? `${(image.hotspot.x * 100).toFixed(1)}% ${(image.hotspot.y * 100).toFixed(1)}%` : '50% 40%')
 
 function Art({ image, lqip, focus, preload }: { image: SanityImage | null | undefined; lqip?: string | null; focus: string; preload?: boolean }) {
   if (!image?.asset) return null
@@ -107,26 +106,28 @@ export function HomeSplit({
       className={className}
       label={settings.booksTitle}
       slides={slides}
-      column={
-        <FillColumn className="split:justify-center">
-          <div>
-            <Tagline className="font-serif text-5xl leading-[1.05] font-semibold tracking-tight">{settings.tagline}</Tagline>
-            <p className="text-muted-foreground mt-3 max-w-md text-lg leading-relaxed">{settings.homeIntro}</p>
-            {(aboutExists || hasBook) && (
-              <div className="mt-6 flex flex-wrap gap-3">
-                {aboutExists && (
-                  <ButtonLink href="/about" variant="outline">
-                    {settings.bioLabel}
-                  </ButtonLink>
-                )}
-                {hasBook && (
-                  <ButtonLink href="/books" variant="outline">
-                    {settings.allBooksLabel}
-                  </ButtonLink>
-                )}
-              </div>
-            )}
-          </div>
+      intro={
+        <>
+          <Tagline className="font-serif text-5xl leading-[1.05] font-semibold tracking-tight">{settings.tagline}</Tagline>
+          <p className="text-muted-foreground mt-3 max-w-md text-lg leading-relaxed">{settings.homeIntro}</p>
+          {(aboutExists || hasBook) && (
+            <div className="mt-6 flex flex-wrap gap-3">
+              {aboutExists && (
+                <ButtonLink href="/about" variant="outline">
+                  {settings.bioLabel}
+                </ButtonLink>
+              )}
+              {hasBook && (
+                <ButtonLink href="/books" variant="outline">
+                  {settings.allBooksLabel}
+                </ButtonLink>
+              )}
+            </div>
+          )}
+        </>
+      }
+      rest={
+        <FillColumn>
           {/* The heading travels with the first preview, so it never shows alone. */}
           <div className="border-border mt-10 border-t pt-8">
             <div className="mb-4 flex items-baseline justify-between gap-4">
@@ -135,11 +136,7 @@ export function HomeSplit({
                 {settings.allPostsLabel}
               </TransitionLink>
             </div>
-            {posts[0] ? (
-              <PostCard post={posts[0]} featuredLabel={settings.featuredLabel} headingLevel={levels.item} />
-            ) : (
-              <p className="text-muted-foreground">{settings.postsEmpty}</p>
-            )}
+            {posts[0] ? <PostCard post={posts[0]} featuredLabel={settings.featuredLabel} headingLevel={levels.item} /> : <p className="text-muted-foreground">{settings.postsEmpty}</p>}
           </div>
           {posts.slice(1).map((post, i) => (
             <div key={post._id} className={cn('mt-3', i + 1 >= POSTS_STACKED && 'split:block hidden')}>

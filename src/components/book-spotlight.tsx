@@ -30,10 +30,12 @@ const subscribeReduce = (onChange: () => void) => {
 
 /**
  * The home page's first screen: books' art breathing on one side, the showing
- * book's details over its foot; on the other, the site's description and what
- * follows (`column`). Two columns exactly filling the screen under the header
- * on landscape screens from tablet width (`split:`); stacked below that, the
- * art takes most of the first screen.
+ * book's details over its foot; on the other, the site's description (`intro`)
+ * and what follows it (`rest`), centered together. Two columns exactly filling
+ * the screen under the header on landscape screens from tablet width
+ * (`split:`). Stacked below that: the description, then the art, then the
+ * rest. That's the reading order too, so keyboard and screen reader order
+ * match the screen.
  *
  * The breath is the clock: as each breath ends, with the art settled and at its
  * dimmest, the next book crossfades in, so there's never a hard cut. The
@@ -46,13 +48,16 @@ const subscribeReduce = (onChange: () => void) => {
  */
 export function BookSpotlight({
   slides,
-  column,
+  intro,
+  rest,
   label,
   className,
 }: {
   slides: SpotlightSlide[]
-  /** The other column's content: the description and what follows it. */
-  column: React.ReactNode
+  /** The site's description: first on the page, beside the art on split screens. */
+  intro: React.ReactNode
+  /** What follows the description (a FillColumn): beside the art on split screens, below it stacked. */
+  rest: React.ReactNode
   /** What the rotation is, for screen readers. */
   label: string
   className?: string
@@ -117,14 +122,7 @@ export function BookSpotlight({
   const markers = (className?: string, quiet = false) => (
     <span inert={quiet} className={cn('bg-background/60 rounded-ui h-9 items-center px-1 transition-opacity', quiet && 'opacity-60', className)}>
       {slides.map((slide, i) => (
-        <button
-          key={slide.key}
-          type="button"
-          onClick={() => go(i)}
-          aria-label={`Show ${slide.title}`}
-          aria-current={i === index ? 'true' : undefined}
-          className="group grid size-7 place-items-center"
-        >
+        <button key={slide.key} type="button" onClick={() => go(i)} aria-label={`Show ${slide.title}`} aria-current={i === index ? 'true' : undefined} className="group grid size-7 place-items-center">
           <span className={cn('rounded-ui h-1 w-4 transition-colors', i === index ? 'bg-foreground' : 'bg-foreground/50 group-hover:bg-foreground/80')} />
         </button>
       ))}
@@ -135,16 +133,24 @@ export function BookSpotlight({
   const hasControls = canPause || many
 
   return (
-    <div className={cn('split:grid-cols-2 split:h-[calc(100svh-var(--header-h))] grid', className)}>
-      {/* First in reading order, so the page's h1 comes first; the art is placed before it on screen. */}
-      <div className="split:min-h-0 split:px-12 split:py-10 flex flex-col px-6 py-12 sm:px-10 lg:px-16">{column}</div>
+    // Stacked, this simply flows: the description, the art, the rest. On split screens the art lifts out to cover the
+    // left half, and the description and the rest (a FillColumn, which steps aside here so its items join in) form
+    // one column on the right: wrapping, so what doesn't fit moves into a clipped second column, and centered, so
+    // whatever fits sits in the middle, at least 40px from either edge.
+    <div
+      className={cn(
+        'split:relative split:flex split:h-[calc(100svh-var(--header-h))] split:flex-col split:flex-wrap split:justify-center split:gap-x-16 split:overflow-hidden split:py-10 split:pr-12 split:pl-[calc(50%+3rem)] split:*:w-full',
+        className,
+      )}
+    >
+      <div className="split:p-0 px-6 pt-12 pb-10 sm:px-10">{intro}</div>
 
       <section
         ref={sectionRef}
         // a11y-only text; not CMS-managed.
         aria-roledescription={many ? 'carousel' : undefined}
         aria-label={many ? label : undefined}
-        className="grid order-first"
+        className="split:absolute split:inset-y-0 split:left-0 split:w-1/2! grid"
         onPointerEnter={(event) => event.pointerType === 'mouse' && setHover(true)}
         onPointerLeave={(event) => event.pointerType === 'mouse' && setHover(false)}
         onFocus={() => setFocusWithin(true)}
@@ -252,6 +258,8 @@ export function BookSpotlight({
           }
         />
       </section>
+
+      {rest}
     </div>
   )
 }
