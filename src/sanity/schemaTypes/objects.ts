@@ -12,7 +12,7 @@ import { defineArrayMember, defineField, defineType } from 'sanity'
  */
 export const CLOUD_COLOR_OPTIONS = { disableAlpha: true, colorList: ['#000000', '#3a060a'] }
 
-/** A labeled link. Internal paths ("/books") or full URLs both work. */
+/** A labeled link. Internal paths ("/stories") or full URLs both work. */
 export const link = defineType({
   name: 'link',
   title: 'Link',
@@ -23,7 +23,7 @@ export const link = defineType({
       name: 'href',
       title: 'Address',
       type: 'string',
-      description: 'A site path like "/books", or a full URL like "https://bookshop.org/…".',
+      description: 'A site path like "/stories", or a full URL like "https://bookshop.org/…".',
       validation: (rule) =>
         rule
           .required()

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
-import { BookCover, StatusBadge } from '@/components/book-card'
+import { BookBadges, BookCover } from '@/components/book-card'
 import { BuyLinks } from '@/components/buy-links'
 import { RichText } from '@/components/rich-text'
 import { PageHeader, Section } from '@/components/ui/section'
@@ -30,7 +30,7 @@ export default async function BookPage({ params }: Props) {
         <div className="flex flex-col gap-8">
           <PageHeader title={book.title} eyebrow={book.series} intro={book.shortDescription}>
             <div className="mt-5">
-              <StatusBadge status={book.status} />
+              <BookBadges status={book.status} format={book.format} />
             </div>
           </PageHeader>
           <BuyLinks links={book.buyLinks} label={settings.buyLabel} />

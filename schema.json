@@ -835,6 +835,47 @@
             {
               "type": "string",
               "value": "On Kickstarter"
+            },
+            {
+              "type": "string",
+              "value": "In development"
+            }
+          ]
+        },
+        "optional": true
+      },
+      "format": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "Novel"
+            },
+            {
+              "type": "string",
+              "value": "Novella"
+            },
+            {
+              "type": "string",
+              "value": "Short stories"
+            },
+            {
+              "type": "string",
+              "value": "Comic"
+            },
+            {
+              "type": "string",
+              "value": "Graphic novel"
+            },
+            {
+              "type": "string",
+              "value": "Art book"
+            },
+            {
+              "type": "string",
+              "value": "Series proposal"
             }
           ]
         },
@@ -1071,6 +1112,21 @@
         "optional": true
       },
       "homeIntro": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
+      "authorPhoto": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "imageWithAlt"
+        },
+        "optional": true
+      },
+      "featuredStoriesLabel": {
         "type": "objectAttribute",
         "value": {
           "type": "string"

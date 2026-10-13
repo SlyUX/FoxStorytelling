@@ -6,10 +6,10 @@ import { usePathname } from 'next/navigation'
 /**
  * The site's internal link. Pages stack like sheets:
  *
- *  - Going anywhere else (a book from Books, Books from the home page, one
+ *  - Going anywhere else (a story from Stories, Stories from the home page, one
  *    section to another): the new page rises from the bottom over the one
  *    you're on, which dims.
- *  - Going back up a level (a book back to Books, any page back home): the
+ *  - Going back up a level (a story back to Stories, any page back home): the
  *    page you're on lowers away, revealing the one beneath.
  *
  * The motion travels as a view-transition type; `globals.css` turns it into

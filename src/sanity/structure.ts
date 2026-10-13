@@ -22,7 +22,7 @@ export const structure: StructureResolver = (S) =>
         .title('Site settings')
         .child(S.editor().id('siteSettings').schemaType('siteSettings').documentId('siteSettings')),
       S.divider(),
-      S.documentTypeListItem('book').title('Books'),
+      S.documentTypeListItem('book').title('Stories'),
       S.documentTypeListItem('post').title('Rejection Files'),
       S.documentTypeListItem('page').title('Pages'),
       // Anything added later still appears, at the end.

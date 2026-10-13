@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 
-import { BookCard, BookCover, BookGrid } from '@/components/book-card'
+import { BookBadges, BookCard, BookCover, BookGrid } from '@/components/book-card'
 import { BuyLinks } from '@/components/buy-links'
 import { HomeSplit } from '@/components/home-split'
 import { Newsletter } from '@/components/newsletter'
@@ -114,7 +114,7 @@ const RULES: [string, string][] = [
   ['Tokens only.', 'Colors come from the tokens above, through Tailwind; no raw hex values or palette classes in components. A new color pair must pass WCAG AA, and its ratio goes in globals.css and the table above.'],
   ['Red is for action, ember is for light.', 'One red button per view: the thing we most want done. Ember marks links, focus, and what’s on its way. The logo’s red is decoration and large display only. Never ember on red.'],
   ['Reading is serif, the interface is sans.', 'Titles and long-form prose are Crimson Pro; navigation, buttons, labels, and blurbs are Geist. Montserrat sets the logo and nothing else.'],
-  ['Corners are 2px.', 'Nearly square, like a book’s edge. Every element uses rounded-ui; shadcn’s radius scale derives from the same value.'],
+  ['Corners are 2px.', 'Nearly square, like a book’s edge. Every element uses rounded-ui; shadcn’s radius scale derives from the same value. The one exception: the author’s portrait is round.'],
   ['One page title.', 'Each page has one h1, and headings never skip a level.'],
   ['Every card is one click target.', 'The title’s link stretches over the card, so the cover, title, and blurb all open it, with one focus ring around the whole card.'],
   ['Covers never break.', 'A book without cover art shows its title on a card with the fox-red spine, so it can be listed before the art is final.'],
@@ -144,6 +144,7 @@ const SAMPLE_BOOKS: BookCardData[] = [
     slug: 'sample',
     series: 'Series name',
     status: 'Available',
+    format: 'Novel',
     shortDescription: 'A short description: two or three sentences that make someone want the book.',
     cover: null,
     buyLinks: [
@@ -151,8 +152,8 @@ const SAMPLE_BOOKS: BookCardData[] = [
       { _key: 'b', _type: 'buyLink', store: 'Amazon', url: 'https://www.amazon.com' },
     ],
   },
-  { _id: 'sample-2', title: 'An Upcoming Book', slug: 'sample', series: null, status: 'Upcoming', shortDescription: null, cover: null, buyLinks: null },
-  { _id: 'sample-3', title: 'A Book on Kickstarter', slug: 'sample', series: 'Series name', status: 'On Kickstarter', shortDescription: null, cover: null, buyLinks: null },
+  { _id: 'sample-2', title: 'An Upcoming Book', slug: 'sample', series: null, status: 'Upcoming', format: 'Comic', shortDescription: null, cover: null, buyLinks: null },
+  { _id: 'sample-3', title: 'A Book on Kickstarter', slug: 'sample', series: 'Series name', status: 'On Kickstarter', format: 'Graphic novel', shortDescription: null, cover: null, buyLinks: null },
 ]
 
 const SAMPLE_POSTS: PostCardData[] = [
@@ -186,7 +187,7 @@ export default async function StyleguidePage() {
     ['actions', 'Actions and labels'],
     ['structure', 'Page structure'],
     ['home', 'Home'],
-    ['books-and-posts', 'Books and posts'],
+    ['books-and-posts', 'Stories and posts'],
     ['reading', 'Reading'],
     ['rules', 'Rules'],
     ['voice', 'Voice'],
@@ -322,15 +323,22 @@ export default async function StyleguidePage() {
           </Specimen>
           <Specimen
             name="Badges"
-            file="src/components/ui/badge.tsx · book-card.tsx StatusBadge"
-            notes={['A book’s status says what it asks of the reader: Available is quiet, Upcoming glows ember, On Kickstarter is the red action.', 'Variants: default, secondary, outline, ember, destructive.']}
+            file="src/components/ui/badge.tsx · book-card.tsx BookBadges"
+            notes={[
+              'A story’s status says what it asks of the reader: Available is quiet (and only when there’s somewhere to buy it), Upcoming glows ember, On Kickstarter is the red action, In development is an outline.',
+              'Its format sits beside it, outlined (Novel, Comic, Series proposal), so readers know what they’d be buying: “Stories” is the brand’s word; the format says “book.”',
+              'Variants: default, secondary, outline, ember, destructive.',
+            ]}
           >
-            <div className="flex flex-wrap items-center gap-3">
-              <Badge variant="secondary">Available</Badge>
-              <Badge variant="ember">Upcoming</Badge>
-              <Badge variant="default">On Kickstarter</Badge>
-              <Badge variant="outline">Outline</Badge>
-              <Badge variant="destructive">Destructive</Badge>
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-wrap items-center gap-3">
+                <Badge variant="secondary">Available</Badge>
+                <Badge variant="ember">Upcoming</Badge>
+                <Badge variant="default">On Kickstarter</Badge>
+                <Badge variant="outline">In development</Badge>
+                <Badge variant="destructive">Destructive</Badge>
+              </div>
+              <BookBadges status="Available" format="Novel" />
             </div>
           </Specimen>
         </div>
@@ -391,7 +399,8 @@ export default async function StyleguidePage() {
           stage="card"
           notes={[
             'The art beside a column: two equal columns exactly filling the screen under the header on landscape screens from tablet width and 576px tall. Stacked below that: the description, then the art with its book, then the posts, in reading order too. The header is sticky.',
-            'Books with “Show on the home page” on and home page art rotate in Books order, one per breath: as each breath ends, with the art at its dimmest, the next book crossfades in. With none, the site’s home art (Site settings) stands with the first book, its cover beside the details.',
+            'The description can carry the author’s portrait, round, beside the intro (Site settings → Home page → Author photo). The rotation is named by “Featured Stories” (Site settings): shown across from its controls on phones, and read to screen readers everywhere.',
+            'Stories with “Show on the home page” on and home page art rotate in Stories order, one per breath: as each breath ends, with the art at its dimmest, the next book crossfades in. With none, the site’s home art (Site settings) stands with the first book, its cover beside the details.',
             'The showing book sits over the foot of its art, on night at 85% so its text holds over any image: status, title, series, blurb, where to buy, and About the book. Its first store is the page’s one red action. The rotation’s controls tuck behind one toggle in the art’s top corner: open, pause, previous, and next slide out. On split screens the markers wait beside them, a quiet sign there’s more than one book until it opens; stacked, they slide out too. Escape closes it. Left and right arrow keys step through the books while focus is on the art, or nothing has focus.',
             'The art breathes every 20 seconds, swelling and brightening from 50% to full opacity, under a cloud drawn from noise that moves through time, from a new seed on each visit. The cloud is black unless Site settings or the book picks a color, and it eases into a new book’s color as the book changes. A book can turn its cloud off; it fades out, and back in for the next book that has one. The hotspot set in the Studio stays in view and is where the breath grows from.',
             'The other column, centered: the description, with Stephen’s Bio (once there’s an About page) and All books; then the Rejection Files previews, featured posts first, as many as fit, never cut in half; what doesn’t fit is inert, so focus skips it (FillColumn). Stacked, three posts show.',
@@ -414,7 +423,7 @@ export default async function StyleguidePage() {
 
       <Section id="books-and-posts" tone="surface" aria-labelledby="books-heading">
         <SectionHeading id="books-heading" intro="Every card is one click target.">
-          Books and posts
+          Stories and posts
         </SectionHeading>
         <div className="grid gap-8">
           <Specimen

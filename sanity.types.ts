@@ -144,7 +144,15 @@ export type Book = {
   homeArt?: ImageWithAlt;
   showCloud?: boolean;
   cloudColor?: Color;
-  status?: "Available" | "Upcoming" | "On Kickstarter";
+  status?: "Available" | "Upcoming" | "On Kickstarter" | "In development";
+  format?:
+    | "Novel"
+    | "Novella"
+    | "Short stories"
+    | "Comic"
+    | "Graphic novel"
+    | "Art book"
+    | "Series proposal";
   shortDescription?: string;
   description?: RichText;
   buyLinks?: Array<
@@ -188,6 +196,8 @@ export type SiteSettings = {
   homeImage?: ImageWithAlt;
   cloudColor?: Color;
   homeIntro?: string;
+  authorPhoto?: ImageWithAlt;
+  featuredStoriesLabel?: string;
   bookDetailsLabel?: string;
   featuredLabel?: string;
   bioLabel?: string;
@@ -379,6 +389,8 @@ export type SITE_SETTINGS_QUERY_RESULT = {
   homeImage?: ImageWithAlt;
   cloudColor?: Color;
   homeIntro?: string;
+  authorPhoto?: ImageWithAlt;
+  featuredStoriesLabel?: string;
   bookDetailsLabel?: string;
   featuredLabel?: string;
   bioLabel?: string;
@@ -401,13 +413,22 @@ export type SITE_SETTINGS_QUERY_RESULT = {
 
 // Source: src/lib/queries.ts
 // Variable: HOME_SPOTLIGHT_QUERY
-// Query: *[_type=="book" && showOnHome == true && defined(homeArt.asset) && defined(slug.current)]|order(order asc, title asc){_id,title,"slug":slug.current,series,status,shortDescription,cover,buyLinks,homeArt,"homeArtLqip": homeArt.asset->metadata.lqip,"cloudHex": cloudColor.hex,"cloudOn": coalesce(showCloud, true)}
+// Query: *[_type=="book" && showOnHome == true && defined(homeArt.asset) && defined(slug.current)]|order(order asc, title asc){_id,title,"slug":slug.current,series,status,format,shortDescription,cover,buyLinks,homeArt,"homeArtLqip": homeArt.asset->metadata.lqip,"cloudHex": cloudColor.hex,"cloudOn": coalesce(showCloud, true)}
 export type HOME_SPOTLIGHT_QUERY_RESULT = Array<{
   _id: string;
   title: string;
   slug: string;
   series: string | null;
-  status: "Available" | "On Kickstarter" | "Upcoming" | null;
+  status: "Available" | "In development" | "On Kickstarter" | "Upcoming" | null;
+  format:
+    | "Art book"
+    | "Comic"
+    | "Graphic novel"
+    | "Novel"
+    | "Novella"
+    | "Series proposal"
+    | "Short stories"
+    | null;
   shortDescription: string | null;
   cover: {
     asset?: SanityImageAssetReference;
@@ -429,13 +450,22 @@ export type HOME_SPOTLIGHT_QUERY_RESULT = Array<{
 
 // Source: src/lib/queries.ts
 // Variable: BOOKS_QUERY
-// Query: *[_type=="book" && defined(slug.current)]|order(order asc, title asc){_id,title,"slug":slug.current,series,status,shortDescription,cover,buyLinks}
+// Query: *[_type=="book" && defined(slug.current)]|order(order asc, title asc){_id,title,"slug":slug.current,series,status,format,shortDescription,cover,buyLinks}
 export type BOOKS_QUERY_RESULT = Array<{
   _id: string;
   title: string;
   slug: string;
   series: string | null;
-  status: "Available" | "On Kickstarter" | "Upcoming" | null;
+  status: "Available" | "In development" | "On Kickstarter" | "Upcoming" | null;
+  format:
+    | "Art book"
+    | "Comic"
+    | "Graphic novel"
+    | "Novel"
+    | "Novella"
+    | "Series proposal"
+    | "Short stories"
+    | null;
   shortDescription: string | null;
   cover: {
     asset?: SanityImageAssetReference;
@@ -453,13 +483,22 @@ export type BOOKS_QUERY_RESULT = Array<{
 
 // Source: src/lib/queries.ts
 // Variable: BOOK_QUERY
-// Query: *[_type=="book" && slug.current==$slug][0]{_id,title,"slug":slug.current,series,status,shortDescription,cover,buyLinks,description,publishDate}
+// Query: *[_type=="book" && slug.current==$slug][0]{_id,title,"slug":slug.current,series,status,format,shortDescription,cover,buyLinks,description,publishDate}
 export type BOOK_QUERY_RESULT = {
   _id: string;
   title: string;
   slug: string;
   series: string | null;
-  status: "Available" | "On Kickstarter" | "Upcoming" | null;
+  status: "Available" | "In development" | "On Kickstarter" | "Upcoming" | null;
+  format:
+    | "Art book"
+    | "Comic"
+    | "Graphic novel"
+    | "Novel"
+    | "Novella"
+    | "Series proposal"
+    | "Short stories"
+    | null;
   shortDescription: string | null;
   cover: {
     asset?: SanityImageAssetReference;
@@ -538,9 +577,9 @@ import "@sanity/client";
 declare module "@sanity/client" {
   interface SanityQueries {
     '*[_type=="siteSettings" && _id=="siteSettings"][0]{\n  ...,\n  "homeImageLqip": homeImage.asset->metadata.lqip,\n  "cloudHex": cloudColor.hex\n}': SITE_SETTINGS_QUERY_RESULT;
-    '*[_type=="book" && showOnHome == true && defined(homeArt.asset) && defined(slug.current)]|order(order asc, title asc){_id,title,"slug":slug.current,series,status,shortDescription,cover,buyLinks,homeArt,"homeArtLqip": homeArt.asset->metadata.lqip,"cloudHex": cloudColor.hex,"cloudOn": coalesce(showCloud, true)}': HOME_SPOTLIGHT_QUERY_RESULT;
-    '*[_type=="book" && defined(slug.current)]|order(order asc, title asc){_id,title,"slug":slug.current,series,status,shortDescription,cover,buyLinks}': BOOKS_QUERY_RESULT;
-    '*[_type=="book" && slug.current==$slug][0]{_id,title,"slug":slug.current,series,status,shortDescription,cover,buyLinks,description,publishDate}': BOOK_QUERY_RESULT;
+    '*[_type=="book" && showOnHome == true && defined(homeArt.asset) && defined(slug.current)]|order(order asc, title asc){_id,title,"slug":slug.current,series,status,format,shortDescription,cover,buyLinks,homeArt,"homeArtLqip": homeArt.asset->metadata.lqip,"cloudHex": cloudColor.hex,"cloudOn": coalesce(showCloud, true)}': HOME_SPOTLIGHT_QUERY_RESULT;
+    '*[_type=="book" && defined(slug.current)]|order(order asc, title asc){_id,title,"slug":slug.current,series,status,format,shortDescription,cover,buyLinks}': BOOKS_QUERY_RESULT;
+    '*[_type=="book" && slug.current==$slug][0]{_id,title,"slug":slug.current,series,status,format,shortDescription,cover,buyLinks,description,publishDate}': BOOK_QUERY_RESULT;
     '*[_type=="post" && defined(slug.current)]|order(publishedAt desc){_id,title,"slug":slug.current,category,excerpt,publishedAt}': POSTS_QUERY_RESULT;
     '*[_type=="post" && slug.current==$slug][0]{_id,title,"slug":slug.current,category,excerpt,publishedAt,cover,body}': POST_QUERY_RESULT;
     '*[_type=="post" && defined(slug.current)]{_id,title,"slug":slug.current,category,excerpt,publishedAt,"pinned": coalesce(featured, false)}|order(pinned desc, publishedAt desc)[0...6]': HOME_POSTS_QUERY_RESULT;
