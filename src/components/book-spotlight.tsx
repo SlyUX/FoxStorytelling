@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useSyncExternalStore } from 'react'
-import { ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react'
+import { useEffect, useId, useRef, useState, useSyncExternalStore } from 'react'
+import { ChevronLeft, ChevronRight, Pause, Play, SlidersHorizontal } from 'lucide-react'
 
 import { BreathingArt } from '@/components/breathing-art'
 import { buttonVariants } from '@/components/ui/button'
@@ -38,9 +38,11 @@ const subscribeReduce = (onChange: () => void) => {
  * The breath is the clock: as each breath ends, with the art settled and at its
  * dimmest, the next book crossfades in, so there's never a hard cut. The
  * rotation holds while the pointer or keyboard focus is anywhere on the art,
- * so a buy button never changes under someone reading it; pause stops it outright;
- * reduced motion never advances on its own. Previous, next, and a marker per
- * book step through by hand. With one slide, it's just the art and details.
+ * so a buy button never changes under someone reading it; pause stops it
+ * outright; reduced motion never advances on its own. Previous, next, and a
+ * marker per book step through by hand, tucked with pause behind one controls
+ * toggle; so do the left and right arrow keys. With one slide, it's just the
+ * art and details.
  */
 export function BookSpotlight({
   slides,
@@ -56,9 +58,18 @@ export function BookSpotlight({
   className?: string
 }) {
   const [index, setIndex] = useState(0)
+  // The point the breath swells from. It follows the showing book, but only as a breath ends, when the art is at
+  // rest: moved mid-swell, the scaled art would jump (stepping by hand happens mid-swell).
+  const [origin, setOrigin] = useState(slides[0]?.focus ?? '50% 40%')
   const [paused, setPaused] = useState(false)
   const [hover, setHover] = useState(false)
   const [focusWithin, setFocusWithin] = useState(false)
+  const [controlsOpen, setControlsOpen] = useState(false)
+  const toggleRef = useRef<HTMLButtonElement>(null)
+  const panelId = useId()
+  const sectionRef = useRef<HTMLElement>(null)
+  // Set when the arrow keys leave a book that had focus: its links go inert, so focus follows to the new one's.
+  const refocus = useRef(false)
   const reduce = useSyncExternalStore(
     subscribeReduce,
     () => window.matchMedia(REDUCE).matches,
@@ -69,8 +80,59 @@ export function BookSpotlight({
   const hasDetails = slides.some((slide) => slide.details)
   const rotating = many && !paused && !hover && !focusWithin && !reduce
   const go = (i: number) => setIndex((i + slides.length) % slides.length)
+  const count = slides.length
+
+  // Left and right arrows step through the books while focus is on the art (its controls, the book's links), or
+  // while nothing has focus and the art is on screen. Arrows with a modifier pass through: Alt+Arrow is the
+  // browser's back and forward. The page has no sideways scroll for them to take from.
+  useEffect(() => {
+    if (count < 2) return
+    const onKey = (event: KeyboardEvent) => {
+      if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return
+      if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return
+      const section = sectionRef.current
+      if (!section) return
+      const active = document.activeElement
+      const inside = !!active && section.contains(active)
+      const box = section.getBoundingClientRect()
+      const idle = (!active || active === document.body) && box.bottom > 0 && box.top < window.innerHeight
+      if (!inside && !idle) return
+      event.preventDefault()
+      refocus.current = !!active?.closest('[aria-roledescription="slide"]')
+      setIndex((i) => (i + (event.key === 'ArrowRight' ? 1 : -1) + count) % count)
+    }
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [count])
+
+  useEffect(() => {
+    if (!refocus.current) return
+    refocus.current = false
+    const slide = sectionRef.current?.querySelectorAll('[aria-roledescription="slide"]')[index]
+    slide?.querySelector<HTMLElement>('a, button')?.focus({ preventScroll: true })
+  }, [index])
   const current = slides[index] ?? slides[0]
   const iconButton = cn(buttonVariants({ variant: 'ghost', size: 'icon' }), 'bg-background/60 text-foreground/80 hover:text-link size-9')
+  /** A marker per book. Stacked, they live in the sliding panel; on split screens they sit beside it. */
+  const markers = (className?: string, quiet = false) => (
+    <span inert={quiet} className={cn('bg-background/60 rounded-ui h-9 items-center px-1 transition-opacity', quiet && 'opacity-60', className)}>
+      {slides.map((slide, i) => (
+        <button
+          key={slide.key}
+          type="button"
+          onClick={() => go(i)}
+          aria-label={`Show ${slide.title}`}
+          aria-current={i === index ? 'true' : undefined}
+          className="group grid size-7 place-items-center"
+        >
+          <span className={cn('rounded-ui h-1 w-4 transition-colors', i === index ? 'bg-foreground' : 'bg-foreground/50 group-hover:bg-foreground/80')} />
+        </button>
+      ))}
+    </span>
+  )
+  // Pause matters only while things move; stepping only with more than one book. With neither, there are no controls.
+  const canPause = !reduce
+  const hasControls = canPause || many
 
   return (
     <div className={cn('split:grid-cols-2 split:h-[calc(100svh-var(--header-h))] grid', className)}>
@@ -78,6 +140,7 @@ export function BookSpotlight({
       <div className="split:min-h-0 split:px-12 split:py-10 flex flex-col px-6 py-12 sm:px-10 lg:px-16">{column}</div>
 
       <section
+        ref={sectionRef}
         // a11y-only text; not CMS-managed.
         aria-roledescription={many ? 'carousel' : undefined}
         aria-label={many ? label : undefined}
@@ -88,11 +151,15 @@ export function BookSpotlight({
         onBlur={(event) => !event.currentTarget.contains(event.relatedTarget) && setFocusWithin(false)}
       >
         <BreathingArt
-          focus={current.focus}
+          focus={origin}
           cloud={current.cloud}
           cloudOn={current.cloudOn ?? true}
           paused={paused}
-          onBreath={() => rotating && go(index + 1)}
+          onBreath={() => {
+            const next = rotating ? (index + 1) % slides.length : index
+            if (next !== index) setIndex(next)
+            setOrigin(slides[next].focus)
+          }}
           // Stacked, the art takes most of the first screen, so the book over it still leaves the art room.
           className="split:min-h-0 min-h-[calc((100svh-var(--header-h))*0.7)]"
           art={slides.map((slide, i) => (
@@ -101,36 +168,56 @@ export function BookSpotlight({
             </div>
           ))}
           controls={
-            <>
-              {/* Labels on these controls are a11y-only text; not CMS-managed. */}
-              <button type="button" onClick={() => setPaused((p) => !p)} aria-label={paused ? 'Play animation' : 'Pause animation'} className={cn(iconButton, 'motion-reduce:hidden')}>
-                {paused ? <Play aria-hidden /> : <Pause aria-hidden />}
-              </button>
-              {many && (
-                <>
-                  <button type="button" onClick={() => go(index - 1)} aria-label="Previous book" className={iconButton}>
-                    <ChevronLeft aria-hidden />
-                  </button>
-                  <span className="bg-background/60 rounded-ui flex h-9 items-center px-1">
-                    {slides.map((slide, i) => (
-                      <button
-                        key={slide.key}
-                        type="button"
-                        onClick={() => go(i)}
-                        aria-label={`Show ${slide.title}`}
-                        aria-current={i === index ? 'true' : undefined}
-                        className="group grid size-7 place-items-center"
-                      >
-                        <span className={cn('rounded-ui h-1 w-4 transition-colors', i === index ? 'bg-foreground' : 'bg-foreground/50 group-hover:bg-foreground/80')} />
+            hasControls && (
+              // The controls tuck behind one toggle (a disclosure): pause, previous, and next slide out to its left. On
+              // split screens the markers wait beside them, quiet until it opens; stacked, they slide out too, between
+              // previous and next. Escape closes the panel and returns focus to the toggle. Labels here are a11y-only
+              // text; not CMS-managed.
+              <div
+                className="flex items-center gap-1.5"
+                onKeyDown={(event) => {
+                  if (event.key === 'Escape' && controlsOpen) {
+                    setControlsOpen(false)
+                    toggleRef.current?.focus()
+                  }
+                }}
+              >
+                {/* First in tab order, last on screen: the revealed controls follow it for the keyboard. */}
+                <button
+                  ref={toggleRef}
+                  type="button"
+                  onClick={() => setControlsOpen((open) => !open)}
+                  aria-expanded={controlsOpen}
+                  aria-controls={panelId}
+                  aria-label="Animation and book controls"
+                  title="Animation and book controls"
+                  className={cn(iconButton, 'order-last', controlsOpen && 'text-link')}
+                >
+                  <SlidersHorizontal aria-hidden />
+                </button>
+                <div id={panelId} data-open={controlsOpen} inert={!controlsOpen} className="controls-panel flex items-center gap-1.5">
+                  {canPause && (
+                    <button type="button" onClick={() => setPaused((p) => !p)} aria-label={paused ? 'Play animation' : 'Pause animation'} className={iconButton}>
+                      {paused ? <Play aria-hidden /> : <Pause aria-hidden />}
+                    </button>
+                  )}
+                  {many && (
+                    <>
+                      <button type="button" onClick={() => go(index - 1)} aria-label="Previous book" className={iconButton}>
+                        <ChevronLeft aria-hidden />
                       </button>
-                    ))}
-                  </span>
-                  <button type="button" onClick={() => go(index + 1)} aria-label="Next book" className={iconButton}>
-                    <ChevronRight aria-hidden />
-                  </button>
-                </>
-              )}
-            </>
+                      {markers('split:hidden flex')}
+                      <button type="button" onClick={() => go(index + 1)} aria-label="Next book" className={iconButton}>
+                        <ChevronRight aria-hidden />
+                      </button>
+                    </>
+                  )}
+                </div>
+                {/* Split screens: beside the panel. Closed, a quiet sign there's more than one book (inert, and hidden from
+                    screen readers, which hear "1 of 3" on each slide); open, a marker per book. Stacked, they're in the panel. */}
+                {many && markers('split:flex hidden', !controlsOpen)}
+              </div>
+            )
           }
           overlay={
             hasDetails && (

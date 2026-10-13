@@ -33,7 +33,7 @@ export function BreathingArt({
   className,
 }: {
   art: React.ReactNode
-  /** The hotspot, as a CSS position: kept in view, and where the breath grows from. */
+  /** Where the breath grows from, as a CSS position: the showing book's hotspot, moved only while the art is at rest. */
   focus: string
   /** The cloud's color (hex), picked in the Studio; without one, the --cloud token. */
   cloud?: string | null

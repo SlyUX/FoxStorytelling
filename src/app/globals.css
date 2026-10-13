@@ -228,6 +228,35 @@
 }
 
 /*
+  The home spotlight's controls panel (BookSpotlight): pause, previous, and
+  next slide out leftward from under their toggle, and back. Clip and
+  transform only. Closed, it's inert and its visibility goes hidden once the
+  slide ends, so hidden controls can't take focus or be read. The clip
+  reaches past the edges so focus rings aren't cut off.
+*/
+:root {
+  --controls-duration: 280ms;
+}
+.controls-panel {
+  clip-path: inset(-0.5rem -0.5rem -0.5rem 100%);
+  transform: translateX(0.75rem);
+  visibility: hidden;
+  transition:
+    clip-path var(--controls-duration) var(--page-ease),
+    transform var(--controls-duration) var(--page-ease),
+    visibility 0s linear var(--controls-duration);
+}
+.controls-panel[data-open='true'] {
+  clip-path: inset(-0.5rem);
+  transform: none;
+  visibility: visible;
+  transition:
+    clip-path var(--controls-duration) var(--page-ease),
+    transform var(--controls-duration) var(--page-ease),
+    visibility 0s;
+}
+
+/*
   The header's height: this built default, then measured live (HeaderHeight),
   so the home page's split fills exactly the rest of the first screen.
 */
