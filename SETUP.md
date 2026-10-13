@@ -47,4 +47,5 @@ Point foxstorytelling.com at Vercel in HostGator Zone Editor — **leave MX + th
 - **Site settings:** every field has a sensible default, so fill in only what you want to change.
 - **Newsletter:** paste your MailerLite hosted form address into Site settings → Newsletter. The site never collects emails; the sign-up panel stays hidden until this is set.
 - **About:** create a Page with the slug `about`.
-- **Home page art:** upload it in Site settings → Home page → Art, and set its hotspot on the part that must stay in view (the face, say). Tall art on black works best. Pick a Featured book there too, or the first book in your Books order is used.
+- **Home page rotation:** on a book, turn on **Show on the home page** and add its **Home page art** (tall, on black, at least 2000px tall), with the hotspot on what must stay in view. Those books rotate through the home page's first screen, one per breath, in your Books order. Each can pick a **Cloud color** for the cloud that rolls over its art; Site settings → Home page → Cloud color sets the default (blank is black).
+- **Home page art (fallback):** Site settings → Home page → Art is shown when no book is set to show on the home page, beside the first book.

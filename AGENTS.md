@@ -24,7 +24,7 @@ Stephen Fox's author site: redemptive horror, books and comics. Readers come to 
 
 ## Content model (`src/sanity/schemaTypes`)
 - `siteSettings` (singleton): all chrome copy, navigation, section headings, empty states, newsletter
-- `book` → `/books`, `/books/[slug]` · `post` → `/blog`, `/blog/[slug]` (the Rejection Files) · `page` → `/[slug]` (About, and any others)
+- `book` → `/books`, `/books/[slug]`; books with "Show on the home page" and home page art rotate through the home page's first screen · `post` → `/blog`, `/blog/[slug]` (the Rejection Files) · `page` → `/[slug]` (About, and any others)
 - Shared types in `objects.ts`: `link`, `imageWithAlt`, `richText` (every style it allows has a renderer in `src/components/rich-text.tsx`)
 
 ## Process

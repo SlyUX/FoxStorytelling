@@ -1,5 +1,7 @@
 import { defineArrayMember, defineField, defineType } from 'sanity'
 
+import { CLOUD_COLOR_OPTIONS } from './objects'
+
 /**
  * Every reader-facing string that isn't part of a book, post, or page. A
  * singleton pinned to the ID `siteSettings` (see `src/sanity/structure.ts`).
@@ -52,18 +54,18 @@ export default defineType({
       type: 'imageWithAlt',
       group: 'home',
       description:
-        'Fills the left half of the first screen (the top half on phones), behind the headline, and slowly breathes. Tall art on black works best. Set the hotspot on the part that must stay in view.',
+        'Fills the left half of the first screen (the top half on phones) when no book is set to show on the home page (Books → Show on the home page), and slowly breathes. Tall art on black works best. Set the hotspot on the part that must stay in view.',
+    }),
+    defineField({
+      name: 'cloudColor',
+      title: 'Cloud color',
+      type: 'color',
+      group: 'home',
+      options: CLOUD_COLOR_OPTIONS,
+      description: 'The cloud that rolls over the home page art. Books can pick their own. Keep it very dark: it should be felt more than seen. Leave blank for black.',
     }),
     defineField({ name: 'homeIntro', title: 'Intro', type: 'text', rows: 2, group: 'home', description: 'Under the headline.' }),
-    defineField({
-      name: 'featuredBook',
-      title: 'Featured book',
-      type: 'reference',
-      to: [{ type: 'book' }],
-      group: 'home',
-      description: 'Beside the art on the first screen. Leave empty to feature the first book in your Books order.',
-    }),
-    defineField({ name: 'featuredBookLabel', title: 'Featured book label', type: 'string', group: 'home', description: 'Small capitals above the featured book.' }),
+    defineField({ name: 'featuredBookLabel', title: 'Featured book label', type: 'string', group: 'home', description: 'Small capitals above the book on the first screen.' }),
     defineField({ name: 'bookDetailsLabel', title: '"About the book" link text', type: 'string', group: 'home', description: 'Beside the buy buttons, linking to the book’s page.' }),
     defineField({ name: 'featuredLabel', title: 'Featured post label', type: 'string', group: 'home' }),
     defineField({ name: 'homePostsHeading', title: 'Latest posts heading', type: 'string', group: 'home' }),

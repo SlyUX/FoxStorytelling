@@ -3,6 +3,7 @@ import type {
   BOOKS_QUERY_RESULT,
   BuyLink,
   FEATURED_POST_QUERY_RESULT,
+  HOME_SPOTLIGHT_QUERY_RESULT,
   ImageWithAlt,
   Link,
   PAGE_QUERY_RESULT,
@@ -21,6 +22,7 @@ export type SanityImage = ImageWithAlt
 export type RichText = GeneratedRichText
 export type BookCardData = BOOKS_QUERY_RESULT[number]
 export type BookDetail = NonNullable<BOOK_QUERY_RESULT>
+export type SpotlightBook = HOME_SPOTLIGHT_QUERY_RESULT[number]
 export type BookStatus = NonNullable<BookCardData['status']>
 export type PostCardData = POSTS_QUERY_RESULT[number]
 export type PostDetail = NonNullable<POST_QUERY_RESULT>

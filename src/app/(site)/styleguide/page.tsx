@@ -11,9 +11,9 @@ import { Specimen } from '@/components/styleguide/specimen'
 import { Badge } from '@/components/ui/badge'
 import { Button, ButtonLink } from '@/components/ui/button'
 import { EmptyState, Eyebrow, PageHeader, Section, SectionHeading } from '@/components/ui/section'
-import { BOOKS_QUERY, POSTS_QUERY, safeFetch } from '@/lib/queries'
+import { BOOKS_QUERY, HOME_SPOTLIGHT_QUERY, POSTS_QUERY, safeFetch } from '@/lib/queries'
 import { getSiteSettings } from '@/lib/site-settings'
-import type { BookCardData, PostCardData, RichText as RichTextValue } from '@/lib/types'
+import type { BookCardData, PostCardData, RichText as RichTextValue, SpotlightBook } from '@/lib/types'
 
 /*
  * The styleguide documents the code itself, so its text lives here, beside
@@ -57,7 +57,7 @@ const TOKENS: TokenGroup[] = [
       { token: 'fox', use: 'The logo’s exact red. Decoration and large display only: spines, rules, the nav underline.' },
       { token: 'ember', use: 'The light in the dark: links, the focus ring, text selection, things on their way.' },
       { token: 'ring', use: 'The keyboard focus ring.' },
-      { token: 'cloud', use: 'The dark red cloud that rolls over the home art. Decorative only.' },
+      { token: 'cloud', use: 'The cloud that rolls over the home art: black, unless Site settings or a book picks another color. Decorative only.' },
     ],
   },
 ]
@@ -90,6 +90,16 @@ const PAIRS: ContrastPair[] = [
 ]
 
 const TYPE = [
+  {
+    role: 'Logo',
+    className: 'font-brand text-xl uppercase',
+    sample: (
+      <>
+        <span className="font-black">Fox</span>storytelling
+      </>
+    ),
+    spec: 'Montserrat, the brand’s typeface: FOX in Black, STORYTELLING in Regular, run together in capitals beside the badge. The logo only.',
+  },
   { role: 'Home headline', className: 'font-serif text-6xl leading-[1.05] font-semibold tracking-tight', sample: 'Redemptive horror.', spec: 'Crimson Pro, semibold: fluid 44–80px. The home page’s h1.' },
   { role: 'Page title', className: 'font-serif text-4xl leading-tight font-semibold tracking-tight md:text-5xl', sample: 'The Rejection Files', spec: 'Crimson Pro, semibold: fluid 32–64px. One per page.' },
   { role: 'Section heading', className: 'font-serif text-3xl font-semibold', sample: 'Latest from the Rejection Files', spec: 'Crimson Pro, semibold: fluid 26–38px. Every band and section.' },
@@ -103,7 +113,7 @@ const TYPE = [
 const RULES: [string, string][] = [
   ['Tokens only.', 'Colors come from the tokens above, through Tailwind; no raw hex values or palette classes in components. A new color pair must pass WCAG AA, and its ratio goes in globals.css and the table above.'],
   ['Red is for action, ember is for light.', 'One red button per view: the thing we most want done. Ember marks links, focus, and what’s on its way. The logo’s red is decoration and large display only. Never ember on red.'],
-  ['Reading is serif, the interface is sans.', 'Titles and long-form prose are Crimson Pro; navigation, buttons, labels, and blurbs are Geist.'],
+  ['Reading is serif, the interface is sans.', 'Titles and long-form prose are Crimson Pro; navigation, buttons, labels, and blurbs are Geist. Montserrat sets the logo and nothing else.'],
   ['Corners are 2px.', 'Nearly square, like a book’s edge. Every element uses rounded-ui; shadcn’s radius scale derives from the same value.'],
   ['One page title.', 'Each page has one h1, and headings never skip a level.'],
   ['Every card is one click target.', 'The title’s link stretches over the card, so the cover, title, and blurb all open it, with one focus ring around the whole card.'],
@@ -112,7 +122,7 @@ const RULES: [string, string][] = [
   ['Every list has an empty state.', 'It’s written for readers, not editors.'],
   ['Content lives in Sanity.', 'Display copy is edited in the Studio, with defaults in src/lib/site-settings.ts. Exceptions are text only assistive technology hears, and this page.'],
   ['Behavior comes from shadcn.', 'Need a dialog or a menu? npx shadcn@latest add it, then restyle to the tokens. Button and badge here are ours: don’t let the CLI overwrite them.'],
-  ['Motion is slow, and it stops.', 'The home art breathes on a 20-second cycle, swelling past its frame and settling back, never shrinking enough to show an edge, under a dark red cloud that’s never the same twice. A pause button stops both; reduced motion stills the art and drops the cloud. Hover lifts a cover 4px.'],
+  ['Motion is slow, and it stops.', 'The home art breathes on a 20-second cycle, swelling past its frame and settling back, never shrinking enough to show an edge, and brightening from 50% to full opacity as it swells. A dark cloud that’s never the same twice fades with it, black unless the Studio picks a color. Books change only as a breath ends, at the art’s dimmest, by crossfade; the rotation holds while someone is reading. A pause button stops it all; reduced motion holds the art still and drops the cloud. Hover lifts a cover 4px.'],
 ]
 
 const VOICE: [string, React.ReactNode][] = [
@@ -159,10 +169,11 @@ const SAMPLE_PROSE: RichTextValue = [
 ]
 
 export default async function StyleguidePage() {
-  const [s, books, posts] = await Promise.all([
+  const [s, books, posts, spotlight] = await Promise.all([
     getSiteSettings(),
     safeFetch<BookCardData[]>(BOOKS_QUERY, {}, []),
     safeFetch<PostCardData[]>(POSTS_QUERY, {}, []),
+    safeFetch<SpotlightBook[]>(HOME_SPOTLIGHT_QUERY, {}, []),
   ])
   const cards = books.length ? books.slice(0, 3) : SAMPLE_BOOKS
   const rows = posts.length ? posts.slice(0, 2) : SAMPLE_POSTS
@@ -216,7 +227,7 @@ export default async function StyleguidePage() {
       </Section>
 
       <Section id="type" aria-labelledby="type-heading">
-        <SectionHeading id="type-heading" intro="Two families: Crimson Pro, a book serif sturdy enough to hold up as light type on a dark ground, for titles and reading; Geist for the interface.">
+        <SectionHeading id="type-heading" intro="Two families: Crimson Pro, a book serif sturdy enough to hold up as light type on a dark ground, for titles and reading; Geist for the interface. Montserrat, the brand’s typeface, sets the logo alone.">
           Type
         </SectionHeading>
         <div className="border-border bg-card rounded-ui divide-border divide-y border">
@@ -375,17 +386,18 @@ export default async function StyleguidePage() {
         </SectionHeading>
         <Specimen
           name="Home split"
-          file="src/components/home-split.tsx · breathing-art.tsx"
+          file="src/components/home-split.tsx · book-spotlight.tsx · breathing-art.tsx"
           stage="card"
           notes={[
             'The art and headline beside the featured book: two equal columns on landscape screens from tablet width, two equal rows below that, edge to edge under the header.',
-            'The art (Site settings → Home page → Art) breathes every 20 seconds under a dark red cloud drawn from noise that moves through time, from a new seed on each visit. The hotspot set in the Studio stays in view and is where the breath grows from.',
-            'The headline sits on night at 70%, legible over any image. The pause button stops the motion; reduced motion stills it.',
-            'The featured book is the one picked in Site settings, or the first in the Books order. Its first store is the page’s one red action.',
+            'Books with “Show on the home page” on and home page art rotate in Books order, one per breath: as each breath ends, with the art at its dimmest, the next book crossfades in. With none, the site’s home art (Site settings) stands beside the first book, its cover beside the details.',
+            'The art breathes every 20 seconds, swelling and brightening from 50% to full opacity, under a cloud drawn from noise that moves through time, from a new seed on each visit. The cloud is black unless Site settings or the book picks a color, and it eases into a new book’s color as the book changes. The hotspot set in the Studio stays in view and is where the breath grows from.',
+            'The description sits at the top of the other column, the showing book’s details below it. Its first store is the page’s one red action. Nothing sits on the art.',
+            'The rotation holds while the pointer or keyboard focus is in it; pause stops it and the motion; previous, next, and a marker per book step through by hand. Reduced motion stills the art and never advances on its own.',
           ]}
         >
           {/* Shorter than the real thing, which fills the screen under the header. */}
-          <HomeSplit settings={s} book={cards[0] ?? null} levels={{ tagline: 'h4', book: 'h4' }} className="min-h-[40rem]" />
+          <HomeSplit settings={s} spotlight={spotlight} fallbackBook={cards[0] ?? null} levels={{ tagline: 'h4', book: 'h4' }} className="split:min-h-[40rem]" />
         </Specimen>
       </Section>
 
