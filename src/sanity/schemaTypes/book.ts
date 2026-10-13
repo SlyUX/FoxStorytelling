@@ -32,13 +32,21 @@ export default defineType({
       hidden: ({ document }) => !document?.showOnHome,
     }),
     defineField({
+      name: 'showCloud',
+      title: 'Cloud',
+      type: 'boolean',
+      initialValue: true,
+      description: 'Roll the dark cloud over this book’s home page art. Turn it off for art that’s better left clear.',
+      hidden: ({ document }) => !document?.showOnHome,
+    }),
+    defineField({
       name: 'cloudColor',
       title: 'Cloud color',
       type: 'color',
       options: CLOUD_COLOR_OPTIONS,
       description:
         'The cloud that rolls over this book’s home page art. Keep it very dark: it should be felt more than seen. Leave blank to use the cloud color in Site settings.',
-      hidden: ({ document }) => !document?.showOnHome,
+      hidden: ({ document }) => !document?.showOnHome || document?.showCloud === false,
     }),
     defineField({ name: 'status', type: 'string',
       options: { list: ['Available', 'Upcoming', 'On Kickstarter'] }, initialValue: 'Available' }),

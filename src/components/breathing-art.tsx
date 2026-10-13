@@ -25,6 +25,7 @@ export function BreathingArt({
   art,
   focus,
   cloud,
+  cloudOn = true,
   paused,
   onBreath,
   controls,
@@ -35,6 +36,8 @@ export function BreathingArt({
   focus: string
   /** The cloud's color (hex), picked in the Studio; without one, the --cloud token. */
   cloud?: string | null
+  /** Whether the cloud shows over this art (a book can turn it off). */
+  cloudOn?: boolean
   paused: boolean
   /** Called as each breath ends: the art is settled and at its dimmest. */
   onBreath?: () => void
@@ -56,7 +59,7 @@ export function BreathingArt({
         >
           {art}
         </div>
-        <CloudLayer artRef={artRef} paused={paused} color={cloud} />
+        <CloudLayer artRef={artRef} paused={paused} color={cloud} on={cloudOn} />
         {/* Vignette: holds the edges in shadow, so the art sinks into the page. */}
         <div aria-hidden className="to-background/80 pointer-events-none absolute inset-0 bg-radial from-transparent from-45%" />
       </div>
@@ -70,7 +73,7 @@ const COLS = 72
 const FPS = 30
 /** How dense the cloud gets at the top of a breath. Keep it subtle. */
 const MAX_ALPHA = 0.525
-/** Seconds for the cloud to take on a new color: about as long as the art's crossfade. */
+/** Seconds for the cloud to take on a new color, or to fade out or in: about as long as the art's crossfade. */
 const COLOR_EASE = 0.6
 
 /** 3D value noise: smooth in x, y, and time. Seeded, so every visit starts from a new formation. */
@@ -117,13 +120,15 @@ const rgb = (hex: string) => {
  * motion is allowed, and the art isn't paused; it keeps its own clock, so a
  * pause freezes the cloud and play resumes it from the same formation. When
  * the color changes (a new book), it eases into the new one rather than
- * switching.
+ * switching; when a book turns the cloud off, it fades out the same way (and
+ * stops drawing once it's gone), and back in for the next book that has one.
  */
-function CloudLayer({ artRef, paused, color }: { artRef: React.RefObject<HTMLDivElement | null>; paused: boolean; color?: string | null }) {
+function CloudLayer({ artRef, paused, color, on }: { artRef: React.RefObject<HTMLDivElement | null>; paused: boolean; color?: string | null; on: boolean }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  // The cloud's seed, clock, and showing color outlive pause and play, so play resumes the same formation.
-  const clock = useRef<{ seed: number; elapsed: number; shown?: number[] } | null>(null)
+  // The cloud's seed, clock, showing color, and how much of it shows outlive pause and play, so play resumes the same formation.
+  const clock = useRef<{ seed: number; elapsed: number; shown?: number[]; amount?: number } | null>(null)
   const colorRef = useRef(color)
+  const onRef = useRef(on)
   const redraw = useRef<() => void>(undefined)
 
   useEffect(() => {
@@ -164,10 +169,13 @@ function CloudLayer({ artRef, paused, color }: { artRef: React.RefObject<HTMLDiv
       return 0.5 - 0.5 * Math.cos(2 * Math.PI * t)
     }
 
-    /** `step` is how far to move toward the goal color: 0 holds it, 1 arrives. */
+    /** `step` is how far to move toward the goal color and amount: 0 holds them, 1 arrives. */
     const draw = (step: number) => {
       const target = goal()
-      if (!target) return ctx.clearRect(0, 0, canvas.width, canvas.height)
+      const want = onRef.current ? 1 : 0
+      state.amount = state.amount === undefined ? want : state.amount + (want - state.amount) * step
+      // No color, or faded out: nothing to draw, and no noise to compute.
+      if (!target || (!want && state.amount < 0.005)) return ctx.clearRect(0, 0, canvas.width, canvas.height)
       state.shown = state.shown ? state.shown.map((c, k) => c + (target[k] - c) * step) : target
       const [r, g, b] = state.shown.map(Math.round)
       const { width, height, data } = image
@@ -185,7 +193,7 @@ function CloudLayer({ artRef, paused, color }: { artRef: React.RefObject<HTMLDiv
           data[i] = r
           data[i + 1] = g
           data[i + 2] = b
-          data[i + 3] = 255 * MAX_ALPHA * swell * smoothstep(0.42, 0.7, n)
+          data[i + 3] = 255 * MAX_ALPHA * swell * state.amount * smoothstep(0.42, 0.7, n)
         }
       }
       ctx.putImageData(image, 0, 0)
@@ -239,8 +247,9 @@ function CloudLayer({ artRef, paused, color }: { artRef: React.RefObject<HTMLDiv
 
   useEffect(() => {
     colorRef.current = color
+    onRef.current = on
     redraw.current?.()
-  }, [color])
+  }, [color, on])
 
   return <canvas ref={canvasRef} aria-hidden className="pointer-events-none absolute inset-0 size-full" />
 }

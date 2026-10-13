@@ -7,11 +7,12 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /*
-  `split:` — a landscape screen at least tablet-wide. The home page's art and
-  featured book sit side by side there; portrait tablets and phones stack them.
+  `split:` — a landscape screen at least tablet-wide and 576px tall. The home
+  page's art and its column sit side by side there; portrait tablets, phones,
+  and short landscape phones stack them.
 */
 @custom-variant split {
-  @media (orientation: landscape) and (min-width: 48rem) {
+  @media (orientation: landscape) and (min-width: 48rem) and (min-height: 36rem) {
     @slot;
   }
 }
@@ -191,13 +192,13 @@
   so it stays on with reduced motion. The controls don't fade: anything that
   can be clicked stays visible.
 
-  The fade completes when about three quarters of the column has gone; on
-  phones and portrait tablets the art is half the screen, so sooner.
+  The fade completes after --recede-range of scroll: 35svh with the art beside
+  its column, 40svh on phones and portrait tablets.
 */
 :root {
   --recede-range: 40svh;
 }
-@media (orientation: landscape) and (min-width: 48rem) {
+@media (orientation: landscape) and (min-width: 48rem) and (min-height: 36rem) {
   :root {
     --recede-range: 35svh;
   }
@@ -227,6 +228,12 @@
   html {
     background: var(--background);
     color: var(--foreground);
+  }
+  /* In-page links (#books) glide there; with reduced motion they jump. */
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
   }
   ::selection {
     background: var(--ember);

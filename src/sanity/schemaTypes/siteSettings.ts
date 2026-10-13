@@ -67,8 +67,25 @@ export default defineType({
     defineField({ name: 'homeIntro', title: 'Intro', type: 'text', rows: 2, group: 'home', description: 'Under the headline.' }),
     defineField({ name: 'featuredBookLabel', title: 'Featured book label', type: 'string', group: 'home', description: 'Small capitals above the book on the first screen.' }),
     defineField({ name: 'bookDetailsLabel', title: '"About the book" link text', type: 'string', group: 'home', description: 'Beside the buy buttons, linking to the book’s page.' }),
-    defineField({ name: 'featuredLabel', title: 'Featured post label', type: 'string', group: 'home' }),
-    defineField({ name: 'homePostsHeading', title: 'Latest posts heading', type: 'string', group: 'home' }),
+    defineField({
+      name: 'featuredLabel',
+      title: 'Featured post label',
+      type: 'string',
+      group: 'home',
+      description: 'Marks posts set as Featured, which lead the home page’s list of posts.',
+    }),
+    defineField({ name: 'allBooksLabel', title: '"All books" link text', type: 'string', group: 'home', description: 'Beside the featured book; glides down to the Books section.' }),
+    defineField({ name: 'aboutLabel', title: 'About preview heading', type: 'string', group: 'home', description: 'Small capitals above the About preview.' }),
+    defineField({
+      name: 'aboutPreview',
+      title: 'About preview',
+      type: 'text',
+      rows: 3,
+      group: 'home',
+      description: 'A sentence or two on the home page’s first screen, below the featured book. The default is placeholder copy: replace it.',
+    }),
+    defineField({ name: 'aboutLinkLabel', title: 'About link text', type: 'string', group: 'home', description: 'Shown once there’s an About page (slug "about").' }),
+    defineField({ name: 'allPostsLabel', title: '"All posts" link text', type: 'string', group: 'home', description: 'Beside the Rejection Files previews.' }),
 
     // Books
     defineField({ name: 'booksTitle', title: 'Books page title', type: 'string', group: 'books' }),
