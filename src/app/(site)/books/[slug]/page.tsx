@@ -1,19 +1,44 @@
-import BuyLinks from '@/components/BuyLinks'
-import PortableTextBody from '@/components/PortableTextBody'
-import { safeFetch, BOOK_QUERY } from '@/lib/queries'
-export const dynamic = 'force-dynamic'
-export default async function BookPage({ params }: { params: Promise<{ slug: string }> }) {
+import type { Metadata } from 'next'
+import { notFound } from 'next/navigation'
+
+import { BookCover, StatusBadge } from '@/components/book-card'
+import { BuyLinks } from '@/components/buy-links'
+import { RichText } from '@/components/rich-text'
+import { PageHeader, Section } from '@/components/ui/section'
+import { BOOK_QUERY, safeFetch } from '@/lib/queries'
+import { getSiteSettings } from '@/lib/site-settings'
+import type { BookDetail } from '@/lib/types'
+
+type Props = { params: Promise<{ slug: string }> }
+
+const getBook = (slug: string) => safeFetch<BookDetail | null>(BOOK_QUERY, { slug }, null)
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const book = await getBook((await params).slug)
+  return book ? { title: book.title, description: book.shortDescription } : {}
+}
+
+export default async function BookPage({ params }: Props) {
   const { slug } = await params
-  const book = await safeFetch<any>(BOOK_QUERY, { slug }, null)
-  if (!book) return <p className="text-neutral-500">Not found.</p>
+  const [settings, book] = await Promise.all([getSiteSettings(), getBook(slug)])
+  if (!book) notFound()
+
   return (
-    <article className="space-y-6">
-      <header>
-        <h1 className="text-3xl font-bold">{book.title}</h1>
-        <p className="text-neutral-500">{book.series} · {book.status}</p>
-      </header>
-      <PortableTextBody value={book.description} />
-      <BuyLinks links={book.buyLinks} />
-    </article>
+    <Section opener>
+      <article className="grid gap-10 md:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] md:gap-14">
+        <BookCover cover={book.cover} title={book.title} series={book.series} sizes="(max-width: 768px) 100vw, 320px" priority className="max-w-xs md:max-w-none" />
+        <div className="flex flex-col gap-8">
+          <PageHeader title={book.title} eyebrow={book.series} intro={book.shortDescription}>
+            <div className="mt-5">
+              <StatusBadge status={book.status} />
+            </div>
+          </PageHeader>
+          <BuyLinks links={book.buyLinks} label={settings.buyLabel} />
+          <div className="max-w-2xl">
+            <RichText value={book.description} />
+          </div>
+        </div>
+      </article>
+    </Section>
   )
 }

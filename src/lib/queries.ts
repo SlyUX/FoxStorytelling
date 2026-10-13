@@ -1,13 +1,36 @@
+import { defineQuery } from 'next-sanity'
+
 import { client } from '@/sanity/client'
+
+/**
+ * Every fetch goes through here with an explicit fallback. GROQ returns `null`
+ * (not `[]`) when nothing matches, and a missing project or network error
+ * should render an empty state rather than a 500.
+ */
 export async function safeFetch<T>(query: string, params: Record<string, unknown>, fallback: T): Promise<T> {
   try {
-    return await client.fetch<T>(query, params)
+    const result = await client.fetch<T>(query, params)
+    return result ?? fallback
   } catch {
     return fallback
   }
 }
-export const BOOKS_QUERY = `*[_type=="book"]|order(order asc){_id,title,"slug":slug.current,series,status,shortDescription,cover}`
-export const BOOK_QUERY = `*[_type=="book" && slug.current==$slug][0]{_id,title,series,status,description,buyLinks,cover}`
-export const POSTS_QUERY = `*[_type=="post"]|order(publishedAt desc){_id,title,"slug":slug.current,category,excerpt,publishedAt,cover}`
-export const POST_QUERY = `*[_type=="post" && slug.current==$slug][0]{_id,title,category,body,publishedAt,cover}`
-export const FEATURED_QUERY = `*[_type=="post" && featured==true]|order(publishedAt desc)[0]{title,"slug":slug.current,excerpt}`
+
+const BOOK_CARD = `_id,title,"slug":slug.current,series,status,shortDescription,cover`
+const POST_CARD = `_id,title,"slug":slug.current,category,excerpt,publishedAt`
+
+export const SITE_SETTINGS_QUERY = defineQuery(`*[_type=="siteSettings" && _id=="siteSettings"][0]`)
+
+export const BOOKS_QUERY = defineQuery(`*[_type=="book" && defined(slug.current)]|order(order asc, title asc){${BOOK_CARD}}`)
+
+export const BOOK_QUERY = defineQuery(`*[_type=="book" && slug.current==$slug][0]{${BOOK_CARD},description,buyLinks,publishDate}`)
+
+export const POSTS_QUERY = defineQuery(`*[_type=="post" && defined(slug.current)]|order(publishedAt desc){${POST_CARD}}`)
+
+export const POST_QUERY = defineQuery(`*[_type=="post" && slug.current==$slug][0]{${POST_CARD},cover,body}`)
+
+export const FEATURED_POST_QUERY = defineQuery(
+  `*[_type=="post" && featured==true && defined(slug.current)]|order(publishedAt desc)[0]{${POST_CARD}}`,
+)
+
+export const PAGE_QUERY = defineQuery(`*[_type=="page" && slug.current==$slug][0]{_id,title,"slug":slug.current,intro,body}`)
