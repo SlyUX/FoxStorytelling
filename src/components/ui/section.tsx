@@ -83,9 +83,9 @@ export function SectionHeading({
   )
 }
 
-/** Small tracked capitals in ember, above a title: a category, a label. */
-export function Eyebrow({ className, ...props }: React.ComponentProps<'p'>) {
-  return <p className={cn('text-link font-sans text-xs font-semibold tracking-[0.14em] uppercase', className)} {...props} />
+/** Small tracked capitals in ember, above a title: a category, a label. `as` a heading when it names a block. */
+export function Eyebrow({ as: Tag = 'p', className, ...props }: React.ComponentProps<'p'> & { as?: 'p' | 'h2' | 'h3' | 'h4' | 'h5' }) {
+  return <Tag className={cn('text-link font-sans text-xs font-semibold tracking-[0.14em] uppercase', className)} {...props} />
 }
 
 /** What a list says before it has anything in it. Every list needs one. */

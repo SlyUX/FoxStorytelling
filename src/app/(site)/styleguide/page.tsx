@@ -4,7 +4,7 @@ import { BookCard, BookCover, BookGrid } from '@/components/book-card'
 import { BuyLinks } from '@/components/buy-links'
 import { HomeSplit } from '@/components/home-split'
 import { Newsletter } from '@/components/newsletter'
-import { PostList } from '@/components/post-list'
+import { PostCard, PostList } from '@/components/post-list'
 import { RichText } from '@/components/rich-text'
 import { ColorTokens, ContrastTable, type ContrastPair, type TokenGroup } from '@/components/styleguide/color-tokens'
 import { Specimen } from '@/components/styleguide/specimen'
@@ -389,16 +389,25 @@ export default async function StyleguidePage() {
           file="src/components/home-split.tsx · book-spotlight.tsx · breathing-art.tsx"
           stage="card"
           notes={[
-            'The art and headline beside the featured book: two equal columns on landscape screens from tablet width, two equal rows below that, edge to edge under the header.',
+            'The art beside a column that flows: two equal columns exactly filling the screen under the header on landscape screens from tablet width and 576px tall, two rows below that. On wide screens it holds still while the rest of the page slides up over it like a sheet, and back down to reveal it.',
             'Books with “Show on the home page” on and home page art rotate in Books order, one per breath: as each breath ends, with the art at its dimmest, the next book crossfades in. With none, the site’s home art (Site settings) stands beside the first book, its cover beside the details.',
-            'The art breathes every 20 seconds, swelling and brightening from 50% to full opacity, under a cloud drawn from noise that moves through time, from a new seed on each visit. The cloud is black unless Site settings or the book picks a color, and it eases into a new book’s color as the book changes. The hotspot set in the Studio stays in view and is where the breath grows from.',
-            'The description sits at the top of the other column, the showing book’s details below it. Its first store is the page’s one red action. Nothing sits on the art.',
-            'Scrolling away, the art and its cloud fade into the night, gone by the time three quarters of the column has left (sooner on phones); the controls stay visible. CSS scroll-driven: browsers without it just scroll.',
+            'The art breathes every 20 seconds, swelling and brightening from 50% to full opacity, under a cloud drawn from noise that moves through time, from a new seed on each visit. The cloud is black unless Site settings or the book picks a color, and it eases into a new book’s color as the book changes. A book can turn its cloud off; it fades out, and back in for the next book that has one. The hotspot set in the Studio stays in view and is where the breath grows from.',
+            'The column: the description; the showing book, with “All books” gliding down to the Books section; then the About preview and the Rejection Files previews (featured posts first). Each block is set off by a rule. On wide screens the About preview and posts show only as far as they fit, never cut in half; what doesn’t fit is inert, so focus skips it (FillColumn). Stacked, three posts show. The book’s first store is the page’s one red action; nothing sits on the art.',
+            'Scrolling away, the art and its cloud fade into the night, gone after scrolling about a third of the screen; the controls stay visible. CSS scroll-driven: browsers without it just scroll.',
             'The rotation holds while the pointer or keyboard focus is in it; pause stops it and the motion; previous, next, and a marker per book step through by hand. Reduced motion stills the art and never advances on its own.',
           ]}
         >
-          {/* Shorter than the real thing, which fills the screen under the header. */}
-          <HomeSplit settings={s} spotlight={spotlight} fallbackBook={cards[0] ?? null} levels={{ tagline: 'h4', book: 'h4' }} className="split:min-h-[40rem]" />
+          {/* Shorter than the real thing, which fills the screen under the header and doesn't pin here. */}
+          <HomeSplit
+            settings={s}
+            spotlight={spotlight}
+            fallbackBook={cards[0] ?? null}
+            posts={rows.map((post) => ({ ...post, pinned: false }))}
+            aboutExists={false}
+            booksHref="#books-and-posts"
+            levels={{ tagline: 'h4', block: 'h5', item: 'h6' }}
+            className="split:h-[44rem]"
+          />
         </Specimen>
       </Section>
 
@@ -436,6 +445,17 @@ export default async function StyleguidePage() {
             notes={[posts.length ? 'The latest posts from the Studio.' : 'A sample post; real ones show here once there are some.', 'Category, title, date, and excerpt, divided by rules. Visited titles turn violet.']}
           >
             <PostList posts={rows} headingLevel="h4" />
+          </Specimen>
+          <Specimen
+            name="Post card"
+            file="src/components/post-list.tsx · PostCard"
+            notes={['A compact preview for tight spaces, like the home page’s first screen: meta line, title, two lines of excerpt. One click target.', 'A featured post says so, in ember, and leads its list.']}
+          >
+            <div className="grid max-w-xl gap-3">
+              {rows.slice(0, 1).map((post) => (
+                <PostCard key={post._id} post={{ ...post, pinned: true }} featuredLabel={s.featuredLabel} headingLevel="h4" />
+              ))}
+            </div>
           </Specimen>
         </div>
       </Section>

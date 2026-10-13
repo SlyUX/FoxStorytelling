@@ -15,6 +15,8 @@ export type SpotlightSlide = {
   focus: string
   /** The cloud's color over this art (hex), if the Studio picked one. */
   cloud?: string | null
+  /** Whether the cloud shows over this art; on unless a book turns it off. */
+  cloudOn?: boolean
   art: React.ReactNode
   details: React.ReactNode
 }
@@ -27,10 +29,11 @@ const subscribeReduce = (onChange: () => void) => {
 }
 
 /**
- * The home page's first screen: books' art breathing on one side, the site's
- * description and the showing book's details on the other. Two columns on
- * landscape screens from tablet width (`split:`), two rows below that, each
- * at least half the screen under the header.
+ * The home page's first screen: books' art breathing on one side; on the
+ * other, the site's description, the showing book's details, and whatever else
+ * fits (`more`). Two columns exactly filling the screen under the header on
+ * landscape screens from tablet width (`split:`), two rows below that, each at
+ * least half the screen.
  *
  * The breath is the clock: as each breath ends, with the art settled and at its
  * dimmest, the next book crossfades in, so there's never a hard cut. The
@@ -43,14 +46,17 @@ export function BookSpotlight({
   slides,
   intro,
   eyebrow,
+  more,
   label,
   className,
 }: {
   slides: SpotlightSlide[]
   /** The site's description, at the top of the details column. */
   intro: React.ReactNode
-  /** Small capitals above the book's details. */
+  /** The heading row above the book's details. */
   eyebrow?: React.ReactNode
+  /** What follows the book in the column (a FillColumn): shown as far as it fits. */
+  more?: React.ReactNode
   /** What the rotation is, for screen readers. */
   label: string
   className?: string
@@ -72,7 +78,7 @@ export function BookSpotlight({
       // a11y-only text; not CMS-managed.
       aria-roledescription={many ? 'carousel' : undefined}
       aria-label={many ? label : undefined}
-      className={cn('split:grid-cols-2 split:min-h-[calc(100svh-var(--header-h))] grid', className)}
+      className={cn('split:grid-cols-2 split:h-[calc(100svh-var(--header-h))] grid', className)}
       onPointerEnter={(event) => event.pointerType === 'mouse' && setHover(true)}
       onPointerLeave={(event) => event.pointerType === 'mouse' && setHover(false)}
       onFocus={() => setFocusWithin(true)}
@@ -81,6 +87,7 @@ export function BookSpotlight({
       <BreathingArt
         focus={current.focus}
         cloud={current.cloud}
+        cloudOn={current.cloudOn ?? true}
         paused={paused}
         onBreath={() => rotating && go(index + 1)}
         className="split:min-h-0 min-h-[calc((100svh-var(--header-h))/2)]"
@@ -127,9 +134,10 @@ export function BookSpotlight({
         }
       />
 
-      <div className="split:min-h-0 split:px-12 split:py-14 flex min-h-[calc((100svh-var(--header-h))/2)] flex-col justify-between gap-12 px-6 py-10 sm:px-10 lg:px-16">
+      {/* The column flows: the description, then the book under a rule, then whatever fits. */}
+      <div className="split:min-h-0 split:px-12 split:py-10 flex min-h-[calc((100svh-var(--header-h))/2)] flex-col px-6 py-10 sm:px-10 lg:px-16">
         {intro}
-        <div className="w-full max-w-xl">
+        <div className="border-border mt-8 w-full border-t pt-8">
           {eyebrow}
           {/* Every book's details share one cell, so the column is as tall as the longest and nothing jumps as they change. */}
           <div className="grid" aria-live={rotating ? 'off' : 'polite'}>
@@ -146,6 +154,7 @@ export function BookSpotlight({
             ))}
           </div>
         </div>
+        {more}
       </div>
     </section>
   )

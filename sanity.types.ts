@@ -142,6 +142,7 @@ export type Book = {
   };
   showOnHome?: boolean;
   homeArt?: ImageWithAlt;
+  showCloud?: boolean;
   cloudColor?: Color;
   status?: "Available" | "Upcoming" | "On Kickstarter";
   shortDescription?: string;
@@ -190,7 +191,11 @@ export type SiteSettings = {
   featuredBookLabel?: string;
   bookDetailsLabel?: string;
   featuredLabel?: string;
-  homePostsHeading?: string;
+  allBooksLabel?: string;
+  aboutLabel?: string;
+  aboutPreview?: string;
+  aboutLinkLabel?: string;
+  allPostsLabel?: string;
   booksTitle?: string;
   booksIntro?: string;
   booksEmpty?: string;
@@ -380,7 +385,11 @@ export type SITE_SETTINGS_QUERY_RESULT = {
   featuredBookLabel?: string;
   bookDetailsLabel?: string;
   featuredLabel?: string;
-  homePostsHeading?: string;
+  allBooksLabel?: string;
+  aboutLabel?: string;
+  aboutPreview?: string;
+  aboutLinkLabel?: string;
+  allPostsLabel?: string;
   booksTitle?: string;
   booksIntro?: string;
   booksEmpty?: string;
@@ -398,7 +407,7 @@ export type SITE_SETTINGS_QUERY_RESULT = {
 
 // Source: src/lib/queries.ts
 // Variable: HOME_SPOTLIGHT_QUERY
-// Query: *[_type=="book" && showOnHome == true && defined(homeArt.asset) && defined(slug.current)]|order(order asc, title asc){_id,title,"slug":slug.current,series,status,shortDescription,cover,buyLinks,homeArt,"homeArtLqip": homeArt.asset->metadata.lqip,"cloudHex": cloudColor.hex}
+// Query: *[_type=="book" && showOnHome == true && defined(homeArt.asset) && defined(slug.current)]|order(order asc, title asc){_id,title,"slug":slug.current,series,status,shortDescription,cover,buyLinks,homeArt,"homeArtLqip": homeArt.asset->metadata.lqip,"cloudHex": cloudColor.hex,"cloudOn": coalesce(showCloud, true)}
 export type HOME_SPOTLIGHT_QUERY_RESULT = Array<{
   _id: string;
   title: string;
@@ -421,6 +430,7 @@ export type HOME_SPOTLIGHT_QUERY_RESULT = Array<{
   homeArt: ImageWithAlt | null;
   homeArtLqip: string | null;
   cloudHex: string | null;
+  cloudOn: boolean | true;
 }>;
 
 // Source: src/lib/queries.ts
@@ -506,16 +516,17 @@ export type POST_QUERY_RESULT = {
 } | null;
 
 // Source: src/lib/queries.ts
-// Variable: FEATURED_POST_QUERY
-// Query: *[_type=="post" && featured==true && defined(slug.current)]|order(publishedAt desc)[0]{_id,title,"slug":slug.current,category,excerpt,publishedAt}
-export type FEATURED_POST_QUERY_RESULT = {
+// Variable: HOME_POSTS_QUERY
+// Query: *[_type=="post" && defined(slug.current)]{_id,title,"slug":slug.current,category,excerpt,publishedAt,"pinned": coalesce(featured, false)}|order(pinned desc, publishedAt desc)[0...6]
+export type HOME_POSTS_QUERY_RESULT = Array<{
   _id: string;
   title: string;
   slug: string;
   category: "Craft" | "News" | "Rejection Files" | null;
   excerpt: string | null;
   publishedAt: string;
-} | null;
+  pinned: boolean | false;
+}>;
 
 // Source: src/lib/queries.ts
 // Variable: PAGE_QUERY
@@ -533,12 +544,12 @@ import "@sanity/client";
 declare module "@sanity/client" {
   interface SanityQueries {
     '*[_type=="siteSettings" && _id=="siteSettings"][0]{\n  ...,\n  "homeImageLqip": homeImage.asset->metadata.lqip,\n  "cloudHex": cloudColor.hex\n}': SITE_SETTINGS_QUERY_RESULT;
-    '*[_type=="book" && showOnHome == true && defined(homeArt.asset) && defined(slug.current)]|order(order asc, title asc){_id,title,"slug":slug.current,series,status,shortDescription,cover,buyLinks,homeArt,"homeArtLqip": homeArt.asset->metadata.lqip,"cloudHex": cloudColor.hex}': HOME_SPOTLIGHT_QUERY_RESULT;
+    '*[_type=="book" && showOnHome == true && defined(homeArt.asset) && defined(slug.current)]|order(order asc, title asc){_id,title,"slug":slug.current,series,status,shortDescription,cover,buyLinks,homeArt,"homeArtLqip": homeArt.asset->metadata.lqip,"cloudHex": cloudColor.hex,"cloudOn": coalesce(showCloud, true)}': HOME_SPOTLIGHT_QUERY_RESULT;
     '*[_type=="book" && defined(slug.current)]|order(order asc, title asc){_id,title,"slug":slug.current,series,status,shortDescription,cover,buyLinks}': BOOKS_QUERY_RESULT;
     '*[_type=="book" && slug.current==$slug][0]{_id,title,"slug":slug.current,series,status,shortDescription,cover,buyLinks,description,publishDate}': BOOK_QUERY_RESULT;
     '*[_type=="post" && defined(slug.current)]|order(publishedAt desc){_id,title,"slug":slug.current,category,excerpt,publishedAt}': POSTS_QUERY_RESULT;
     '*[_type=="post" && slug.current==$slug][0]{_id,title,"slug":slug.current,category,excerpt,publishedAt,cover,body}': POST_QUERY_RESULT;
-    '*[_type=="post" && featured==true && defined(slug.current)]|order(publishedAt desc)[0]{_id,title,"slug":slug.current,category,excerpt,publishedAt}': FEATURED_POST_QUERY_RESULT;
+    '*[_type=="post" && defined(slug.current)]{_id,title,"slug":slug.current,category,excerpt,publishedAt,"pinned": coalesce(featured, false)}|order(pinned desc, publishedAt desc)[0...6]': HOME_POSTS_QUERY_RESULT;
     '*[_type=="page" && slug.current==$slug][0]{_id,title,"slug":slug.current,intro,body}': PAGE_QUERY_RESULT;
   }
 }

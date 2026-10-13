@@ -804,6 +804,13 @@
         },
         "optional": true
       },
+      "showCloud": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "boolean"
+        },
+        "optional": true
+      },
       "cloudColor": {
         "type": "objectAttribute",
         "value": {
@@ -1091,7 +1098,35 @@
         },
         "optional": true
       },
-      "homePostsHeading": {
+      "allBooksLabel": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
+      "aboutLabel": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
+      "aboutPreview": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
+      "aboutLinkLabel": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
+      "allPostsLabel": {
         "type": "objectAttribute",
         "value": {
           "type": "string"

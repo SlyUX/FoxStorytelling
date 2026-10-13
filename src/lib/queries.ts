@@ -27,7 +27,7 @@ export const SITE_SETTINGS_QUERY = defineQuery(`*[_type=="siteSettings" && _id==
 
 /** Books that rotate through the home page's first screen: toggled on, with their art, in Books order. */
 export const HOME_SPOTLIGHT_QUERY = defineQuery(
-  `*[_type=="book" && showOnHome == true && defined(homeArt.asset) && defined(slug.current)]|order(order asc, title asc){${BOOK_CARD},homeArt,"homeArtLqip": homeArt.asset->metadata.lqip,"cloudHex": cloudColor.hex}`,
+  `*[_type=="book" && showOnHome == true && defined(homeArt.asset) && defined(slug.current)]|order(order asc, title asc){${BOOK_CARD},homeArt,"homeArtLqip": homeArt.asset->metadata.lqip,"cloudHex": cloudColor.hex,"cloudOn": coalesce(showCloud, true)}`,
 )
 
 export const BOOKS_QUERY = defineQuery(`*[_type=="book" && defined(slug.current)]|order(order asc, title asc){${BOOK_CARD}}`)
@@ -38,8 +38,9 @@ export const POSTS_QUERY = defineQuery(`*[_type=="post" && defined(slug.current)
 
 export const POST_QUERY = defineQuery(`*[_type=="post" && slug.current==$slug][0]{${POST_CARD},cover,body}`)
 
-export const FEATURED_POST_QUERY = defineQuery(
-  `*[_type=="post" && featured==true && defined(slug.current)]|order(publishedAt desc)[0]{${POST_CARD}}`,
+/** The home page's post previews: featured posts first, then newest. */
+export const HOME_POSTS_QUERY = defineQuery(
+  `*[_type=="post" && defined(slug.current)]{${POST_CARD},"pinned": coalesce(featured, false)}|order(pinned desc, publishedAt desc)[0...6]`,
 )
 
 export const PAGE_QUERY = defineQuery(`*[_type=="page" && slug.current==$slug][0]{_id,title,"slug":slug.current,intro,body}`)
