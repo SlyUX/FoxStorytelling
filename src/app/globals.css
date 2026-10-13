@@ -7,6 +7,16 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /*
+  `split:` — a landscape screen at least tablet-wide. The home page's art and
+  featured book sit side by side there; portrait tablets and phones stack them.
+*/
+@custom-variant split {
+  @media (orientation: landscape) and (min-width: 48rem) {
+    @slot;
+  }
+}
+
+/*
   Design tokens (2026-10-12). PROVISIONAL pending art direction.
   Night, bone, the fox's red, and one ember of light.
   Components use these through Tailwind (`bg-card`, `text-link`), never raw
@@ -47,6 +57,8 @@
     --fox on --background ................  4.34  large text and graphics only
     --primary on --background ............  3.37  FAILS for text — a ground, not a text color
     --ember on --primary .................  3.06  FAILS — never ember on red
+    Home art: --foreground on --background at 70% over pure white: 5.96 (AA),
+    the worst case, so the headline holds over any part of any image.
 */
 :root {
   color-scheme: dark;
@@ -76,6 +88,7 @@
   --link: #e9b44c; /* links: ember, its own token so it can diverge */
   --visited: #b8a3e0; /* visited links: dusk violet, from the illustration */
   --ring: #e9b44c;
+  --cloud: #3a060a; /* the dark red cloud that rolls over the home art: decorative */
 
   /* Corners: nearly square, like a book's edge. shadcn's scale derives from this. */
   --radius: 2px;
@@ -105,6 +118,7 @@
   --color-link: var(--link);
   --color-visited: var(--visited);
   --color-ring: var(--ring);
+  --color-cloud: var(--cloud);
 
   /* Reading is serif, the interface is sans. */
   --font-sans: var(--font-geist);
@@ -121,6 +135,53 @@
   --text-4xl: clamp(2rem, calc(1.625rem + 1.875vw), 3.125rem);
   --text-5xl: clamp(2.5rem, calc(2rem + 2.5vw), 4rem);
   --text-6xl: clamp(2.75rem, calc(2rem + 3.75vw), 5rem);
+}
+
+/*
+  The header's height: this built default, then measured live (HeaderHeight),
+  so the home page's split fills exactly the rest of the first screen.
+*/
+:root {
+  --header-h: 61px;
+}
+/* Phones: the nav wraps under the logo. */
+@media (max-width: 30rem) {
+  :root {
+    --header-h: 89px;
+  }
+}
+
+/*
+  The home art breathes: every 20 seconds (--breath) it swells past "cover"
+  and settles back. It never shrinks below cover, so no edge of the image ever shows. The
+  cloud over it (CloudLayer) reads this animation's clock to swell in step.
+  Transform only, so it runs on the compositor.
+*/
+:root {
+  --breath: 20s;
+}
+@keyframes breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+.breathe {
+  animation: breathe var(--breath) ease-in-out infinite;
+  transform-origin: var(--focus, 50% 40%);
+  will-change: transform;
+}
+[data-paused='true'] .breathe {
+  animation-play-state: paused;
+}
+/* Reduced motion: the art holds still (and CloudLayer doesn't draw). */
+@media (prefers-reduced-motion: reduce) {
+  .breathe {
+    animation: none;
+  }
 }
 
 @layer base {
@@ -140,6 +201,8 @@
     *, *::before, *::after {
       transition-duration: 0.01ms !important;
       animation-duration: 0.01ms !important;
+      /* Without this, an infinite animation squeezed to 0.01ms would flicker. */
+      animation-iteration-count: 1 !important;
     }
   }
 }

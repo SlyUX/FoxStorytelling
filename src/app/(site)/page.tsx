@@ -1,6 +1,7 @@
 import Link from 'next/link'
 
 import { BookCard, BookGrid } from '@/components/book-card'
+import { HomeSplit } from '@/components/home-split'
 import { Newsletter } from '@/components/newsletter'
 import { PostList } from '@/components/post-list'
 import { ButtonLink } from '@/components/ui/button'
@@ -18,16 +19,15 @@ export default async function Home() {
     safeFetch<PostCardData[]>(POSTS_QUERY, {}, []),
   ])
   const featuredDate = formatDate(featured?.publishedAt)
+  // The book picked in Site settings, or the first in the Books order.
+  const featuredBook = settings.featuredBook ?? books[0] ?? null
 
   return (
     <>
-      <Section opener className="pb-6 md:pb-10">
-        <h1 className="max-w-3xl font-serif text-6xl leading-[1.05] font-semibold tracking-tight">{settings.tagline}</h1>
-        <p className="text-muted-foreground mt-5 max-w-xl text-xl leading-relaxed">{settings.homeIntro}</p>
-      </Section>
+      <HomeSplit settings={settings} book={featuredBook} preload />
 
       {featured && (
-        <Section className="pt-0 md:pt-0">
+        <Section>
           <article className="group bg-card border-border rounded-ui relative border p-6 md:p-10">
             <Eyebrow className="mb-3">{settings.featuredLabel}</Eyebrow>
             <h2 className="font-serif text-3xl leading-tight font-semibold">

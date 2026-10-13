@@ -16,14 +16,18 @@ export async function safeFetch<T>(query: string, params: Record<string, unknown
   }
 }
 
-const BOOK_CARD = `_id,title,"slug":slug.current,series,status,shortDescription,cover`
+const BOOK_CARD = `_id,title,"slug":slug.current,series,status,shortDescription,cover,buyLinks`
 const POST_CARD = `_id,title,"slug":slug.current,category,excerpt,publishedAt`
 
-export const SITE_SETTINGS_QUERY = defineQuery(`*[_type=="siteSettings" && _id=="siteSettings"][0]`)
+export const SITE_SETTINGS_QUERY = defineQuery(`*[_type=="siteSettings" && _id=="siteSettings"][0]{
+  ...,
+  "homeImageLqip": homeImage.asset->metadata.lqip,
+  "featuredBook": featuredBook->{${BOOK_CARD}}
+}`)
 
 export const BOOKS_QUERY = defineQuery(`*[_type=="book" && defined(slug.current)]|order(order asc, title asc){${BOOK_CARD}}`)
 
-export const BOOK_QUERY = defineQuery(`*[_type=="book" && slug.current==$slug][0]{${BOOK_CARD},description,buyLinks,publishDate}`)
+export const BOOK_QUERY = defineQuery(`*[_type=="book" && slug.current==$slug][0]{${BOOK_CARD},description,publishDate}`)
 
 export const POSTS_QUERY = defineQuery(`*[_type=="post" && defined(slug.current)]|order(publishedAt desc){${POST_CARD}}`)
 
