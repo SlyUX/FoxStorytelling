@@ -46,7 +46,25 @@ export default defineType({
     }),
 
     // Home page
+    defineField({
+      name: 'homeImage',
+      title: 'Art',
+      type: 'imageWithAlt',
+      group: 'home',
+      description:
+        'Fills the left half of the first screen (the top half on phones), behind the headline, and slowly breathes. Tall art on black works best. Set the hotspot on the part that must stay in view.',
+    }),
     defineField({ name: 'homeIntro', title: 'Intro', type: 'text', rows: 2, group: 'home', description: 'Under the headline.' }),
+    defineField({
+      name: 'featuredBook',
+      title: 'Featured book',
+      type: 'reference',
+      to: [{ type: 'book' }],
+      group: 'home',
+      description: 'Beside the art on the first screen. Leave empty to feature the first book in your Books order.',
+    }),
+    defineField({ name: 'featuredBookLabel', title: 'Featured book label', type: 'string', group: 'home', description: 'Small capitals above the featured book.' }),
+    defineField({ name: 'bookDetailsLabel', title: '"About the book" link text', type: 'string', group: 'home', description: 'Beside the buy buttons, linking to the book’s page.' }),
     defineField({ name: 'featuredLabel', title: 'Featured post label', type: 'string', group: 'home' }),
     defineField({ name: 'homePostsHeading', title: 'Latest posts heading', type: 'string', group: 'home' }),
 

@@ -25,6 +25,8 @@ const DEFAULTS = {
   ],
   homeIntro: 'Dark stories with a soul — books and comics by Stephen Fox.',
   featuredLabel: 'Featured',
+  featuredBookLabel: 'Featured book',
+  bookDetailsLabel: 'About the book',
   homePostsHeading: 'Latest from the Rejection Files',
   booksTitle: 'Books',
   booksEmpty: 'New books are on the way.',

@@ -33,21 +33,25 @@ export function BookCover({
   title,
   series,
   sizes = '(max-width: 640px) 50vw, 280px',
-  priority,
+  preload,
+  loading,
   className,
 }: {
   cover: BookCardData['cover']
   title: string
   series?: string | null
   sizes?: string
-  priority?: boolean
+  /** For the page's largest image (its LCP). */
+  preload?: boolean
+  /** `eager` for a cover above the fold that isn't the LCP. */
+  loading?: 'eager' | 'lazy'
   className?: string
 }) {
   const frame = cn('rounded-ui relative aspect-[2/3] w-full overflow-hidden', className)
   if (cover?.asset) {
     return (
       <div className={cn(frame, 'bg-card')}>
-        <Image src={urlFor(cover).width(800).height(1200).fit('crop').url()} alt="" fill sizes={sizes} priority={priority} className="object-cover" />
+        <Image src={urlFor(cover).width(800).height(1200).fit('crop').url()} alt="" fill sizes={sizes} preload={preload} loading={loading} className="object-cover" />
       </div>
     )
   }

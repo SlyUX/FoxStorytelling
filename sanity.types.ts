@@ -124,6 +124,53 @@ export type SanityImageHotspot = {
   width: number;
 };
 
+export type BookReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "book";
+};
+
+export type SiteSettings = {
+  _id: string;
+  _type: "siteSettings";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  tagline?: string;
+  seoDescription?: string;
+  viewAllLabel?: string;
+  socials?: Array<
+    {
+      _key: string;
+    } & BuyLink
+  >;
+  navigation?: Array<
+    {
+      _key: string;
+    } & Link
+  >;
+  homeImage?: ImageWithAlt;
+  homeIntro?: string;
+  featuredBook?: BookReference;
+  featuredBookLabel?: string;
+  bookDetailsLabel?: string;
+  featuredLabel?: string;
+  homePostsHeading?: string;
+  booksTitle?: string;
+  booksIntro?: string;
+  booksEmpty?: string;
+  buyLabel?: string;
+  blogTitle?: string;
+  blogIntro?: string;
+  postsEmpty?: string;
+  newsletterHeading?: string;
+  newsletterBlurb?: string;
+  newsletterUrl?: string;
+  newsletterButtonLabel?: string;
+};
+
 export type Book = {
   _id: string;
   _type: "book";
@@ -150,42 +197,6 @@ export type Book = {
   >;
   publishDate?: string;
   order?: number;
-};
-
-export type SiteSettings = {
-  _id: string;
-  _type: "siteSettings";
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  title?: string;
-  tagline?: string;
-  seoDescription?: string;
-  viewAllLabel?: string;
-  socials?: Array<
-    {
-      _key: string;
-    } & BuyLink
-  >;
-  navigation?: Array<
-    {
-      _key: string;
-    } & Link
-  >;
-  homeIntro?: string;
-  featuredLabel?: string;
-  homePostsHeading?: string;
-  booksTitle?: string;
-  booksIntro?: string;
-  booksEmpty?: string;
-  buyLabel?: string;
-  blogTitle?: string;
-  blogIntro?: string;
-  postsEmpty?: string;
-  newsletterHeading?: string;
-  newsletterBlurb?: string;
-  newsletterUrl?: string;
-  newsletterButtonLabel?: string;
 };
 
 export type SanityImagePaletteSwatch = {
@@ -296,8 +307,9 @@ export type AllSanitySchemaTypes =
   | Post
   | SanityImageCrop
   | SanityImageHotspot
-  | Book
+  | BookReference
   | SiteSettings
+  | Book
   | SanityImagePaletteSwatch
   | SanityImagePalette
   | SanityImageDimensions
@@ -309,7 +321,7 @@ export type AllSanitySchemaTypes =
 
 // Source: src/lib/queries.ts
 // Variable: SITE_SETTINGS_QUERY
-// Query: *[_type=="siteSettings" && _id=="siteSettings"][0]
+// Query: *[_type=="siteSettings" && _id=="siteSettings"][0]{  ...,  "homeImageLqip": homeImage.asset->metadata.lqip,  "featuredBook": featuredBook->{_id,title,"slug":slug.current,series,status,shortDescription,cover,buyLinks}}
 export type SITE_SETTINGS_QUERY_RESULT = {
   _id: "siteSettings";
   _type: "siteSettings";
@@ -330,7 +342,30 @@ export type SITE_SETTINGS_QUERY_RESULT = {
       _key: string;
     } & Link
   >;
+  homeImage?: ImageWithAlt;
   homeIntro?: string;
+  featuredBook: {
+    _id: string;
+    title: string;
+    slug: string;
+    series: string | null;
+    status: "Available" | "On Kickstarter" | "Upcoming" | null;
+    shortDescription: string | null;
+    cover: {
+      asset?: SanityImageAssetReference;
+      media?: unknown;
+      hotspot?: SanityImageHotspot;
+      crop?: SanityImageCrop;
+      _type: "image";
+    } | null;
+    buyLinks: Array<
+      {
+        _key: string;
+      } & BuyLink
+    > | null;
+  } | null;
+  featuredBookLabel?: string;
+  bookDetailsLabel?: string;
   featuredLabel?: string;
   homePostsHeading?: string;
   booksTitle?: string;
@@ -344,11 +379,12 @@ export type SITE_SETTINGS_QUERY_RESULT = {
   newsletterBlurb?: string;
   newsletterUrl?: string;
   newsletterButtonLabel?: string;
+  homeImageLqip: string | null;
 } | null;
 
 // Source: src/lib/queries.ts
 // Variable: BOOKS_QUERY
-// Query: *[_type=="book" && defined(slug.current)]|order(order asc, title asc){_id,title,"slug":slug.current,series,status,shortDescription,cover}
+// Query: *[_type=="book" && defined(slug.current)]|order(order asc, title asc){_id,title,"slug":slug.current,series,status,shortDescription,cover,buyLinks}
 export type BOOKS_QUERY_RESULT = Array<{
   _id: string;
   title: string;
@@ -363,11 +399,16 @@ export type BOOKS_QUERY_RESULT = Array<{
     crop?: SanityImageCrop;
     _type: "image";
   } | null;
+  buyLinks: Array<
+    {
+      _key: string;
+    } & BuyLink
+  > | null;
 }>;
 
 // Source: src/lib/queries.ts
 // Variable: BOOK_QUERY
-// Query: *[_type=="book" && slug.current==$slug][0]{_id,title,"slug":slug.current,series,status,shortDescription,cover,description,buyLinks,publishDate}
+// Query: *[_type=="book" && slug.current==$slug][0]{_id,title,"slug":slug.current,series,status,shortDescription,cover,buyLinks,description,publishDate}
 export type BOOK_QUERY_RESULT = {
   _id: string;
   title: string;
@@ -382,12 +423,12 @@ export type BOOK_QUERY_RESULT = {
     crop?: SanityImageCrop;
     _type: "image";
   } | null;
-  description: RichText | null;
   buyLinks: Array<
     {
       _key: string;
     } & BuyLink
   > | null;
+  description: RichText | null;
   publishDate: string | null;
 } | null;
 
@@ -450,9 +491,9 @@ export type PAGE_QUERY_RESULT = {
 import "@sanity/client";
 declare module "@sanity/client" {
   interface SanityQueries {
-    '*[_type=="siteSettings" && _id=="siteSettings"][0]': SITE_SETTINGS_QUERY_RESULT;
-    '*[_type=="book" && defined(slug.current)]|order(order asc, title asc){_id,title,"slug":slug.current,series,status,shortDescription,cover}': BOOKS_QUERY_RESULT;
-    '*[_type=="book" && slug.current==$slug][0]{_id,title,"slug":slug.current,series,status,shortDescription,cover,description,buyLinks,publishDate}': BOOK_QUERY_RESULT;
+    '*[_type=="siteSettings" && _id=="siteSettings"][0]{\n  ...,\n  "homeImageLqip": homeImage.asset->metadata.lqip,\n  "featuredBook": featuredBook->{_id,title,"slug":slug.current,series,status,shortDescription,cover,buyLinks}\n}': SITE_SETTINGS_QUERY_RESULT;
+    '*[_type=="book" && defined(slug.current)]|order(order asc, title asc){_id,title,"slug":slug.current,series,status,shortDescription,cover,buyLinks}': BOOKS_QUERY_RESULT;
+    '*[_type=="book" && slug.current==$slug][0]{_id,title,"slug":slug.current,series,status,shortDescription,cover,buyLinks,description,publishDate}': BOOK_QUERY_RESULT;
     '*[_type=="post" && defined(slug.current)]|order(publishedAt desc){_id,title,"slug":slug.current,category,excerpt,publishedAt}': POSTS_QUERY_RESULT;
     '*[_type=="post" && slug.current==$slug][0]{_id,title,"slug":slug.current,category,excerpt,publishedAt,cover,body}': POST_QUERY_RESULT;
     '*[_type=="post" && featured==true && defined(slug.current)]|order(publishedAt desc)[0]{_id,title,"slug":slug.current,category,excerpt,publishedAt}': FEATURED_POST_QUERY_RESULT;

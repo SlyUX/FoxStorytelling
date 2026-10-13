@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 
 import { BookCard, BookCover, BookGrid } from '@/components/book-card'
 import { BuyLinks } from '@/components/buy-links'
+import { HomeSplit } from '@/components/home-split'
 import { Newsletter } from '@/components/newsletter'
 import { PostList } from '@/components/post-list'
 import { RichText } from '@/components/rich-text'
@@ -56,6 +57,7 @@ const TOKENS: TokenGroup[] = [
       { token: 'fox', use: 'The logo’s exact red. Decoration and large display only: spines, rules, the nav underline.' },
       { token: 'ember', use: 'The light in the dark: links, the focus ring, text selection, things on their way.' },
       { token: 'ring', use: 'The keyboard focus ring.' },
+      { token: 'cloud', use: 'The dark red cloud that rolls over the home art. Decorative only.' },
     ],
   },
 ]
@@ -110,7 +112,7 @@ const RULES: [string, string][] = [
   ['Every list has an empty state.', 'It’s written for readers, not editors.'],
   ['Content lives in Sanity.', 'Display copy is edited in the Studio, with defaults in src/lib/site-settings.ts. Exceptions are text only assistive technology hears, and this page.'],
   ['Behavior comes from shadcn.', 'Need a dialog or a menu? npx shadcn@latest add it, then restyle to the tokens. Button and badge here are ours: don’t let the CLI overwrite them.'],
-  ['Motion is quiet.', 'Hover lifts a cover 4px. Reduced motion skips it.'],
+  ['Motion is slow, and it stops.', 'The home art breathes on a 20-second cycle, swelling past its frame and settling back, never shrinking enough to show an edge, under a dark red cloud that’s never the same twice. A pause button stops both; reduced motion stills the art and drops the cloud. Hover lifts a cover 4px.'],
 ]
 
 const VOICE: [string, React.ReactNode][] = [
@@ -125,9 +127,21 @@ const VOICE: [string, React.ReactNode][] = [
 ]
 
 const SAMPLE_BOOKS: BookCardData[] = [
-  { _id: 'sample-1', title: 'A Title Without Cover Art', slug: 'sample', series: 'Series name', status: 'Available', shortDescription: 'A short description: two or three sentences that make someone want the book.', cover: null },
-  { _id: 'sample-2', title: 'An Upcoming Book', slug: 'sample', series: null, status: 'Upcoming', shortDescription: null, cover: null },
-  { _id: 'sample-3', title: 'A Book on Kickstarter', slug: 'sample', series: 'Series name', status: 'On Kickstarter', shortDescription: null, cover: null },
+  {
+    _id: 'sample-1',
+    title: 'A Title Without Cover Art',
+    slug: 'sample',
+    series: 'Series name',
+    status: 'Available',
+    shortDescription: 'A short description: two or three sentences that make someone want the book.',
+    cover: null,
+    buyLinks: [
+      { _key: 'a', _type: 'buyLink', store: 'Bookshop.org', url: 'https://bookshop.org' },
+      { _key: 'b', _type: 'buyLink', store: 'Amazon', url: 'https://www.amazon.com' },
+    ],
+  },
+  { _id: 'sample-2', title: 'An Upcoming Book', slug: 'sample', series: null, status: 'Upcoming', shortDescription: null, cover: null, buyLinks: null },
+  { _id: 'sample-3', title: 'A Book on Kickstarter', slug: 'sample', series: 'Series name', status: 'On Kickstarter', shortDescription: null, cover: null, buyLinks: null },
 ]
 
 const SAMPLE_POSTS: PostCardData[] = [
@@ -159,6 +173,7 @@ export default async function StyleguidePage() {
     ['corners-and-spacing', 'Corners and spacing'],
     ['actions', 'Actions and labels'],
     ['structure', 'Page structure'],
+    ['home', 'Home'],
     ['books-and-posts', 'Books and posts'],
     ['reading', 'Reading'],
     ['rules', 'Rules'],
@@ -354,7 +369,27 @@ export default async function StyleguidePage() {
         </div>
       </Section>
 
-      <Section id="books-and-posts" aria-labelledby="books-heading">
+      <Section id="home" aria-labelledby="home-heading">
+        <SectionHeading id="home-heading" intro="The first screen of the home page.">
+          Home
+        </SectionHeading>
+        <Specimen
+          name="Home split"
+          file="src/components/home-split.tsx · breathing-art.tsx"
+          stage="card"
+          notes={[
+            'The art and headline beside the featured book: two equal columns on landscape screens from tablet width, two equal rows below that, edge to edge under the header.',
+            'The art (Site settings → Home page → Art) breathes every 20 seconds under a dark red cloud drawn from noise that moves through time, from a new seed on each visit. The hotspot set in the Studio stays in view and is where the breath grows from.',
+            'The headline sits on night at 70%, legible over any image. The pause button stops the motion; reduced motion stills it.',
+            'The featured book is the one picked in Site settings, or the first in the Books order. Its first store is the page’s one red action.',
+          ]}
+        >
+          {/* Shorter than the real thing, which fills the screen under the header. */}
+          <HomeSplit settings={s} book={cards[0] ?? null} levels={{ tagline: 'h4', book: 'h4' }} className="min-h-[40rem]" />
+        </Specimen>
+      </Section>
+
+      <Section id="books-and-posts" tone="surface" aria-labelledby="books-heading">
         <SectionHeading id="books-heading" intro="Every card is one click target.">
           Books and posts
         </SectionHeading>
@@ -392,7 +427,7 @@ export default async function StyleguidePage() {
         </div>
       </Section>
 
-      <Section id="reading" tone="surface" aria-labelledby="reading-heading">
+      <Section id="reading" aria-labelledby="reading-heading">
         <SectionHeading id="reading-heading" intro="Posts, pages, and book descriptions, as edited in the Studio’s Body field.">
           Reading
         </SectionHeading>
@@ -407,7 +442,7 @@ export default async function StyleguidePage() {
         </Specimen>
       </Section>
 
-      <Section id="rules" aria-labelledby="rules-heading">
+      <Section id="rules" tone="surface" aria-labelledby="rules-heading">
         <SectionHeading id="rules-heading" intro="The decisions behind the components, so the next one fits.">
           Rules
         </SectionHeading>
@@ -420,7 +455,7 @@ export default async function StyleguidePage() {
         </ul>
       </Section>
 
-      <Section id="voice" tone="surface" aria-labelledby="voice-heading">
+      <Section id="voice" aria-labelledby="voice-heading">
         <SectionHeading id="voice-heading" intro="The mechanics of how the site is written.">
           Voice
         </SectionHeading>
