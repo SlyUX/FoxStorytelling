@@ -1,64 +1,98 @@
 import Link from 'next/link'
-import Newsletter from '@/components/Newsletter'
-import { safeFetch, BOOKS_QUERY, POSTS_QUERY, FEATURED_QUERY } from '@/lib/queries'
 
-export const dynamic = 'force-dynamic'
+import { BookCard, BookGrid } from '@/components/book-card'
+import { Newsletter } from '@/components/newsletter'
+import { PostList } from '@/components/post-list'
+import { ButtonLink } from '@/components/ui/button'
+import { EmptyState, Eyebrow, Section, SectionHeading } from '@/components/ui/section'
+import { BOOKS_QUERY, FEATURED_POST_QUERY, POSTS_QUERY, safeFetch } from '@/lib/queries'
+import { getSiteSettings } from '@/lib/site-settings'
+import { formatDate } from '@/lib/utils'
+import type { BookCardData, FeaturedPost, PostCardData } from '@/lib/types'
 
 export default async function Home() {
-  const featured = await safeFetch<any>(FEATURED_QUERY, {}, null)
-  const books = await safeFetch<any[]>(BOOKS_QUERY, {}, [])
-  const posts = await safeFetch<any[]>(POSTS_QUERY, {}, [])
+  const [settings, featured, books, posts] = await Promise.all([
+    getSiteSettings(),
+    safeFetch<FeaturedPost>(FEATURED_POST_QUERY, {}, null),
+    safeFetch<BookCardData[]>(BOOKS_QUERY, {}, []),
+    safeFetch<PostCardData[]>(POSTS_QUERY, {}, []),
+  ])
+  const featuredDate = formatDate(featured?.publishedAt)
 
   return (
-    <div className="space-y-16">
-      <section className="py-8">
-        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">Redemptive horror.</h1>
-        <p className="mt-4 max-w-xl text-neutral-400">Dark stories with a soul — books and comics by Stephen Fox.</p>
-      </section>
+    <>
+      <Section opener className="pb-6 md:pb-10">
+        <h1 className="max-w-3xl font-serif text-6xl leading-[1.05] font-semibold tracking-tight">{settings.tagline}</h1>
+        <p className="text-muted-foreground mt-5 max-w-xl text-xl leading-relaxed">{settings.homeIntro}</p>
+      </Section>
 
       {featured && (
-        <section>
-          <p className="text-xs uppercase tracking-widest text-neutral-500">Featured</p>
-          <Link href={`/blog/${featured.slug}`} className="mt-2 block text-2xl font-semibold hover:underline">
-            {featured.title}
-          </Link>
-          <p className="mt-2 text-neutral-400">{featured.excerpt}</p>
-        </section>
+        <Section className="pt-0 md:pt-0">
+          <article className="group bg-card border-border rounded-ui relative border p-6 md:p-10">
+            <Eyebrow className="mb-3">{settings.featuredLabel}</Eyebrow>
+            <h2 className="font-serif text-3xl leading-tight font-semibold">
+              <Link
+                href={`/blog/${featured.slug}`}
+                className="group-hover:text-link focus-visible:after:outline-ring after:absolute after:inset-0 focus-visible:outline-none focus-visible:after:outline-2"
+              >
+                {featured.title}
+              </Link>
+            </h2>
+            {featuredDate && (
+              <p className="text-muted-foreground mt-2 text-sm">
+                <time dateTime={featured.publishedAt}>{featuredDate}</time>
+              </p>
+            )}
+            {featured.excerpt && <p className="text-muted-foreground mt-4 max-w-2xl text-lg leading-relaxed">{featured.excerpt}</p>}
+          </article>
+        </Section>
       )}
 
-      <section>
-        <div className="flex items-baseline justify-between">
-          <h2 className="text-xl font-semibold">Books</h2>
-          <Link href="/books" className="text-sm text-neutral-400 hover:text-white">View all →</Link>
-        </div>
-        <ul className="mt-4 grid gap-4 sm:grid-cols-2">
-          {books.slice(0, 4).map((b) => (
-            <li key={b._id} className="rounded-lg border border-neutral-800 p-4">
-              <Link href={`/books/${b.slug}`} className="font-medium hover:underline">{b.title}</Link>
-              <p className="text-sm text-neutral-500">{b.series} · {b.status}</p>
-            </li>
-          ))}
-          {!books.length && <li className="text-sm text-neutral-500">No books yet — add one in the Studio.</li>}
-        </ul>
-      </section>
+      <Section aria-labelledby="books-heading">
+        <SectionHeading
+          id="books-heading"
+          action={
+            books.length > 4 && (
+              <ButtonLink href="/books" variant="outline" size="sm">
+                {settings.viewAllLabel}
+              </ButtonLink>
+            )
+          }
+        >
+          {settings.booksTitle}
+        </SectionHeading>
+        {books.length ? (
+          <BookGrid>
+            {books.slice(0, 4).map((book) => (
+              <BookCard key={book._id} book={book} />
+            ))}
+          </BookGrid>
+        ) : (
+          <EmptyState>{settings.booksEmpty}</EmptyState>
+        )}
+      </Section>
 
-      <section>
-        <div className="flex items-baseline justify-between">
-          <h2 className="text-xl font-semibold">Latest from the Rejection Files</h2>
-          <Link href="/blog" className="text-sm text-neutral-400 hover:text-white">View all →</Link>
-        </div>
-        <ul className="mt-4 space-y-3">
-          {posts.slice(0, 5).map((p) => (
-            <li key={p._id}>
-              <Link href={`/blog/${p.slug}`} className="hover:underline">{p.title}</Link>
-              <span className="ml-2 text-xs text-neutral-500">{p.category}</span>
-            </li>
-          ))}
-          {!posts.length && <li className="text-sm text-neutral-500">No posts yet — write one in the Studio.</li>}
-        </ul>
-      </section>
+      <Section tone="surface" aria-labelledby="posts-heading">
+        <SectionHeading
+          id="posts-heading"
+          action={
+            posts.length > 5 && (
+              <ButtonLink href="/blog" variant="outline" size="sm">
+                {settings.viewAllLabel}
+              </ButtonLink>
+            )
+          }
+        >
+          {settings.homePostsHeading}
+        </SectionHeading>
+        {posts.length ? <PostList posts={posts.slice(0, 5)} /> : <EmptyState>{settings.postsEmpty}</EmptyState>}
+      </Section>
 
-      <Newsletter />
-    </div>
+      {settings.newsletterUrl && (
+        <Section>
+          <Newsletter settings={settings} />
+        </Section>
+      )}
+    </>
   )
 }

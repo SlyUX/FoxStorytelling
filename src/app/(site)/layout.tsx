@@ -1,19 +1,39 @@
+import Image from 'next/image'
 import Link from 'next/link'
-export default function SiteLayout({ children }: { children: React.ReactNode }) {
+
+import { SiteFooter } from '@/components/site-footer'
+import { SiteNav } from '@/components/site-nav'
+import { getSiteSettings } from '@/lib/site-settings'
+
+/**
+ * Pages are static but refresh from Sanity at most once a minute, so edits in
+ * the Studio go live without a redeploy. New slugs render on first request.
+ */
+export const revalidate = 60
+
+/** Site chrome: skip link, header, footer. Kept off the full-screen Studio. */
+export default async function SiteLayout({ children }: { children: React.ReactNode }) {
+  const settings = await getSiteSettings()
   return (
-    <>
-      <header className="border-b border-neutral-800">
-        <nav className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
-          <Link href="/" className="font-bold tracking-tight">Fox Storytelling</Link>
-          <div className="flex gap-6 text-sm text-neutral-300">
-            <Link href="/books" className="hover:text-white">Books</Link>
-            <Link href="/blog" className="hover:text-white">Rejection Files</Link>
-            <Link href="/about" className="hover:text-white">About</Link>
-          </div>
-        </nav>
+    <div className="flex min-h-svh flex-col">
+      <a href="#main" className="bg-primary text-primary-foreground sr-only z-50 px-4 py-2 focus:not-sr-only focus:fixed focus:top-2 focus:left-2">
+        {/* a11y-only text; not CMS-managed. */}
+        Skip to content
+      </a>
+      <header className="border-border border-b px-4 sm:px-6">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-8 gap-y-3 py-4">
+          <Link href="/" className="shrink-0">
+            {/* The logo lockup (fox and wordmark), drawn for dark grounds. 678 × 84. */}
+            <Image src="/brand/fox-storytelling-logo.svg" alt={settings.title} width={678} height={84} priority className="h-6 w-auto sm:h-7" />
+          </Link>
+          {/* aria-label is a11y-only text, not CMS copy. */}
+          <SiteNav links={settings.navigation} label="Main" />
+        </div>
       </header>
-      <main className="mx-auto max-w-5xl px-6 py-10">{children}</main>
-      <footer className="border-t border-neutral-800 py-8 text-center text-xs text-neutral-500">© Fox Storytelling</footer>
-    </>
+      <main id="main" className="flex-1">
+        {children}
+      </main>
+      <SiteFooter settings={settings} />
+    </div>
   )
 }

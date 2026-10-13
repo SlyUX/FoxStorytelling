@@ -1,26 +1,145 @@
 @import "tailwindcss";
 
+/*
+  The site is always dark, so shadcn components' `dark:` styles always apply
+  (they're tuned for dark grounds). The root layout puts `dark` on <html>.
+*/
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+  Design tokens (2026-10-12). PROVISIONAL pending art direction.
+  Night, bone, the fox's red, and one ember of light.
+  Components use these through Tailwind (`bg-card`, `text-link`), never raw
+  hex or palette classes. Names follow shadcn (`name` is a ground,
+  `name-foreground` is what sits on it), so `npx shadcn add` components fit.
+
+  - --background is night with a faint violet, from the illustration's darks.
+  - --fox is the logo's exact red (#E91D2D, sampled from the file). It fails
+    AA both as text on night (4.34) and under white text (4.49), so it's
+    decoration and large display only. --primary is the same hue, as deep as
+    white button text needs.
+  - --ember is the light in the dark (the firefly gold in "The Gardener"):
+    links, the focus ring, things on their way. Red is for action, ember is
+    for light. Never ember on red (3.06).
+
+  Verified contrast (WCAG 2.x):
+    --foreground on --background ......... 15.69  (AAA)
+    --foreground on --surface ............ 14.69  (AAA) — bands
+    --foreground on --card ............... 13.86  (AAA) — cards, panels
+    --foreground on --muted .............. 11.81  (AAA) — badges, secondary buttons
+    --muted-foreground on --background ...  7.79  (AAA)
+    --muted-foreground on --surface ......  7.30  (AAA)
+    --muted-foreground on --card .........  6.89  (AA)
+    --muted-foreground on --muted ........  5.87  (AA)
+    --link on --background ............... 10.30  (AAA) — links, eyebrows
+    --link on --surface ..................  9.65  (AAA)
+    --link on --card .....................  9.10  (AAA)
+    --visited on --background ............  8.68  (AAA) — visited links
+    --visited on --card ..................  7.67  (AAA)
+    --destructive on --background ........  7.72  (AAA) — errors
+    --destructive on --card ..............  6.82  (AA)
+    white on --primary ...................  5.79  (AA) — primary buttons
+    white on --primary at 85% ............  7.23  (AAA) — primary button hover
+    --foreground on --primary ............  4.66  (AA)
+    --background on --ember .............. 10.30  (AAA) — text selection
+    --input on --background ..............  3.63  non-text (≥3) — form field edges
+    --input on --card ....................  3.21  non-text (≥3)
+    --fox on --background ................  4.34  large text and graphics only
+    --primary on --background ............  3.37  FAILS for text — a ground, not a text color
+    --ember on --primary .................  3.06  FAILS — never ember on red
+*/
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  color-scheme: dark;
+
+  --background: #0d0c10;
+  --foreground: #ece6da; /* bone */
+  --surface: #16141b; /* alternating bands */
+  --card: #1c1a21;
+  --card-foreground: #ece6da;
+  --popover: #1c1a21;
+  --popover-foreground: #ece6da;
+  --muted: #2a2730;
+  --muted-foreground: #aaa397;
+  --border: #34303b; /* dividers and card edges: decorative, so no contrast floor */
+  --input: #6e6878; /* form field edges: must clear 3:1 against the ground */
+
+  --primary: #c8192a;
+  --primary-foreground: #ffffff;
+  --secondary: #2a2730;
+  --secondary-foreground: #ece6da;
+  --accent: #2a2730; /* hover ground for menu items (shadcn) */
+  --accent-foreground: #ece6da;
+  --destructive: #ff7a7a; /* errors: a light red that reads as text on night */
+
+  --fox: #e91d2d;
+  --ember: #e9b44c;
+  --link: #e9b44c; /* links: ember, its own token so it can diverge */
+  --visited: #b8a3e0; /* visited links: dusk violet, from the illustration */
+  --ring: #e9b44c;
+
+  /* Corners: nearly square, like a book's edge. shadcn's scale derives from this. */
+  --radius: 2px;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-surface: var(--surface);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-fox: var(--fox);
+  --color-ember: var(--ember);
+  --color-link: var(--link);
+  --color-visited: var(--visited);
+  --color-ring: var(--ring);
+
+  /* Reading is serif, the interface is sans. */
+  --font-sans: var(--font-geist);
+  --font-serif: var(--font-crimson);
+
+  --radius-ui: var(--radius);
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+
+  /* Fluid display sizes: body text stays fixed, headings scale 320px→1280px. */
+  --text-3xl: clamp(1.625rem, calc(1.375rem + 1.25vw), 2.375rem);
+  --text-4xl: clamp(2rem, calc(1.625rem + 1.875vw), 3.125rem);
+  --text-5xl: clamp(2.5rem, calc(2rem + 2.5vw), 4rem);
+  --text-6xl: clamp(2.75rem, calc(2rem + 3.75vw), 5rem);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  html {
+    background: var(--background);
+    color: var(--foreground);
   }
-}
-
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  ::selection {
+    background: var(--ember);
+    color: var(--background);
+  }
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 3px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms !important;
+    }
+  }
 }

@@ -34,7 +34,16 @@ Then in Vercel: **Add New Project** → import this repo → add the three `NEXT
 Point foxstorytelling.com at Vercel in HostGator Zone Editor — **leave MX + the MailerLite SPF/DKIM records untouched**. See the site runbook for exact records.
 
 ## What's here
-- `src/sanity/schemaTypes/` — content model: `book`, `post` (Rejection Files), `page`, `siteSettings`, `buyLink`
-- `src/app/` — routes: `/`, `/books`, `/books/[slug]`, `/blog`, `/blog/[slug]`, `/about`, `/studio`
-- `src/components/` — `BuyLinks` (retail links out, no checkout), `Newsletter` (paste your MailerLite form), `PortableTextBody`
-- Drop your v0/Figma components into these routes to replace the plain styling.
+- `AGENTS.md`: how this project is built: stack, design system, process, and rules. Read it first.
+- `/styleguide`: the design system, live: tokens, contrast, type, components, rules, and voice.
+- `src/app/globals.css`: design tokens (provisional palette, fonts, radius, fluid type).
+- `src/components/ui/`: shadcn-style primitives (`button`, `badge`, `section`). Add more with `npx shadcn@latest add <name>`.
+- `src/components/`: site components: `book-card`, `post-list`, `buy-links` (retail links out, no checkout), `newsletter`, `rich-text`, header and footer.
+- `src/sanity/schemaTypes/`: content model: `book`, `post` (Rejection Files), `page`, `siteSettings` (singleton: all site copy), plus `link`, `imageWithAlt`, `richText`, `buyLink`.
+- `src/app/`: routes: `/`, `/books`, `/books/[slug]`, `/blog`, `/blog/[slug]`, `/[slug]` (About and other pages), `/styleguide`, `/studio`.
+- `npm run typegen`: regenerates `sanity.types.ts` from the schema and queries (also runs before every build).
+
+## Content to add in the Studio
+- **Site settings:** every field has a sensible default, so fill in only what you want to change.
+- **Newsletter:** paste your MailerLite hosted form address into Site settings → Newsletter. The site never collects emails; the sign-up panel stays hidden until this is set.
+- **About:** create a Page with the slug `about`.

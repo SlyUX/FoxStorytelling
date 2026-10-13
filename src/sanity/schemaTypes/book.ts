@@ -9,7 +9,7 @@ export default defineType({
     defineField({ name: 'status', type: 'string',
       options: { list: ['Available', 'Upcoming', 'On Kickstarter'] }, initialValue: 'Available' }),
     defineField({ name: 'shortDescription', type: 'text', rows: 3 }),
-    defineField({ name: 'description', type: 'array', of: [{ type: 'block' }] }),
+    defineField({ name: 'description', type: 'richText' }),
     defineField({ name: 'buyLinks', title: 'Buy links', type: 'array', of: [{ type: 'buyLink' }] }),
     defineField({ name: 'publishDate', type: 'date' }),
     defineField({ name: 'order', type: 'number' }),

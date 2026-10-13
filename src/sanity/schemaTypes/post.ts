@@ -8,7 +8,7 @@ export default defineType({
       options: { list: ['Rejection Files', 'News', 'Craft'] }, initialValue: 'Rejection Files' }),
     defineField({ name: 'excerpt', type: 'text', rows: 3 }),
     defineField({ name: 'cover', type: 'image', options: { hotspot: true } }),
-    defineField({ name: 'body', type: 'array', of: [{ type: 'block' }, { type: 'image' }] }),
+    defineField({ name: 'body', type: 'richText' }),
     defineField({ name: 'publishedAt', type: 'datetime', validation: (r) => r.required() }),
     defineField({ name: 'featured', type: 'boolean', initialValue: false }),
   ],
