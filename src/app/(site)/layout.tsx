@@ -1,8 +1,8 @@
-import Image from 'next/image'
 import Link from 'next/link'
 
 import { HeaderHeight } from '@/components/header-height'
 import { SiteFooter } from '@/components/site-footer'
+import { SiteLogo } from '@/components/site-logo'
 import { SiteNav } from '@/components/site-nav'
 import { getSiteSettings } from '@/lib/site-settings'
 
@@ -24,9 +24,8 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       <header data-site-header className="border-border border-b px-4 sm:px-6">
         <HeaderHeight />
         <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-8 gap-y-3 py-4">
-          <Link href="/" className="shrink-0">
-            {/* The logo lockup (fox and wordmark), drawn for dark grounds. 678 × 84. */}
-            <Image src="/brand/fox-storytelling-logo.svg" alt={settings.title} width={678} height={84} loading="eager" className="h-6 w-auto sm:h-7" />
+          <Link href="/" aria-label={settings.title} className="shrink-0">
+            <SiteLogo />
           </Link>
           {/* aria-label is a11y-only text, not CMS copy. */}
           <SiteNav links={settings.navigation} label="Main" />

@@ -1,44 +1,62 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
-import { Pause, Play } from 'lucide-react'
+import { useEffect, useRef } from 'react'
 
-import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
 /**
  * Art that breathes. The image swells past "cover" and settles back every 20
- * seconds (`--breath` and `.breathe` in globals.css), while a very dark red
- * cloud rolls over it, thickening as the image swells and thinning as it
- * settles.
+ * seconds, brightening as it swells and fading as it settles (`--breath`,
+ * `--breath-dim`, `--breath-bright`, and `.breathe` in globals.css), while a
+ * dark cloud rolls over it (black, or the color picked in the Studio),
+ * thickening and fading in step.
  *
  * The cloud is never the same twice: it's drawn from noise that moves through
  * time, so each frame grows out of the one before, from a new random seed on
- * every visit. A pause button stops both; reduced motion stills the image and
- * skips the cloud, leaving the vignette.
+ * every visit. Pausing stops both; reduced motion stills the image and skips
+ * the cloud, leaving the vignette.
+ *
+ * BookSpotlight owns pausing (it also stops the rotation) and the controls,
+ * and hears each breath end, when the art is settled and dimmest, to change
+ * books.
  */
-export function BreathingArt({ art, focus, children, className }: { art: React.ReactNode; focus: string; children?: React.ReactNode; className?: string }) {
-  const [paused, setPaused] = useState(false)
+export function BreathingArt({
+  art,
+  focus,
+  cloud,
+  paused,
+  onBreath,
+  controls,
+  className,
+}: {
+  art: React.ReactNode
+  /** The hotspot, as a CSS position: kept in view, and where the breath grows from. */
+  focus: string
+  /** The cloud's color (hex), picked in the Studio; without one, the --cloud token. */
+  cloud?: string | null
+  paused: boolean
+  /** Called as each breath ends: the art is settled and at its dimmest. */
+  onBreath?: () => void
+  /** Buttons in the bottom-left corner. */
+  controls?: React.ReactNode
+  className?: string
+}) {
   const artRef = useRef<HTMLDivElement>(null)
 
   return (
     <div data-paused={paused} className={cn('bg-background relative isolate overflow-hidden', className)}>
-      <div ref={artRef} className="breathe absolute inset-0" style={{ '--focus': focus } as React.CSSProperties}>
+      <div
+        ref={artRef}
+        onAnimationIteration={(event) => event.target === event.currentTarget && onBreath?.()}
+        className="breathe absolute inset-0"
+        style={{ '--focus': focus } as React.CSSProperties}
+      >
         {art}
       </div>
-      <CloudLayer artRef={artRef} paused={paused} />
+      <CloudLayer artRef={artRef} paused={paused} color={cloud} />
       {/* Vignette: holds the edges in shadow, so the art sinks into the page. */}
       <div aria-hidden className="to-background/80 pointer-events-none absolute inset-0 bg-radial from-transparent from-45%" />
-      {children}
-      <button
-        type="button"
-        onClick={() => setPaused((p) => !p)}
-        // a11y-only text; not CMS-managed.
-        aria-label={paused ? 'Play animation' : 'Pause animation'}
-        className={cn(buttonVariants({ variant: 'ghost', size: 'icon' }), 'bg-background/60 text-foreground/80 hover:text-link absolute top-3 right-3 z-10 size-9 motion-reduce:hidden')}
-      >
-        {paused ? <Play aria-hidden /> : <Pause aria-hidden />}
-      </button>
+      {controls && <div className="absolute bottom-3 left-3 z-10 flex items-center gap-1.5">{controls}</div>}
     </div>
   )
 }
@@ -48,6 +66,8 @@ const COLS = 72
 const FPS = 30
 /** How dense the cloud gets at the top of a breath. Keep it subtle. */
 const MAX_ALPHA = 0.75
+/** Seconds for the cloud to take on a new color: about as long as the art's crossfade. */
+const COLOR_EASE = 0.6
 
 /** 3D value noise: smooth in x, y, and time. Seeded, so every visit starts from a new formation. */
 function valueNoise(seed: number) {
@@ -91,21 +111,30 @@ const rgb = (hex: string) => {
 /**
  * Draws the cloud. Runs only while the art is on screen, the tab is visible,
  * motion is allowed, and the art isn't paused; it keeps its own clock, so a
- * pause freezes the cloud and play resumes it from the same formation.
+ * pause freezes the cloud and play resumes it from the same formation. When
+ * the color changes (a new book), it eases into the new one rather than
+ * switching.
  */
-function CloudLayer({ artRef, paused }: { artRef: React.RefObject<HTMLDivElement | null>; paused: boolean }) {
+function CloudLayer({ artRef, paused, color }: { artRef: React.RefObject<HTMLDivElement | null>; paused: boolean; color?: string | null }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  // The cloud's seed and clock outlive pause and play, so play resumes the same formation.
-  const clock = useRef<{ seed: number; elapsed: number } | null>(null)
+  // The cloud's seed, clock, and showing color outlive pause and play, so play resumes the same formation.
+  const clock = useRef<{ seed: number; elapsed: number; shown?: number[] } | null>(null)
+  const colorRef = useRef(color)
+  const redraw = useRef<() => void>(undefined)
 
   useEffect(() => {
     const canvas = canvasRef.current
     const art = artRef.current
     const ctx = canvas?.getContext('2d')
-    // The cloud's color is the --cloud token; without it, there's no cloud.
-    const color = rgb(getComputedStyle(document.documentElement).getPropertyValue('--cloud'))
-    if (!canvas || !art || !ctx || !color) return
-    const [r, g, b] = color
+    const root = getComputedStyle(document.documentElement)
+    // The color picked in the Studio, or the --cloud token. With neither, there's no cloud.
+    const fallback = rgb(root.getPropertyValue('--cloud'))
+    const goal = () => rgb(colorRef.current ?? '') ?? fallback
+    // The same opacities the art breathes between, so the cloud fades with it. Without them, no fade.
+    const dim = parseFloat(root.getPropertyValue('--breath-dim'))
+    const bright = parseFloat(root.getPropertyValue('--breath-bright'))
+    const opacityAt = (at: number) => (Number.isFinite(dim) && Number.isFinite(bright) ? dim + (bright - dim) * at : 1)
+    if (!canvas || !art || !ctx) return
 
     clock.current ??= { seed: (Math.random() * 2 ** 31) | 0, elapsed: 0 }
     const state = clock.current
@@ -131,9 +160,15 @@ function CloudLayer({ artRef, paused }: { artRef: React.RefObject<HTMLDivElement
       return 0.5 - 0.5 * Math.cos(2 * Math.PI * t)
     }
 
-    const draw = () => {
+    /** `step` is how far to move toward the goal color: 0 holds it, 1 arrives. */
+    const draw = (step: number) => {
+      const target = goal()
+      if (!target) return ctx.clearRect(0, 0, canvas.width, canvas.height)
+      state.shown = state.shown ? state.shown.map((c, k) => c + (target[k] - c) * step) : target
+      const [r, g, b] = state.shown.map(Math.round)
       const { width, height, data } = image
-      const swell = 0.35 + 0.65 * breath()
+      const now = breath()
+      const swell = (0.35 + 0.65 * now) * opacityAt(now)
       const drift = state.elapsed * 0.06 // the cloud rolls slowly across
       const time = state.elapsed * 0.1 // and slowly re-forms
       const scale = 3 / COLS // about three cloud masses across
@@ -156,9 +191,10 @@ function CloudLayer({ artRef, paused }: { artRef: React.RefObject<HTMLDivElement
       frame = requestAnimationFrame(tick)
       if (now - last < 1000 / FPS) return
       // Cap the step, so returning to a background tab doesn't jump the cloud.
-      if (last) state.elapsed += Math.min(now - last, 100) / 1000
+      const dt = last ? Math.min(now - last, 100) / 1000 : 0
+      state.elapsed += dt
       last = now
-      draw()
+      draw(1 - Math.exp(-dt / COLOR_EASE))
     }
 
     const update = () => {
@@ -172,8 +208,12 @@ function CloudLayer({ artRef, paused }: { artRef: React.RefObject<HTMLDivElement
 
     const resize = new ResizeObserver(() => {
       size()
-      if (!reduce.matches) draw()
+      if (!reduce.matches) draw(0)
     })
+    // A new color while the cloud is still (paused): show it at once.
+    redraw.current = () => {
+      if (!frame && !reduce.matches) draw(1)
+    }
     const visible = new IntersectionObserver(([entry]) => {
       onScreen = entry.isIntersecting
       update()
@@ -192,6 +232,11 @@ function CloudLayer({ artRef, paused }: { artRef: React.RefObject<HTMLDivElement
       reduce.removeEventListener('change', update)
     }
   }, [artRef, paused])
+
+  useEffect(() => {
+    colorRef.current = color
+    redraw.current?.()
+  }, [color])
 
   return <canvas ref={canvasRef} aria-hidden className="pointer-events-none absolute inset-0 size-full" />
 }

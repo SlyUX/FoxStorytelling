@@ -6,25 +6,24 @@ import { Newsletter } from '@/components/newsletter'
 import { PostList } from '@/components/post-list'
 import { ButtonLink } from '@/components/ui/button'
 import { EmptyState, Eyebrow, Section, SectionHeading } from '@/components/ui/section'
-import { BOOKS_QUERY, FEATURED_POST_QUERY, POSTS_QUERY, safeFetch } from '@/lib/queries'
+import { BOOKS_QUERY, FEATURED_POST_QUERY, HOME_SPOTLIGHT_QUERY, POSTS_QUERY, safeFetch } from '@/lib/queries'
 import { getSiteSettings } from '@/lib/site-settings'
 import { formatDate } from '@/lib/utils'
-import type { BookCardData, FeaturedPost, PostCardData } from '@/lib/types'
+import type { BookCardData, FeaturedPost, PostCardData, SpotlightBook } from '@/lib/types'
 
 export default async function Home() {
-  const [settings, featured, books, posts] = await Promise.all([
+  const [settings, featured, books, posts, spotlight] = await Promise.all([
     getSiteSettings(),
     safeFetch<FeaturedPost>(FEATURED_POST_QUERY, {}, null),
     safeFetch<BookCardData[]>(BOOKS_QUERY, {}, []),
     safeFetch<PostCardData[]>(POSTS_QUERY, {}, []),
+    safeFetch<SpotlightBook[]>(HOME_SPOTLIGHT_QUERY, {}, []),
   ])
   const featuredDate = formatDate(featured?.publishedAt)
-  // The book picked in Site settings, or the first in the Books order.
-  const featuredBook = settings.featuredBook ?? books[0] ?? null
 
   return (
     <>
-      <HomeSplit settings={settings} book={featuredBook} preload />
+      <HomeSplit settings={settings} spotlight={spotlight} fallbackBook={books[0] ?? null} preload />
 
       {featured && (
         <Section>

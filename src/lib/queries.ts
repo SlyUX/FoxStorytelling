@@ -22,8 +22,13 @@ const POST_CARD = `_id,title,"slug":slug.current,category,excerpt,publishedAt`
 export const SITE_SETTINGS_QUERY = defineQuery(`*[_type=="siteSettings" && _id=="siteSettings"][0]{
   ...,
   "homeImageLqip": homeImage.asset->metadata.lqip,
-  "featuredBook": featuredBook->{${BOOK_CARD}}
+  "cloudHex": cloudColor.hex
 }`)
+
+/** Books that rotate through the home page's first screen: toggled on, with their art, in Books order. */
+export const HOME_SPOTLIGHT_QUERY = defineQuery(
+  `*[_type=="book" && showOnHome == true && defined(homeArt.asset) && defined(slug.current)]|order(order asc, title asc){${BOOK_CARD},homeArt,"homeArtLqip": homeArt.asset->metadata.lqip,"cloudHex": cloudColor.hex}`,
+)
 
 export const BOOKS_QUERY = defineQuery(`*[_type=="book" && defined(slug.current)]|order(order asc, title asc){${BOOK_CARD}}`)
 

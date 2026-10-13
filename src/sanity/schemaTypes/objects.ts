@@ -5,6 +5,13 @@ import { defineArrayMember, defineField, defineType } from 'sanity'
  * by name.
  */
 
+/**
+ * The color of the cloud that rolls over the home page art (a `color` field
+ * from @sanity/color-input). Presets: black, and the dark red it first was.
+ * Not a registered type: a shared field options object.
+ */
+export const CLOUD_COLOR_OPTIONS = { disableAlpha: true, colorList: ['#000000', '#3a060a'] }
+
 /** A labeled link. Internal paths ("/books") or full URLs both work. */
 export const link = defineType({
   name: 'link',

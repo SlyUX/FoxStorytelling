@@ -57,8 +57,6 @@
     --fox on --background ................  4.34  large text and graphics only
     --primary on --background ............  3.37  FAILS for text — a ground, not a text color
     --ember on --primary .................  3.06  FAILS — never ember on red
-    Home art: --foreground on --background at 70% over pure white: 5.96 (AA),
-    the worst case, so the headline holds over any part of any image.
 */
 :root {
   color-scheme: dark;
@@ -88,7 +86,7 @@
   --link: #e9b44c; /* links: ember, its own token so it can diverge */
   --visited: #b8a3e0; /* visited links: dusk violet, from the illustration */
   --ring: #e9b44c;
-  --cloud: #3a060a; /* the dark red cloud that rolls over the home art: decorative */
+  --cloud: #000000; /* the cloud that rolls over the home art, unless the Studio picks another: decorative */
 
   /* Corners: nearly square, like a book's edge. shadcn's scale derives from this. */
   --radius: 2px;
@@ -123,6 +121,8 @@
   /* Reading is serif, the interface is sans. */
   --font-sans: var(--font-geist);
   --font-serif: var(--font-crimson);
+  /* The logo's letters only. */
+  --font-brand: var(--font-montserrat);
 
   --radius-ui: var(--radius);
   --radius-sm: calc(var(--radius) * 0.6);
@@ -142,45 +142,52 @@
   so the home page's split fills exactly the rest of the first screen.
 */
 :root {
-  --header-h: 61px;
+  --header-h: 69px;
 }
 /* Phones: the nav wraps under the logo. */
 @media (max-width: 30rem) {
   :root {
-    --header-h: 89px;
+    --header-h: 97px;
   }
 }
 
 /*
   The home art breathes: every 20 seconds (--breath) it swells past "cover"
-  and settles back. It never shrinks below cover, so no edge of the image ever shows. The
-  cloud over it (CloudLayer) reads this animation's clock to swell in step.
-  Transform only, so it runs on the compositor.
+  and settles back, brightening from --breath-dim to --breath-bright as it
+  swells and fading back as it settles. It never shrinks below cover, so no
+  edge of the image ever shows. The cloud over it (CloudLayer) reads this
+  animation's clock and the same two opacities, so it swells and fades in
+  step. Transform and opacity only, so it runs on the compositor.
 */
 :root {
   --breath: 20s;
+  --breath-dim: 0.5;
+  --breath-bright: 1;
 }
 @keyframes breathe {
   0%,
   100% {
     transform: scale(1);
+    opacity: var(--breath-dim);
   }
   50% {
     transform: scale(1.1);
+    opacity: var(--breath-bright);
   }
 }
 .breathe {
   animation: breathe var(--breath) ease-in-out infinite;
   transform-origin: var(--focus, 50% 40%);
-  will-change: transform;
+  will-change: transform, opacity;
 }
 [data-paused='true'] .breathe {
   animation-play-state: paused;
 }
-/* Reduced motion: the art holds still (and CloudLayer doesn't draw). */
+/* Reduced motion: the art holds still at full brightness (and CloudLayer doesn't draw). */
 @media (prefers-reduced-motion: reduce) {
   .breathe {
     animation: none;
+    opacity: var(--breath-bright);
   }
 }
 
