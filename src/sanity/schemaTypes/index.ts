@@ -5,6 +5,6 @@ import series from './series'
 import siteSettings from './siteSettings'
 import buyLink from './buyLink'
 import socialLink from './socialLink'
-import { imageWithAlt, link, richText } from './objects'
+import { imageWithAlt, link, richText, screenplay } from './objects'
 
-export const schemaTypes = [siteSettings, book, series, post, page, buyLink, socialLink, link, imageWithAlt, richText]
+export const schemaTypes = [siteSettings, book, series, post, page, buyLink, socialLink, link, imageWithAlt, richText, screenplay]

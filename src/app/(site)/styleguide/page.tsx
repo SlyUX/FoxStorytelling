@@ -8,6 +8,7 @@ import { PalettePicker } from '@/components/palette-preview'
 import { PostBecame } from '@/components/post-became'
 import { PostCard, PostList } from '@/components/post-list'
 import { RichText } from '@/components/rich-text'
+import { Screenplay } from '@/components/screenplay'
 import { SocialLinks } from '@/components/social-links'
 import { ColorTokens, ContrastTable, type ContrastPair, type TokenGroup } from '@/components/styleguide/color-tokens'
 import { Specimen } from '@/components/styleguide/specimen'
@@ -16,7 +17,7 @@ import { Button, ButtonLink } from '@/components/ui/button'
 import { EmptyState, Eyebrow, PageHeader, Section, SectionHeading } from '@/components/ui/section'
 import { BOOKS_QUERY, HOME_SPOTLIGHT_QUERY, POSTS_QUERY, safeFetch } from '@/lib/queries'
 import { getSiteSettings, type SiteSettings } from '@/lib/site-settings'
-import type { BookCardData, CmsBuyLink, PostCardData, RichText as RichTextValue, SpotlightBook } from '@/lib/types'
+import type { BookCardData, CmsBuyLink, PostCardData, RichText as RichTextValue, Screenplay as ScreenplayValue, SpotlightBook } from '@/lib/types'
 
 /*
  * The styleguide documents the code itself, so its text lives here, beside
@@ -129,7 +130,7 @@ const TYPE = [
 const RULES: [string, string][] = [
   ['Tokens only.', 'Colors come from the tokens above, through Tailwind; no raw hex values or palette classes in components. A new color pair must pass WCAG AA, and its ratio goes in globals.css and the table above.'],
   ['Red is for action, ember is for light.', 'One red button per view: the thing we most want done, like All stories on Home or the first store on a story’s page. A second action in the same view is ember text, underlined. Light red text and outlines mean something went wrong. Ember is the light: page titles, links, focus, and what’s on its way. The brand file’s red (--fox) is decoration and large display only; the logo’s badge wears the primary red. Never ember on red.'],
-  ['Two faces, plus the logo.', 'Titles are Special Gothic Condensed, never bold: it has one weight. Page titles (h1) are capitals, set by CSS, so they’re typed and read aloud as written; a story’s title keeps its own case wherever it’s a heading. Everything else is Roboto, with true italics: headings, reading, the interface. Montserrat sets the logo’s letters and nothing else.'],
+  ['Two faces, plus the logo.', 'Titles are Special Gothic Condensed, never bold: it has one weight. Page titles (h1) are capitals, set by CSS, so they’re typed and read aloud as written; a story’s title keeps its own case wherever it’s a heading. Everything else is Roboto, with true italics: headings, reading, the interface. Montserrat sets the logo’s letters and nothing else; scripts are set in Courier Prime, as scripts are.'],
   ['Corners are 2px.', 'Nearly square, like a book’s edge. Every element uses rounded-ui; shadcn’s radius scale derives from the same value. The one exception: the author’s portrait is round.'],
   ['One page title.', 'Each page has one h1, and headings never skip a level.'],
   ['Every card is one click target.', 'The title’s link stretches over the card, so the cover, title, and blurb all open it, with one focus ring around the whole card.'],
@@ -208,6 +209,18 @@ const SAMPLE_POEM: RichTextValue = [
   { _type: 'block', _key: 'v1', style: 'normal', markDefs: [], children: [span('t1', 'A poem keeps its lines\nexactly where they break,\nhowever short the line.')] },
   { _type: 'block', _key: 'v2', style: 'normal', markDefs: [], children: [span('t2', 'Each stanza is a paragraph,\nwith room above it.')] },
 ]
+
+type ScriptStyle = NonNullable<Extract<ScreenplayValue[number], { _type: 'block' }>['style']>
+const line = (key: string, style: ScriptStyle, text: string) => ({ _type: 'block' as const, _key: key, style, children: [span(`${key}s`, text)] })
+// From the NEX pilot (The Rejection Files): one of each element.
+const SAMPLE_SCRIPT = [
+  line('c1', 'scene', 'SCENE 1: Bobby’s Wings & Auto Repair'),
+  line('c2', 'normal', 'Int. Bobby’s Wings n’ Fries. Camera begins tight on several mugs... beer fills the mugs, the foamy head flows over the sides.'),
+  line('c3', 'character', 'BRITNEY'),
+  line('c4', 'parenthetical', '(pointing at Virgil)'),
+  line('c5', 'dialogue', 'Gotcha there, hun.'),
+  line('c6', 'transition', 'Fade to black.'),
+] satisfies ScreenplayValue
 
 export default async function StyleguidePage() {
   const [s, books, posts, spotlight] = await Promise.all([
@@ -556,6 +569,7 @@ export default async function StyleguidePage() {
                 became={{ note: 'A sentence or two on what happened to it after the rejections: here, it became a book.', story: cards[0] ?? null }}
                 heading={s.becameHeading}
                 linkLabel={s.bookDetailsLabel}
+                buyLabel={s.buyLabel}
                 headingLevel="h4"
               />
             </div>
@@ -591,6 +605,18 @@ export default async function StyleguidePage() {
         >
           <div className="max-w-2xl">
             <RichText value={SAMPLE_POEM} form="poetry" />
+          </div>
+        </Specimen>
+        <Specimen
+          name="Script"
+          file="src/components/screenplay.tsx · Screenplay"
+          notes={[
+            'A Rejection File’s script (Post → The script), set as a script page is, in Courier Prime: scene headings in bold capitals, action across the column, the character’s name, a parenthetical, and dialogue indented beneath, transitions to the right. Each paragraph’s style in the Studio picks its element.',
+            'Storyboard images sit centered between elements, never wider than they were drawn. Courier Prime loads only where a script is shown.',
+          ]}
+        >
+          <div className="max-w-2xl">
+            <Screenplay value={SAMPLE_SCRIPT} />
           </div>
         </Specimen>
       </Section>

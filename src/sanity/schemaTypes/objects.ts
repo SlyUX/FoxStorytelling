@@ -109,3 +109,37 @@ export const richText = defineType({
     defineArrayMember({ type: 'imageWithAlt' }),
   ],
 })
+
+/**
+ * A script (a screenplay), one block per element, written the way scripts are:
+ * scene headings, action, a character's name, a parenthetical, their dialogue,
+ * and transitions, with storyboard images between. Rendered in
+ * `src/components/screenplay.tsx`, which sets each the way a script page does.
+ */
+export const screenplay = defineType({
+  name: 'screenplay',
+  title: 'Script',
+  type: 'array',
+  of: [
+    defineArrayMember({
+      type: 'block',
+      styles: [
+        { title: 'Action', value: 'normal' },
+        { title: 'Scene heading', value: 'scene' },
+        { title: 'Character', value: 'character' },
+        { title: 'Parenthetical', value: 'parenthetical' },
+        { title: 'Dialogue', value: 'dialogue' },
+        { title: 'Transition', value: 'transition' },
+      ],
+      lists: [],
+      marks: {
+        decorators: [
+          { title: 'Emphasis', value: 'em' },
+          { title: 'Strong', value: 'strong' },
+        ],
+        annotations: [],
+      },
+    }),
+    defineArrayMember({ type: 'imageWithAlt' }),
+  ],
+})

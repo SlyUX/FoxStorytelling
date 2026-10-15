@@ -1,4 +1,5 @@
 import { BookCover } from '@/components/book-card'
+import { BuyLinks } from '@/components/buy-links'
 import { TransitionLink } from '@/components/transition-link'
 import { ButtonLink } from '@/components/ui/button'
 import type { PostDetail } from '@/lib/types'
@@ -6,13 +7,15 @@ import type { PostDetail } from '@/lib/types'
 /**
  * A Rejection File's epilogue, after the story: what the rejected work became.
  * The story it became (a book on this site), as a small card linking to its
- * page, and the author's words about it; either, or both. Renders nothing
- * without either.
+ * page, with where to buy it (the story's own buy links, the first in ember),
+ * and the author's words about it; either, or both. Renders nothing without
+ * either.
  */
 export function PostBecame({
   became,
   heading,
   linkLabel,
+  buyLabel,
   headingLevel: Heading = 'h2',
   className,
 }: {
@@ -20,6 +23,8 @@ export function PostBecame({
   heading: string
   /** The story link's text ("About the book"). */
   linkLabel: string
+  /** The buy buttons' text ("Buy on {store}"). */
+  buyLabel: string
   headingLevel?: 'h2' | 'h3' | 'h4'
   className?: string
 }) {
@@ -51,9 +56,12 @@ export function PostBecame({
               </TransitionLink>
             </p>
             {story.shortDescription && <p className="text-muted-foreground line-clamp-3 leading-relaxed">{story.shortDescription}</p>}
-            <ButtonLink href={href} variant="link" className="mt-1">
-              {linkLabel}
-            </ButtonLink>
+            <div className="mt-2 flex flex-wrap items-center gap-x-6 gap-y-3">
+              <BuyLinks links={story.buyLinks} label={buyLabel} lead="ember" />
+              <ButtonLink href={href} variant="link">
+                {linkLabel}
+              </ButtonLink>
+            </div>
           </div>
         </div>
       )}

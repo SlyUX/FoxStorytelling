@@ -112,6 +112,9 @@ export default defineType({
     defineField({ name: 'postsEmpty', title: 'No posts yet', type: 'string', group: 'shortForm', description: 'Shown where posts would be, before there are any.' }),
     defineField({ name: 'becameHeading', title: '"What it became" heading', type: 'string', group: 'shortForm', description: 'On a Rejection File, after the story.' }),
     defineField({ name: 'pitchHeading', title: '"The pitch" heading', type: 'string', group: 'shortForm', description: 'On a Rejection File, above the pitch itself.' }),
+    defineField({ name: 'scriptHeading', title: '"The script" heading', type: 'string', group: 'shortForm', description: 'On a Rejection File, above a script.' }),
+    defineField({ name: 'followsLabel', title: '"Previously" label', type: 'string', group: 'shortForm', description: 'Under a part’s title, before the part it continues.' }),
+    defineField({ name: 'continuedLabel', title: '"Continued in" label', type: 'string', group: 'shortForm', description: 'At the end of a part, before the part that continues it.' }),
 
     // Newsletter
     defineField({ name: 'newsletterHeading', title: 'Heading', type: 'string', group: 'newsletter' }),
