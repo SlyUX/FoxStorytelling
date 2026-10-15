@@ -115,13 +115,21 @@ export default defineType({
     defineField({ name: 'newsletterHeading', title: 'Heading', type: 'string', group: 'newsletter' }),
     defineField({ name: 'newsletterBlurb', title: 'Blurb', type: 'text', rows: 2, group: 'newsletter' }),
     defineField({
-      name: 'newsletterUrl',
-      title: 'Sign-up form address',
+      name: 'newsletterForm',
+      title: 'MailerLite form address',
       type: 'url',
       group: 'newsletter',
-      description: 'The MailerLite hosted form. The site never collects emails itself; until this is set, the sign-up panel stays hidden.',
+      description:
+        'Where the sign-up sends the address, straight from the reader’s browser: the site never sees it. In MailerLite: Forms → the form → Embed form → HTML code, the address after action=. Until this is set, the sign-up stays hidden.',
+      validation: (rule) =>
+        rule.custom((value?: string) =>
+          !value || /^https:\/\/assets\.mailerlite\.com\/jsonp\/\d+\/forms\/\d+\/subscribe$/.test(value) ? true : 'Use the form’s address from its HTML code: https://assets.mailerlite.com/jsonp/…/forms/…/subscribe',
+        ),
     }),
+    defineField({ name: 'newsletterEmailLabel', title: 'Email field label', type: 'string', group: 'newsletter', description: 'Shown in the empty field, and read to screen readers as its name.' }),
     defineField({ name: 'newsletterButtonLabel', title: 'Button text', type: 'string', group: 'newsletter' }),
+    defineField({ name: 'newsletterSuccess', title: 'Thank-you message', type: 'text', rows: 2, group: 'newsletter', description: 'Replaces the form once MailerLite has the address.' }),
+    defineField({ name: 'newsletterError', title: 'Error message', type: 'string', group: 'newsletter', description: 'When MailerLite turns the address away, or can’t be reached.' }),
   ],
   preview: { prepare: () => ({ title: 'Site settings' }) },
 })

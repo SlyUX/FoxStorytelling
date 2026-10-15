@@ -6,7 +6,7 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 # Project: foxstorytelling.com
 
-Stephen Fox's author site: redemptive horror, books and comics. Readers come to find a book and where to buy it, read the Rejection Files (the blog), and join the mailing list. The site never sells and never collects emails: buying hands off to retailers, sign-up hands off to MailerLite.
+Stephen Fox's author site: redemptive horror, books and comics. Readers come to find a book and where to buy it, read the Rejection Files (the blog), and join the mailing list. The site never sells and never collects emails: buying hands off to retailers; the sign-up form sends the address from the reader's browser straight to MailerLite.
 
 ## Stack
 - Next.js 16.2.10 (App Router, Turbopack, `src/`, alias `@/*`), React 19.2, TypeScript, Tailwind v4 (CSS-first tokens in `src/app/globals.css`)

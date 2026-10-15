@@ -32,11 +32,11 @@ const subscribeReduce = (onChange: () => void) => {
 /**
  * The home page's first screen: books' art breathing on one side, the showing
  * book's details over its foot; on the other, the site's description (`intro`)
- * and what follows it (`rest`), centered together. Two columns exactly filling
- * the screen under the header on landscape screens from tablet width
- * (`split:`). Stacked below that: the description, then the art, then the
- * rest. That's the reading order too, so keyboard and screen reader order
- * match the screen.
+ * and what follows it (`rest`), with `footer` (the sign-up) pinned beneath
+ * them. Two columns exactly filling the screen under the header on landscape
+ * screens from tablet width (`split:`). Stacked below that: the description,
+ * then the art, then the rest, then the footer. That's the reading order too,
+ * so keyboard and screen reader order match the screen.
  *
  * The breath is the clock: as each breath ends, with the art settled and at its
  * dimmest, the next book crossfades in, so there's never a hard cut. The
@@ -51,14 +51,17 @@ export function BookSpotlight({
   slides,
   intro,
   rest,
+  footer,
   label,
   className,
 }: {
   slides: SpotlightSlide[]
   /** The site's description: first on the page, beside the art on split screens. */
   intro: React.ReactNode
-  /** What follows the description (a FillColumn): beside the art on split screens, below it stacked. */
+  /** What follows the description: beside the art on split screens, below it stacked. */
   rest: React.ReactNode
+  /** Pinned under the column on split screens, the column scrolling above it; stacked, last. */
+  footer?: React.ReactNode
   /** What the rotation is called: shown above the art on phones, and its name for screen readers everywhere. */
   label: string
   className?: string
@@ -135,140 +138,151 @@ export function BookSpotlight({
   const hasControls = canPause || many
 
   return (
-    // Stacked, this simply flows: the description, the art, the rest. On split screens the art lifts out to cover the
-    // left half, and the description and the rest (a FillColumn, which steps aside here so its items join in) form
-    // one column on the right: wrapping, so what doesn't fit moves into a clipped second column, and centered, so
-    // whatever fits sits in the middle, at least 40px from either edge. Past the site's width (max-w-page) it stops
-    // and centers; the header lines up with its edges. The column starts half this element's width in, plus 48px:
-    // a padding percentage measures the parent (the full window), so half of min(window, site width) instead.
+    // Stacked, this simply flows: the description, the art, the rest, the footer. On split screens the art lifts out
+    // to cover the left half, and the right half is a column: the description and the rest scroll in it, centered
+    // while they fit (their auto margins), at least 40px from its edges; the footer is pinned beneath. Past the
+    // site's width (max-w-page) it stops and centers; the header lines up with its edges. The column starts half
+    // this element's width in: a padding percentage measures the parent (the full window), so half of
+    // min(window, site width) instead.
     <div
       className={cn(
-        'split:mx-auto split:max-w-page split:relative split:flex split:h-[calc(100svh-var(--header-h))] split:flex-col split:flex-wrap split:justify-center split:gap-x-16 split:overflow-hidden split:py-10 split:pr-12 split:pl-[calc(min(100%,var(--container-page))/2+3rem)] split:*:w-full',
+        'split:mx-auto split:max-w-page split:relative split:flex split:h-[calc(100svh-var(--header-h))] split:flex-col split:overflow-hidden split:pl-[calc(min(100%,var(--container-page))/2)]',
         className,
       )}
     >
-      <div className="split:p-0 px-6 pt-12 pb-10 sm:px-10">{intro}</div>
+      {/* The scrolling part. The art sits inside it for the reading order, but it's positioned against the whole
+          (this has no position of its own), so it neither scrolls nor clips with it. */}
+      <div className="split:flex split:min-h-0 split:flex-1 split:flex-col split:overflow-y-auto split:px-12 split:py-10 split:[scrollbar-color:var(--color-border)_transparent] split:[scrollbar-width:thin]">
+        <div className="split:mt-auto split:p-0 px-6 pt-12 pb-10 sm:px-10">{intro}</div>
 
-      <section
-        ref={sectionRef}
-        // a11y-only text; not CMS-managed.
-        aria-roledescription={many ? 'carousel' : undefined}
-        aria-labelledby={labelId}
-        // Stacked, a band between the description and the posts, ruled top and bottom like the header (--border).
-        className="border-border split:absolute split:inset-y-0 split:left-0 split:w-1/2! split:border-0 relative grid border-y"
-        onPointerEnter={(event) => event.pointerType === 'mouse' && setHover(true)}
-        onPointerLeave={(event) => event.pointerType === 'mouse' && setHover(false)}
-        onFocus={() => setFocusWithin(true)}
-        onBlur={(event) => !event.currentTarget.contains(event.relatedTarget) && setFocusWithin(false)}
-      >
-        {/* Stacked, the name sits across from the controls, on night at 85% so it reads over any art (see globals.css). */}
-        <Eyebrow id={labelId} className="bg-background/85 rounded-ui split:hidden absolute top-3 left-3 z-20 flex h-9 items-center px-3">
-          {label}
-        </Eyebrow>
-        <BreathingArt
-          focus={origin}
-          cloud={current.cloud}
-          cloudOn={current.cloudOn ?? true}
-          paused={paused}
-          onBreath={() => {
-            const next = rotating ? (index + 1) % slides.length : index
-            if (next !== index) setIndex(next)
-            setOrigin(slides[next].focus)
-          }}
-          // Stacked, the art takes most of the first screen, so the book over it still leaves the art room.
-          className="split:min-h-0 min-h-[calc((100svh-var(--header-h))*0.7)]"
-          art={slides.map((slide, i) => (
-            <div key={slide.key} aria-hidden={i !== index} className={cn('absolute inset-0 transition-opacity duration-2000 ease-in-out', i === index ? 'opacity-100' : 'opacity-0')}>
-              {slide.art}
-            </div>
-          ))}
-          controls={
-            hasControls && (
-              // The controls tuck behind one toggle (a disclosure): pause, previous, and next slide out to its left. On
-              // split screens the markers wait beside them, quiet until it opens; stacked, they slide out too, between
-              // previous and next. Escape closes the panel and returns focus to the toggle. Labels here are a11y-only
-              // text; not CMS-managed.
-              <div
-                className="flex items-center gap-1.5"
-                onKeyDown={(event) => {
-                  if (event.key === 'Escape' && controlsOpen) {
-                    setControlsOpen(false)
-                    toggleRef.current?.focus()
-                  }
-                }}
-              >
-                {/* First in tab order, last on screen: the revealed controls follow it for the keyboard. */}
-                <button
-                  ref={toggleRef}
-                  type="button"
-                  onClick={() => setControlsOpen((open) => !open)}
-                  aria-expanded={controlsOpen}
-                  aria-controls={panelId}
-                  aria-label="Animation and book controls"
-                  title="Animation and book controls"
-                  className={cn(iconButton, 'order-last', controlsOpen && 'text-link')}
-                >
-                  <SlidersHorizontal aria-hidden />
-                </button>
-                <div id={panelId} data-open={controlsOpen} inert={!controlsOpen} className="controls-panel flex items-center gap-1.5">
-                  {canPause && (
-                    <button type="button" onClick={() => setPaused((p) => !p)} aria-label={paused ? 'Play animation' : 'Pause animation'} className={iconButton}>
-                      {paused ? <Play aria-hidden /> : <Pause aria-hidden />}
-                    </button>
-                  )}
-                  {many && (
-                    <>
-                      <button type="button" onClick={() => go(index - 1)} aria-label="Previous book" className={iconButton}>
-                        <ChevronLeft aria-hidden />
-                      </button>
-                      {markers('split:hidden flex')}
-                      <button type="button" onClick={() => go(index + 1)} aria-label="Next book" className={iconButton}>
-                        <ChevronRight aria-hidden />
-                      </button>
-                    </>
-                  )}
-                </div>
-                {/* Split screens: beside the panel. Closed, a quiet sign there's more than one book (inert, and hidden from
-                    screen readers, which hear "1 of 3" on each slide); open, a marker per book. Stacked, they're in the panel. */}
-                {many && markers('split:flex hidden', !controlsOpen)}
+        <section
+          ref={sectionRef}
+          // a11y-only text; not CMS-managed.
+          aria-roledescription={many ? 'carousel' : undefined}
+          aria-labelledby={labelId}
+          // Stacked, a band between the description and the posts, ruled top and bottom like the header (--border).
+          className="border-border split:absolute split:inset-y-0 split:left-0 split:w-1/2! split:border-0 relative grid border-y"
+          onPointerEnter={(event) => event.pointerType === 'mouse' && setHover(true)}
+          onPointerLeave={(event) => event.pointerType === 'mouse' && setHover(false)}
+          onFocus={() => setFocusWithin(true)}
+          onBlur={(event) => !event.currentTarget.contains(event.relatedTarget) && setFocusWithin(false)}
+        >
+          {/* Stacked, the name sits across from the controls, on night at 85% so it reads over any art (see globals.css). */}
+          <Eyebrow id={labelId} className="bg-background/85 rounded-ui split:hidden absolute top-3 left-3 z-20 flex h-9 items-center px-3">
+            {label}
+          </Eyebrow>
+          <BreathingArt
+            focus={origin}
+            cloud={current.cloud}
+            cloudOn={current.cloudOn ?? true}
+            paused={paused}
+            onBreath={() => {
+              const next = rotating ? (index + 1) % slides.length : index
+              if (next !== index) setIndex(next)
+              setOrigin(slides[next].focus)
+            }}
+            // Stacked, the art takes most of the first screen, so the book over it still leaves the art room.
+            className="split:min-h-0 min-h-[calc((100svh-var(--header-h))*0.7)]"
+            art={slides.map((slide, i) => (
+              <div key={slide.key} aria-hidden={i !== index} className={cn('absolute inset-0 transition-opacity duration-2000 ease-in-out', i === index ? 'opacity-100' : 'opacity-0')}>
+                {slide.art}
               </div>
-            )
-          }
-          overlay={
-            hasDetails && (
-              // The book sits on night at 85%, so its text holds over any part of any image (see globals.css).
-              <div>
-                {/* A long fade into the band, so it reads as shadow, not a panel; shorter stacked, where the art has less room. */}
-                <div aria-hidden className="from-background/85 split:h-40 h-24 bg-linear-to-t to-transparent" />
-                <div className="bg-background/85 split:px-12 split:pb-12 px-6 pb-8 sm:px-10">
-                  {/* Every book's details share one cell, so the overlay is as tall as the longest and nothing jumps as they change. */}
-                  <div className="grid max-w-xl" aria-live={rotating ? 'off' : 'polite'}>
-                    {slides.map((slide, i) => (
-                      <div
-                        key={slide.key}
-                        {...(many
-                          ? {
-                              role: 'group',
-                              'aria-roledescription': 'slide',
-                              'aria-label': `${i + 1} of ${slides.length}`,
-                            }
-                          : {})}
-                        inert={i !== index}
-                        // One book's words leave before the next's arrive, so two titles never overlap.
-                        className={cn('transition-opacity [grid-area:1/1]', i === index ? 'opacity-100 delay-300 duration-500' : 'opacity-0 duration-300')}
-                      >
-                        {slide.details}
-                      </div>
-                    ))}
+            ))}
+            controls={
+              hasControls && (
+                // The controls tuck behind one toggle (a disclosure): pause, previous, and next slide out to its left. On
+                // split screens the markers wait beside them, quiet until it opens; stacked, they slide out too, between
+                // previous and next. Escape closes the panel and returns focus to the toggle. Labels here are a11y-only
+                // text; not CMS-managed.
+                <div
+                  className="flex items-center gap-1.5"
+                  onKeyDown={(event) => {
+                    if (event.key === 'Escape' && controlsOpen) {
+                      setControlsOpen(false)
+                      toggleRef.current?.focus()
+                    }
+                  }}
+                >
+                  {/* First in tab order, last on screen: the revealed controls follow it for the keyboard. */}
+                  <button
+                    ref={toggleRef}
+                    type="button"
+                    onClick={() => setControlsOpen((open) => !open)}
+                    aria-expanded={controlsOpen}
+                    aria-controls={panelId}
+                    aria-label="Animation and book controls"
+                    title="Animation and book controls"
+                    className={cn(iconButton, 'order-last', controlsOpen && 'text-link')}
+                  >
+                    <SlidersHorizontal aria-hidden />
+                  </button>
+                  <div id={panelId} data-open={controlsOpen} inert={!controlsOpen} className="controls-panel flex items-center gap-1.5">
+                    {canPause && (
+                      <button type="button" onClick={() => setPaused((p) => !p)} aria-label={paused ? 'Play animation' : 'Pause animation'} className={iconButton}>
+                        {paused ? <Play aria-hidden /> : <Pause aria-hidden />}
+                      </button>
+                    )}
+                    {many && (
+                      <>
+                        <button type="button" onClick={() => go(index - 1)} aria-label="Previous book" className={iconButton}>
+                          <ChevronLeft aria-hidden />
+                        </button>
+                        {markers('split:hidden flex')}
+                        <button type="button" onClick={() => go(index + 1)} aria-label="Next book" className={iconButton}>
+                          <ChevronRight aria-hidden />
+                        </button>
+                      </>
+                    )}
+                  </div>
+                  {/* Split screens: beside the panel. Closed, a quiet sign there's more than one book (inert, and hidden from
+                    screen readers, which hear "1 of 3" on each slide); open, a marker per book. Stacked, they're in the panel. */}
+                  {many && markers('split:flex hidden', !controlsOpen)}
+                </div>
+              )
+            }
+            overlay={
+              hasDetails && (
+                // The book sits on night at 85%, so its text holds over any part of any image (see globals.css).
+                <div>
+                  {/* A long fade into the band, so it reads as shadow, not a panel; shorter stacked, where the art has less room. */}
+                  <div aria-hidden className="from-background/85 split:h-40 h-24 bg-linear-to-t to-transparent" />
+                  <div className="bg-background/85 split:px-12 split:pb-12 px-6 pb-8 sm:px-10">
+                    {/* Every book's details share one cell, so the overlay is as tall as the longest and nothing jumps as they change. */}
+                    <div className="grid max-w-xl" aria-live={rotating ? 'off' : 'polite'}>
+                      {slides.map((slide, i) => (
+                        <div
+                          key={slide.key}
+                          {...(many
+                            ? {
+                                role: 'group',
+                                'aria-roledescription': 'slide',
+                                'aria-label': `${i + 1} of ${slides.length}`,
+                              }
+                            : {})}
+                          inert={i !== index}
+                          // One book's words leave before the next's arrive, so two titles never overlap.
+                          className={cn('transition-opacity [grid-area:1/1]', i === index ? 'opacity-100 delay-300 duration-500' : 'opacity-0 duration-300')}
+                        >
+                          {slide.details}
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
-            )
-          }
-        />
-      </section>
+              )
+            }
+          />
+        </section>
 
-      {rest}
+        <div className="split:mb-auto">{rest}</div>
+      </div>
+
+      {footer && (
+        // Stacked, ruled off below the rest. Split, pinned: the column fades into it, so what scrolls seems to pass beneath.
+        <div className="border-border split:relative split:mx-0 split:shrink-0 split:px-12 split:py-5 split:before:pointer-events-none split:before:absolute split:before:inset-x-0 split:before:bottom-full split:before:h-12 split:before:bg-linear-to-t split:before:from-background split:before:to-transparent mx-6 border-t pt-8 pb-12 sm:mx-10">
+          {footer}
+        </div>
+      )}
     </div>
   )
 }

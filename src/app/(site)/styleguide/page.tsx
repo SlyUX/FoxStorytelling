@@ -132,7 +132,7 @@ const RULES: [string, string][] = [
   ['One page title.', 'Each page has one h1, and headings never skip a level.'],
   ['Every card is one click target.', 'The title’s link stretches over the card, so the cover, title, and blurb all open it, with one focus ring around the whole card.'],
   ['Covers never break.', 'A book without cover art shows its title on a card with the fox-red spine, so it can be listed before the art is final.'],
-  ['The site never sells or collects emails.', 'Buying hands off to retailers in a new tab; the newsletter hands off to MailerLite. Until a sign-up address is set, the newsletter panel stays hidden.'],
+  ['The site never sells or collects emails.', 'Buying hands off to retailers in a new tab; the sign-up form sends the address from the reader’s browser straight to MailerLite. Until its form address is set, the sign-up stays hidden.'],
   ['Every list has an empty state.', 'It’s written for readers, not editors.'],
   ['Content lives in Sanity.', 'Display copy is edited in the Studio, with defaults in src/lib/site-settings.ts. Exceptions are text only assistive technology hears, and this page.'],
   ['Behavior comes from shadcn.', 'Need a dialog or a menu? npx shadcn@latest add it, then restyle to the tokens. Button and badge here are ours: don’t let the CLI overwrite them.'],
@@ -169,6 +169,9 @@ const SAMPLE_BOOKS: BookCardData[] = [
   { _id: 'sample-2', title: 'An Upcoming Book', slug: 'sample', series: null, status: 'Upcoming', format: 'Comic', shortDescription: null, cover: null, buyLinks: null },
   { _id: 'sample-3', title: 'A Book on Kickstarter', slug: 'sample', series: 'Series name', status: 'On Kickstarter', format: 'Graphic novel', shortDescription: null, cover: null, buyLinks: null },
 ]
+
+/** Stands in for the MailerLite form until Site settings has one: shaped right, so it fails the way a real one would, with the error. */
+const SAMPLE_FORM = 'https://assets.mailerlite.com/jsonp/0/forms/0/subscribe'
 
 const SAMPLE_BUY_LINKS: CmsBuyLink[] = [
   { _key: 'a', _type: 'buyLink', store: 'Bookshop.org', url: 'https://bookshop.org' },
@@ -437,8 +440,20 @@ export default async function StyleguidePage() {
           <Specimen name="Empty state" file="src/components/ui/section.tsx · EmptyState" notes={['Every list has one, written for readers. Its text comes from Site settings.']}>
             <EmptyState>{s.booksEmpty}</EmptyState>
           </Specimen>
-          <Specimen name="Newsletter" file="src/components/newsletter.tsx" stage="background" notes={['Hands off to the MailerLite form set in Site settings. Hidden until that address is set; shown here with a stand-in.']}>
-            <Newsletter settings={{ ...s, newsletterUrl: s.newsletterUrl ?? '/styleguide' }} headingLevel="h4" />
+          <Specimen
+            name="Newsletter"
+            file="src/components/newsletter.tsx"
+            stage="background"
+            notes={[
+              'An email field and a button, sending the address from the reader’s browser straight to the MailerLite form set in Site settings: the site never sees it. Hidden until that address is set; shown here with a stand-in, which turns any address away, so it shows the error.',
+              'On success the thank-you replaces the form and takes focus, so it’s heard; an error is announced and the address stays to fix. The browser checks the address first. Without JavaScript, the form still posts to MailerLite in a new tab.',
+              'Two layouts: the panel, with the red button, for a band of its own; and the bar, with an outlined button, pinned under Home’s right column, where All stories holds the red. The bar sets the form beside its words when there’s room, beneath them when there isn’t.',
+            ]}
+          >
+            <div className="grid gap-10">
+              <Newsletter settings={{ ...s, newsletterForm: s.newsletterForm ?? SAMPLE_FORM }} headingLevel="h4" />
+              <Newsletter settings={{ ...s, newsletterForm: s.newsletterForm ?? SAMPLE_FORM }} layout="bar" id="newsletter-bar-heading" headingLevel="h4" />
+            </div>
           </Specimen>
         </div>
       </Section>
@@ -457,14 +472,14 @@ export default async function StyleguidePage() {
             'Stories with “Show on the home page” on and home page art rotate in Stories order, one per breath: as each breath ends, with the art at its dimmest, the next book crossfades in. With none, the site’s home art (Site settings) stands with the first book, its cover beside the details.',
             'The showing book sits over the foot of its art, on night at 85% so its text holds over any image: status, title, series, blurb, where to buy, and About the book. Its first store is an ember link, since All stories is the view’s red button. The rotation’s controls tuck behind one toggle in the art’s top corner: open, pause, previous, and next slide out. On split screens the markers wait beside them, a quiet sign there’s more than one book until it opens; stacked, they slide out too. Escape closes it. Left and right arrow keys step through the books while focus is on the art, or nothing has focus.',
             'The art breathes every 20 seconds, swelling and brightening from 50% to full opacity, under a cloud drawn from noise that moves through time, from a new seed on each visit. The cloud is black unless Site settings or the book picks a color, and it eases into a new book’s color as the book changes. A book can turn its cloud off; it fades out, and back in for the next book that has one. The hotspot set in the Studio stays in view and is where the breath grows from.',
-            'The other column, centered: the description, with All stories in red and Stephen’s Bio (once there’s an About page); then the featured series’ previews under its name (white, set like an h3; Site settings → Home page → Featured series: The Rejection Files), featured posts first, as many as fit, never cut in half; what doesn’t fit is inert, so focus skips it (FillColumn). Stacked, three posts show.',
+            'The other column, centered while it fits: the description, with All stories in red and Stephen’s Bio (once there’s an About page); then the featured series’ previews under its name (white, set like an h3; Site settings → Home page → Featured series: The Rejection Files), featured posts first, up to seven. On split screens the column scrolls, with the sign-up bar pinned beneath it; the column fades into the bar, so what scrolls seems to pass under it. Stacked, three posts show, then the bar.',
             'On split screens, scrolling away, the art and its cloud fade into the night, gone after scrolling about a third of the screen; the book and controls stay. Stacked, the art doesn’t fade. CSS scroll-driven: browsers without it just scroll.',
             'The rotation holds while the pointer or keyboard focus is in it; pause stops it and the motion; previous, next, and a marker per book step through by hand. Reduced motion stills the art and never advances on its own.',
           ]}
         >
           {/* Shorter than the real thing, which fills the screen under the header and doesn't pin here. */}
           <HomeSplit
-            settings={s}
+            settings={{ ...s, newsletterForm: s.newsletterForm ?? SAMPLE_FORM }}
             spotlight={spotlight}
             fallbackBook={cards[0] ?? null}
             posts={rows.map((post) => ({ ...post, pinned: false }))}

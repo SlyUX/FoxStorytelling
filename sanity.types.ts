@@ -109,7 +109,6 @@ export type Post = {
   title: string;
   slug: Slug;
   series: SeriesReference;
-  category?: string;
   excerpt?: string;
   cover?: {
     asset?: SanityImageAssetReference;
@@ -228,8 +227,11 @@ export type SiteSettings = {
   postsEmpty?: string;
   newsletterHeading?: string;
   newsletterBlurb?: string;
-  newsletterUrl?: string;
+  newsletterForm?: string;
+  newsletterEmailLabel?: string;
   newsletterButtonLabel?: string;
+  newsletterSuccess?: string;
+  newsletterError?: string;
 };
 
 export type Series = {
@@ -441,8 +443,11 @@ export type SITE_SETTINGS_QUERY_RESULT = {
   postsEmpty?: string;
   newsletterHeading?: string;
   newsletterBlurb?: string;
-  newsletterUrl?: string;
+  newsletterForm?: string;
+  newsletterEmailLabel?: string;
   newsletterButtonLabel?: string;
+  newsletterSuccess?: string;
+  newsletterError?: string;
   homeImageLqip: string | null;
   cloudHex: string | null;
 } | null;
@@ -661,7 +666,7 @@ export type SERIES_QUERY_RESULT = {
 
 // Source: src/lib/queries.ts
 // Variable: HOME_POSTS_QUERY
-// Query: *[_type=="post" && defined(slug.current) && defined(series->slug.current) && (!defined(*[_id=="siteSettings"][0].homeSeries) || series._ref == *[_id=="siteSettings"][0].homeSeries._ref)]{_id,title,"slug":slug.current,"series": series->{title,"slug":slug.current,form},excerpt,publishedAt,cover,"pinned": coalesce(featured, false)}|order(pinned desc, publishedAt desc)[0...6]
+// Query: *[_type=="post" && defined(slug.current) && defined(series->slug.current) && (!defined(*[_id=="siteSettings"][0].homeSeries) || series._ref == *[_id=="siteSettings"][0].homeSeries._ref)]{_id,title,"slug":slug.current,"series": series->{title,"slug":slug.current,form},excerpt,publishedAt,cover,"pinned": coalesce(featured, false)}|order(pinned desc, publishedAt desc)[0...7]
 export type HOME_POSTS_QUERY_RESULT = Array<{
   _id: string;
   title: string;
@@ -706,7 +711,7 @@ declare module "@sanity/client" {
     '*[_type=="post" && slug.current==$slug && series->slug.current==$series][0]{_id,title,"slug":slug.current,"series": series->{title,"slug":slug.current,form},excerpt,publishedAt,cover,body}': POST_QUERY_RESULT;
     '*[_type=="series" && defined(slug.current)]|order(order asc, title asc){_id,title,"slug":slug.current,intro,form,"posts": *[_type=="post" && defined(slug.current) && defined(series->slug.current) && references(^._id)]|order(publishedAt desc)[0...4]{_id,title,"slug":slug.current,"series": series->{title,"slug":slug.current,form},excerpt,publishedAt,cover}}': SERIES_LIST_QUERY_RESULT;
     '*[_type=="series" && slug.current==$series][0]{_id,title,"slug":slug.current,intro,form,"posts": *[_type=="post" && defined(slug.current) && defined(series->slug.current) && references(^._id)]|order(publishedAt desc){_id,title,"slug":slug.current,"series": series->{title,"slug":slug.current,form},excerpt,publishedAt,cover}}': SERIES_QUERY_RESULT;
-    '*[_type=="post" && defined(slug.current) && defined(series->slug.current) && (!defined(*[_id=="siteSettings"][0].homeSeries) || series._ref == *[_id=="siteSettings"][0].homeSeries._ref)]{_id,title,"slug":slug.current,"series": series->{title,"slug":slug.current,form},excerpt,publishedAt,cover,"pinned": coalesce(featured, false)}|order(pinned desc, publishedAt desc)[0...6]': HOME_POSTS_QUERY_RESULT;
+    '*[_type=="post" && defined(slug.current) && defined(series->slug.current) && (!defined(*[_id=="siteSettings"][0].homeSeries) || series._ref == *[_id=="siteSettings"][0].homeSeries._ref)]{_id,title,"slug":slug.current,"series": series->{title,"slug":slug.current,form},excerpt,publishedAt,cover,"pinned": coalesce(featured, false)}|order(pinned desc, publishedAt desc)[0...7]': HOME_POSTS_QUERY_RESULT;
     '*[_type=="page" && slug.current==$slug][0]{_id,title,"slug":slug.current,intro,body}': PAGE_QUERY_RESULT;
   }
 }

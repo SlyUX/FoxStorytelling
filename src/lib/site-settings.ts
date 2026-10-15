@@ -41,7 +41,10 @@ const DEFAULTS = {
   postsEmpty: 'The first post is on its way.',
   newsletterHeading: 'Join the list',
   newsletterBlurb: 'Get the free reader magnet and news on new books.',
-  newsletterButtonLabel: 'Join the list',
+  newsletterEmailLabel: 'Email address',
+  newsletterButtonLabel: 'Subscribe',
+  newsletterSuccess: 'Thank you! You’re on the list.',
+  newsletterError: 'That didn’t go through. Check the address and try again.',
 } satisfies Partial<Settings>
 
 export type SiteSettings = Omit<Settings, keyof typeof DEFAULTS> & typeof DEFAULTS
