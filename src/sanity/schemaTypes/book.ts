@@ -1,12 +1,13 @@
 import { defineType, defineField } from 'sanity'
 
 import { CLOUD_COLOR_OPTIONS } from './objects'
+import { slugField } from './slugField'
 export default defineType({
   // Shown as "Story" in the Studio; the type keeps its name, `book`, so saved stories stay put.
   name: 'book', title: 'Story', type: 'document',
   fields: [
     defineField({ name: 'title', type: 'string', validation: (r) => r.required() }),
-    defineField({ name: 'slug', type: 'slug', options: { source: 'title' }, validation: (r) => r.required() }),
+    slugField('title', '/stories/scar-tissue-bargains'),
     defineField({ name: 'series', type: 'string', description: 'e.g. Scar Tissue' }),
     defineField({ name: 'cover', type: 'image', options: { hotspot: true } }),
     defineField({

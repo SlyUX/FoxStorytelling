@@ -26,6 +26,7 @@ Stephen Fox's author site: redemptive horror, books and comics. Readers come to 
 - `siteSettings` (singleton): all chrome copy, navigation, section headings, empty states, newsletter
 - `book` ("Story" in the Studio) → `/stories`, `/stories/[slug]`; books with "Show on the home page" and home page art rotate through the home page's first screen · `post` → `/blog`, `/blog/[slug]` (the Rejection Files) · `page` → `/[slug]` (About, and any others)
 - Shared types in `objects.ts`: `link`, `imageWithAlt`, `richText` (every style it allows has a renderer in `src/components/rich-text.tsx`)
+- Every routed type's slug is `slugField()` (`schemaTypes/slugField.ts`): lowercase letters, numbers, and single hyphens, normalized as you type and enforced on save. Routes are case-sensitive; a capital is a silent broken link.
 
 ## Process
 1. **Look before building.** Check `/styleguide` and `src/components/ui/` for something to reuse or extend. Need behavior (a dialog, a menu)? Add it with the shadcn CLI and restyle it to the tokens.

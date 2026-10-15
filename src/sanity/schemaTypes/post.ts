@@ -1,9 +1,11 @@
 import { defineType, defineField } from 'sanity'
+
+import { slugField } from './slugField'
 export default defineType({
   name: 'post', title: 'Post', type: 'document',
   fields: [
     defineField({ name: 'title', type: 'string', validation: (r) => r.required() }),
-    defineField({ name: 'slug', type: 'slug', options: { source: 'title' }, validation: (r) => r.required() }),
+    slugField('title', '/blog/your-post-title'),
     defineField({ name: 'category', type: 'string',
       options: { list: ['Rejection Files', 'News', 'Craft'] }, initialValue: 'Rejection Files' }),
     defineField({ name: 'excerpt', type: 'text', rows: 3 }),
