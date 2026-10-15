@@ -138,10 +138,12 @@ export function BookSpotlight({
     // Stacked, this simply flows: the description, the art, the rest. On split screens the art lifts out to cover the
     // left half, and the description and the rest (a FillColumn, which steps aside here so its items join in) form
     // one column on the right: wrapping, so what doesn't fit moves into a clipped second column, and centered, so
-    // whatever fits sits in the middle, at least 40px from either edge.
+    // whatever fits sits in the middle, at least 40px from either edge. Past the site's width (max-w-page) it stops
+    // and centers; the header lines up with its edges. The column starts half this element's width in, plus 48px:
+    // a padding percentage measures the parent (the full window), so half of min(window, site width) instead.
     <div
       className={cn(
-        'split:relative split:flex split:h-[calc(100svh-var(--header-h))] split:flex-col split:flex-wrap split:justify-center split:gap-x-16 split:overflow-hidden split:py-10 split:pr-12 split:pl-[calc(50%+3rem)] split:*:w-full',
+        'split:mx-auto split:max-w-page split:relative split:flex split:h-[calc(100svh-var(--header-h))] split:flex-col split:flex-wrap split:justify-center split:gap-x-16 split:overflow-hidden split:py-10 split:pr-12 split:pl-[calc(min(100%,var(--container-page))/2+3rem)] split:*:w-full',
         className,
       )}
     >

@@ -24,7 +24,7 @@ Stephen Fox's author site: redemptive horror, books and comics. Readers come to 
 
 ## Content model (`src/sanity/schemaTypes`)
 - `siteSettings` (singleton): all chrome copy, navigation, section headings, empty states, newsletter
-- `book` ("Story" in the Studio) → `/stories`, `/stories/[slug]`; books with "Show on the home page" and home page art rotate through the home page's first screen · `post` → `/blog`, `/blog/[slug]` (the Rejection Files) · `page` → `/[slug]` (About, and any others)
+- `book` ("Story" in the Studio) → `/stories`, `/stories/[slug]`; books with "Show on the home page" and home page art rotate through the home page's first screen · Short Form: `series` (The Rejection Files, Poetry, Mere Christian, Political Commentary, and any added in the Studio) → `/short-form`, `/short-form/[series]`; `post` (one series each, required) → `/short-form/[series]/[slug]`, set by its series' `form` (prose, poetry, comics); Home previews the series chosen in Site settings → Featured series · `page` → `/[slug]` (About, and any others). "Stories" means the books; shorter work, fiction included, is Short Form.
 - Shared types in `objects.ts`: `link`, `imageWithAlt`, `richText` (every style it allows has a renderer in `src/components/rich-text.tsx`)
 - Every routed type's slug is `slugField()` (`schemaTypes/slugField.ts`): lowercase letters, numbers, and single hyphens, normalized as you type and enforced on save. Routes are case-sensitive; a capital is a silent broken link.
 
@@ -40,7 +40,7 @@ Stephen Fox's author site: redemptive horror, books and comics. Readers come to 
 3. **Generated types only.** `npm run typegen` (runs on prebuild). Wrap queries in `defineQuery()`; alias results in `src/lib/types.ts`. GROQ returns `null` for absent fields.
 4. **All fetches via `safeFetch()`** with a fallback. Every list needs an empty state, written for readers.
 5. **Tokens only:** no raw hex or palette classes (`neutral-*`, `red-500`, `black`) in components. New color pairs must clear WCAG AA; record the ratio in `globals.css` and the styleguide's contrast table. On this dark ground `--primary` is a button ground, not a text color: links are `text-link`. Restyle shadcn components that use `text-primary` for text.
-6. **Red is for action, ember is for light.** One red (`default`) button per view. Ember marks links, focus, and what's on its way. The logo's red (`--fox`) is decoration and large display only.
+6. **Red is for action, ember is for light.** One red (`default`) button per view; a second action in the same view is `ember` (ember text, underlined). Red text means an error, never an action. Ember is the light: page titles (h1), links, focus, and what's on its way. The logo's red (`--fox`) is decoration and large display only.
 7. **Accessibility:** one `<h1>` per page, no skipped heading levels, real alt text from Sanity (blank for covers beside their title), visible focus, reduced motion respected.
 8. **American English** in copy and Studio labels.
 9. **Internal links use `TransitionLink`**, never `next/link` directly, so pages rise over and lower away from each other (`src/components/transition-link.tsx`, `route-transition.tsx`). Main and the footer live in `(site)/template.tsx` for the same reason; the header, in the layout, holds still.

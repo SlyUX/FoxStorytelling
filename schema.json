@@ -304,6 +304,58 @@
     }
   },
   {
+    "name": "socialLink",
+    "type": "type",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "socialLink"
+          }
+        },
+        "platform": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "union",
+            "of": [
+              {
+                "type": "string",
+                "value": "ND Riot"
+              },
+              {
+                "type": "string",
+                "value": "Instagram"
+              },
+              {
+                "type": "string",
+                "value": "Facebook"
+              },
+              {
+                "type": "string",
+                "value": "YouTube"
+              },
+              {
+                "type": "string",
+                "value": "Bluesky"
+              }
+            ]
+          },
+          "optional": false
+        },
+        "url": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": false
+        }
+      }
+    }
+  },
+  {
     "name": "buyLink",
     "type": "type",
     "value": {
@@ -340,6 +392,13 @@
             ]
           },
           "optional": false
+        },
+        "storeName": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          },
+          "optional": true
         },
         "url": {
           "type": "objectAttribute",
@@ -449,6 +508,36 @@
     }
   },
   {
+    "type": "type",
+    "name": "series.reference",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_ref": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          }
+        },
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "reference"
+          }
+        },
+        "_weak": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
+        }
+      },
+      "dereferencesTo": "series"
+    }
+  },
+  {
     "name": "post",
     "type": "document",
     "attributes": {
@@ -498,24 +587,18 @@
         },
         "optional": false
       },
+      "series": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "series.reference"
+        },
+        "optional": false
+      },
       "category": {
         "type": "objectAttribute",
         "value": {
-          "type": "union",
-          "of": [
-            {
-              "type": "string",
-              "value": "Rejection Files"
-            },
-            {
-              "type": "string",
-              "value": "News"
-            },
-            {
-              "type": "string",
-              "value": "Craft"
-            }
-          ]
+          "type": "string"
         },
         "optional": true
       },
@@ -1067,7 +1150,7 @@
             },
             "rest": {
               "type": "inline",
-              "name": "buyLink"
+              "name": "socialLink"
             }
           }
         },
@@ -1161,6 +1244,14 @@
         },
         "optional": true
       },
+      "homeSeries": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "series.reference"
+        },
+        "optional": true
+      },
       "allPostsLabel": {
         "type": "objectAttribute",
         "value": {
@@ -1196,14 +1287,14 @@
         },
         "optional": true
       },
-      "blogTitle": {
+      "shortFormTitle": {
         "type": "objectAttribute",
         "value": {
           "type": "string"
         },
         "optional": true
       },
-      "blogIntro": {
+      "shortFormIntro": {
         "type": "objectAttribute",
         "value": {
           "type": "string"
@@ -1242,6 +1333,93 @@
         "type": "objectAttribute",
         "value": {
           "type": "string"
+        },
+        "optional": true
+      }
+    }
+  },
+  {
+    "name": "series",
+    "type": "document",
+    "attributes": {
+      "_id": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "_type": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string",
+          "value": "series"
+        }
+      },
+      "_createdAt": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "_updatedAt": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "_rev": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        }
+      },
+      "title": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": false
+      },
+      "slug": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "slug"
+        },
+        "optional": false
+      },
+      "intro": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
+      "form": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "union",
+          "of": [
+            {
+              "type": "string",
+              "value": "prose"
+            },
+            {
+              "type": "string",
+              "value": "poetry"
+            },
+            {
+              "type": "string",
+              "value": "comics"
+            }
+          ]
+        },
+        "optional": false
+      },
+      "order": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "number"
         },
         "optional": true
       }

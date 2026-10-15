@@ -1,7 +1,7 @@
 /**
- * The fox badge, from the brand's FoxBadge.svg, drawn in `currentColor` so it
- * always matches the logo's letters. Decorative: the logo's link carries the
- * site's name.
+ * The fox badge, from the brand's FoxBadge.svg, drawn in `currentColor` so
+ * its color is set where it's used: the primary red in the logo. Decorative: the
+ * logo's link carries the site's name.
  */
 export function FoxBadge({ className }: { className?: string }) {
   return (

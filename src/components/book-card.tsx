@@ -74,7 +74,7 @@ export function BookCover({
   return (
     // Two across on phones, a cover is about 150px wide: the title steps down so long words fit.
     <div className={cn(frame, 'bg-card border-border border-l-fox flex flex-col justify-between border border-l-4 p-4 sm:p-5')}>
-      <p className="font-serif text-lg leading-tight font-semibold break-words hyphens-auto sm:text-2xl">{title}</p>
+      <p className="font-display text-xl leading-tight break-words hyphens-auto sm:text-3xl">{title}</p>
       {series && <p className="text-muted-foreground text-xs font-semibold tracking-[0.14em] uppercase">{series}</p>}
     </div>
   )
@@ -90,7 +90,7 @@ export function BookCard({ book, headingLevel: Heading = 'h3' }: { book: BookCar
       <BookCover cover={book.cover} title={book.title} series={book.series} className="transition-transform group-hover:-translate-y-1" />
       <div className="flex flex-col gap-2">
         <BookBadges status={book.status} format={book.format} />
-        <Heading className="font-serif text-xl leading-snug font-semibold">
+        <Heading className="font-display text-2xl leading-tight">
           <TransitionLink
             href={`/stories/${book.slug}`}
             className="group-hover:text-link after:rounded-ui focus-visible:after:outline-ring after:absolute after:inset-0 focus-visible:outline-none focus-visible:after:outline-2 focus-visible:after:outline-offset-4"

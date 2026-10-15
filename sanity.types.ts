@@ -62,9 +62,16 @@ export type Link = {
   href: string;
 };
 
+export type SocialLink = {
+  _type: "socialLink";
+  platform: "ND Riot" | "Instagram" | "Facebook" | "YouTube" | "Bluesky";
+  url: string;
+};
+
 export type BuyLink = {
   _type: "buyLink";
   store: "Bookshop.org" | "Amazon" | "Kickstarter" | "Other";
+  storeName?: string;
   url: string;
 };
 
@@ -86,6 +93,13 @@ export type Slug = {
   source?: string;
 };
 
+export type SeriesReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "series";
+};
+
 export type Post = {
   _id: string;
   _type: "post";
@@ -94,7 +108,8 @@ export type Post = {
   _rev: string;
   title: string;
   slug: Slug;
-  category?: "Rejection Files" | "News" | "Craft";
+  series: SeriesReference;
+  category?: string;
   excerpt?: string;
   cover?: {
     asset?: SanityImageAssetReference;
@@ -186,7 +201,7 @@ export type SiteSettings = {
   socials?: Array<
     {
       _key: string;
-    } & BuyLink
+    } & SocialLink
   >;
   navigation?: Array<
     {
@@ -202,18 +217,32 @@ export type SiteSettings = {
   featuredLabel?: string;
   bioLabel?: string;
   allBooksLabel?: string;
+  homeSeries?: SeriesReference;
   allPostsLabel?: string;
   booksTitle?: string;
   booksIntro?: string;
   booksEmpty?: string;
   buyLabel?: string;
-  blogTitle?: string;
-  blogIntro?: string;
+  shortFormTitle?: string;
+  shortFormIntro?: string;
   postsEmpty?: string;
   newsletterHeading?: string;
   newsletterBlurb?: string;
   newsletterUrl?: string;
   newsletterButtonLabel?: string;
+};
+
+export type Series = {
+  _id: string;
+  _type: "series";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title: string;
+  slug: Slug;
+  intro?: string;
+  form: "prose" | "poetry" | "comics";
+  order?: number;
 };
 
 export type RgbaColor = {
@@ -342,15 +371,18 @@ export type AllSanitySchemaTypes =
   | SanityImageAssetReference
   | ImageWithAlt
   | Link
+  | SocialLink
   | BuyLink
   | Page
   | Slug
+  | SeriesReference
   | Post
   | SanityImageCrop
   | SanityImageHotspot
   | Book
   | Color
   | SiteSettings
+  | Series
   | RgbaColor
   | HsvaColor
   | HslaColor
@@ -365,7 +397,7 @@ export type AllSanitySchemaTypes =
 
 // Source: src/lib/queries.ts
 // Variable: SITE_SETTINGS_QUERY
-// Query: *[_type=="siteSettings" && _id=="siteSettings"][0]{  ...,  "homeImageLqip": homeImage.asset->metadata.lqip,  "cloudHex": cloudColor.hex}
+// Query: *[_type=="siteSettings" && _id=="siteSettings"][0]{  ...,  "homeSeries": homeSeries->{title,"slug":slug.current},  "homeImageLqip": homeImage.asset->metadata.lqip,  "cloudHex": cloudColor.hex}
 export type SITE_SETTINGS_QUERY_RESULT = {
   _id: "siteSettings";
   _type: "siteSettings";
@@ -379,7 +411,7 @@ export type SITE_SETTINGS_QUERY_RESULT = {
   socials?: Array<
     {
       _key: string;
-    } & BuyLink
+    } & SocialLink
   >;
   navigation?: Array<
     {
@@ -395,13 +427,17 @@ export type SITE_SETTINGS_QUERY_RESULT = {
   featuredLabel?: string;
   bioLabel?: string;
   allBooksLabel?: string;
+  homeSeries: {
+    title: string;
+    slug: string;
+  } | null;
   allPostsLabel?: string;
   booksTitle?: string;
   booksIntro?: string;
   booksEmpty?: string;
   buyLabel?: string;
-  blogTitle?: string;
-  blogIntro?: string;
+  shortFormTitle?: string;
+  shortFormIntro?: string;
   postsEmpty?: string;
   newsletterHeading?: string;
   newsletterBlurb?: string;
@@ -518,24 +554,39 @@ export type BOOK_QUERY_RESULT = {
 
 // Source: src/lib/queries.ts
 // Variable: POSTS_QUERY
-// Query: *[_type=="post" && defined(slug.current)]|order(publishedAt desc){_id,title,"slug":slug.current,category,excerpt,publishedAt}
+// Query: *[_type=="post" && defined(slug.current) && defined(series->slug.current)]|order(publishedAt desc){_id,title,"slug":slug.current,"series": series->{title,"slug":slug.current,form},excerpt,publishedAt,cover}
 export type POSTS_QUERY_RESULT = Array<{
   _id: string;
   title: string;
   slug: string;
-  category: "Craft" | "News" | "Rejection Files" | null;
+  series: {
+    title: string;
+    slug: string;
+    form: "comics" | "poetry" | "prose";
+  };
   excerpt: string | null;
   publishedAt: string;
+  cover: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  } | null;
 }>;
 
 // Source: src/lib/queries.ts
 // Variable: POST_QUERY
-// Query: *[_type=="post" && slug.current==$slug][0]{_id,title,"slug":slug.current,category,excerpt,publishedAt,cover,body}
+// Query: *[_type=="post" && slug.current==$slug && series->slug.current==$series][0]{_id,title,"slug":slug.current,"series": series->{title,"slug":slug.current,form},excerpt,publishedAt,cover,body}
 export type POST_QUERY_RESULT = {
   _id: string;
   title: string;
   slug: string;
-  category: "Craft" | "News" | "Rejection Files" | null;
+  series: {
+    title: string;
+    slug: string;
+    form: "comics" | "poetry" | "prose";
+  };
   excerpt: string | null;
   publishedAt: string;
   cover: {
@@ -549,15 +600,86 @@ export type POST_QUERY_RESULT = {
 } | null;
 
 // Source: src/lib/queries.ts
+// Variable: SERIES_LIST_QUERY
+// Query: *[_type=="series" && defined(slug.current)]|order(order asc, title asc){_id,title,"slug":slug.current,intro,form,"posts": *[_type=="post" && defined(slug.current) && defined(series->slug.current) && references(^._id)]|order(publishedAt desc)[0...4]{_id,title,"slug":slug.current,"series": series->{title,"slug":slug.current,form},excerpt,publishedAt,cover}}
+export type SERIES_LIST_QUERY_RESULT = Array<{
+  _id: string;
+  title: string;
+  slug: string;
+  intro: string | null;
+  form: "comics" | "poetry" | "prose";
+  posts: Array<{
+    _id: string;
+    title: string;
+    slug: string;
+    series: {
+      title: string;
+      slug: string;
+      form: "comics" | "poetry" | "prose";
+    };
+    excerpt: string | null;
+    publishedAt: string;
+    cover: {
+      asset?: SanityImageAssetReference;
+      media?: unknown;
+      hotspot?: SanityImageHotspot;
+      crop?: SanityImageCrop;
+      _type: "image";
+    } | null;
+  }>;
+}>;
+
+// Source: src/lib/queries.ts
+// Variable: SERIES_QUERY
+// Query: *[_type=="series" && slug.current==$series][0]{_id,title,"slug":slug.current,intro,form,"posts": *[_type=="post" && defined(slug.current) && defined(series->slug.current) && references(^._id)]|order(publishedAt desc){_id,title,"slug":slug.current,"series": series->{title,"slug":slug.current,form},excerpt,publishedAt,cover}}
+export type SERIES_QUERY_RESULT = {
+  _id: string;
+  title: string;
+  slug: string;
+  intro: string | null;
+  form: "comics" | "poetry" | "prose";
+  posts: Array<{
+    _id: string;
+    title: string;
+    slug: string;
+    series: {
+      title: string;
+      slug: string;
+      form: "comics" | "poetry" | "prose";
+    };
+    excerpt: string | null;
+    publishedAt: string;
+    cover: {
+      asset?: SanityImageAssetReference;
+      media?: unknown;
+      hotspot?: SanityImageHotspot;
+      crop?: SanityImageCrop;
+      _type: "image";
+    } | null;
+  }>;
+} | null;
+
+// Source: src/lib/queries.ts
 // Variable: HOME_POSTS_QUERY
-// Query: *[_type=="post" && defined(slug.current)]{_id,title,"slug":slug.current,category,excerpt,publishedAt,"pinned": coalesce(featured, false)}|order(pinned desc, publishedAt desc)[0...6]
+// Query: *[_type=="post" && defined(slug.current) && defined(series->slug.current) && (!defined(*[_id=="siteSettings"][0].homeSeries) || series._ref == *[_id=="siteSettings"][0].homeSeries._ref)]{_id,title,"slug":slug.current,"series": series->{title,"slug":slug.current,form},excerpt,publishedAt,cover,"pinned": coalesce(featured, false)}|order(pinned desc, publishedAt desc)[0...6]
 export type HOME_POSTS_QUERY_RESULT = Array<{
   _id: string;
   title: string;
   slug: string;
-  category: "Craft" | "News" | "Rejection Files" | null;
+  series: {
+    title: string;
+    slug: string;
+    form: "comics" | "poetry" | "prose";
+  };
   excerpt: string | null;
   publishedAt: string;
+  cover: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  } | null;
   pinned: boolean | false;
 }>;
 
@@ -576,13 +698,15 @@ export type PAGE_QUERY_RESULT = {
 import "@sanity/client";
 declare module "@sanity/client" {
   interface SanityQueries {
-    '*[_type=="siteSettings" && _id=="siteSettings"][0]{\n  ...,\n  "homeImageLqip": homeImage.asset->metadata.lqip,\n  "cloudHex": cloudColor.hex\n}': SITE_SETTINGS_QUERY_RESULT;
+    '*[_type=="siteSettings" && _id=="siteSettings"][0]{\n  ...,\n  "homeSeries": homeSeries->{title,"slug":slug.current},\n  "homeImageLqip": homeImage.asset->metadata.lqip,\n  "cloudHex": cloudColor.hex\n}': SITE_SETTINGS_QUERY_RESULT;
     '*[_type=="book" && showOnHome == true && defined(homeArt.asset) && defined(slug.current)]|order(order asc, title asc){_id,title,"slug":slug.current,series,status,format,shortDescription,cover,buyLinks,homeArt,"homeArtLqip": homeArt.asset->metadata.lqip,"cloudHex": cloudColor.hex,"cloudOn": coalesce(showCloud, true)}': HOME_SPOTLIGHT_QUERY_RESULT;
     '*[_type=="book" && defined(slug.current)]|order(order asc, title asc){_id,title,"slug":slug.current,series,status,format,shortDescription,cover,buyLinks}': BOOKS_QUERY_RESULT;
     '*[_type=="book" && slug.current==$slug][0]{_id,title,"slug":slug.current,series,status,format,shortDescription,cover,buyLinks,description,publishDate}': BOOK_QUERY_RESULT;
-    '*[_type=="post" && defined(slug.current)]|order(publishedAt desc){_id,title,"slug":slug.current,category,excerpt,publishedAt}': POSTS_QUERY_RESULT;
-    '*[_type=="post" && slug.current==$slug][0]{_id,title,"slug":slug.current,category,excerpt,publishedAt,cover,body}': POST_QUERY_RESULT;
-    '*[_type=="post" && defined(slug.current)]{_id,title,"slug":slug.current,category,excerpt,publishedAt,"pinned": coalesce(featured, false)}|order(pinned desc, publishedAt desc)[0...6]': HOME_POSTS_QUERY_RESULT;
+    '*[_type=="post" && defined(slug.current) && defined(series->slug.current)]|order(publishedAt desc){_id,title,"slug":slug.current,"series": series->{title,"slug":slug.current,form},excerpt,publishedAt,cover}': POSTS_QUERY_RESULT;
+    '*[_type=="post" && slug.current==$slug && series->slug.current==$series][0]{_id,title,"slug":slug.current,"series": series->{title,"slug":slug.current,form},excerpt,publishedAt,cover,body}': POST_QUERY_RESULT;
+    '*[_type=="series" && defined(slug.current)]|order(order asc, title asc){_id,title,"slug":slug.current,intro,form,"posts": *[_type=="post" && defined(slug.current) && defined(series->slug.current) && references(^._id)]|order(publishedAt desc)[0...4]{_id,title,"slug":slug.current,"series": series->{title,"slug":slug.current,form},excerpt,publishedAt,cover}}': SERIES_LIST_QUERY_RESULT;
+    '*[_type=="series" && slug.current==$series][0]{_id,title,"slug":slug.current,intro,form,"posts": *[_type=="post" && defined(slug.current) && defined(series->slug.current) && references(^._id)]|order(publishedAt desc){_id,title,"slug":slug.current,"series": series->{title,"slug":slug.current,form},excerpt,publishedAt,cover}}': SERIES_QUERY_RESULT;
+    '*[_type=="post" && defined(slug.current) && defined(series->slug.current) && (!defined(*[_id=="siteSettings"][0].homeSeries) || series._ref == *[_id=="siteSettings"][0].homeSeries._ref)]{_id,title,"slug":slug.current,"series": series->{title,"slug":slug.current,form},excerpt,publishedAt,cover,"pinned": coalesce(featured, false)}|order(pinned desc, publishedAt desc)[0...6]': HOME_POSTS_QUERY_RESULT;
     '*[_type=="page" && slug.current==$slug][0]{_id,title,"slug":slug.current,intro,body}': PAGE_QUERY_RESULT;
   }
 }

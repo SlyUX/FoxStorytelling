@@ -7,7 +7,6 @@ import { FillColumn } from '@/components/fill-column'
 import { PostCard } from '@/components/post-list'
 import { TransitionLink } from '@/components/transition-link'
 import { ButtonLink } from '@/components/ui/button'
-import { Eyebrow } from '@/components/ui/section'
 import type { SiteSettings } from '@/lib/site-settings'
 import type { BookCardData, HomePost, SanityImage, SpotlightBook } from '@/lib/types'
 import { cn } from '@/lib/utils'
@@ -45,9 +44,10 @@ function Art({ image, lqip, focus, preload }: { image: SanityImage | null | unde
  * details over the foot of its art. Without any, the site's home art (Site
  * settings) stands with the first book.
  *
- * The other column, centered: the description, with Stephen's Bio (once
- * there's an About page) and All books; then the Rejection Files previews, as
- * many as fit (FillColumn).
+ * The other column, centered: the description, with All stories (the view's
+ * red button) and Stephen's Bio (once there's an About page); then the
+ * featured series' previews (Site settings; The Rejection Files), as many as
+ * fit (FillColumn).
  */
 export function HomeSplit({
   settings,
@@ -74,6 +74,7 @@ export function HomeSplit({
   className?: string
 }) {
   const Tagline = levels.tagline
+  const Block = levels.block
   const homeFocus = focusOf(settings.homeImage)
   const slides: SpotlightSlide[] = spotlight.length
     ? spotlight.map((book, i) => {
@@ -108,7 +109,7 @@ export function HomeSplit({
       slides={slides}
       intro={
         <>
-          <Tagline className="font-serif text-5xl leading-[1.05] font-semibold tracking-tight">{settings.tagline}</Tagline>
+          <Tagline className="font-display text-ember text-5xl leading-[1.05] uppercase">{settings.tagline}</Tagline>
           <div className="mt-4 flex items-center gap-4">
             {/* The author's portrait, round: the one exception to the 2px corners. Blank alt by default: the intro names him. */}
             {settings.authorPhoto?.asset && (
@@ -125,14 +126,10 @@ export function HomeSplit({
           </div>
           {(aboutExists || hasBook) && (
             <div className="mt-6 flex flex-wrap gap-3">
+              {hasBook && <ButtonLink href="/stories">{settings.allBooksLabel}</ButtonLink>}
               {aboutExists && (
                 <ButtonLink href="/about" variant="outline">
                   {settings.bioLabel}
-                </ButtonLink>
-              )}
-              {hasBook && (
-                <ButtonLink href="/stories" variant="outline">
-                  {settings.allBooksLabel}
                 </ButtonLink>
               )}
             </div>
@@ -145,16 +142,17 @@ export function HomeSplit({
               screens; stacked, the art's band above already draws that line. */}
           <div className="border-border split:border-t split:pt-8 mt-10">
             <div className="mb-4 flex items-baseline justify-between gap-4">
-              <Eyebrow as={levels.block}>{settings.blogTitle}</Eyebrow>
-              <TransitionLink href="/blog" className="text-link text-sm font-semibold underline-offset-4 hover:underline">
+              {/* Set like an h3 (white, 24px), but an h2 in the outline: a main section of the page, not part of the book above it. */}
+              <Block className="font-heading text-2xl leading-snug font-semibold text-white">{settings.homeSeries?.title ?? settings.shortFormTitle}</Block>
+              <ButtonLink href={settings.homeSeries ? `/short-form/${settings.homeSeries.slug}` : '/short-form'} variant="link" className="h-auto text-sm">
                 {settings.allPostsLabel}
-              </TransitionLink>
+              </ButtonLink>
             </div>
-            {posts[0] ? <PostCard post={posts[0]} featuredLabel={settings.featuredLabel} headingLevel={levels.item} /> : <p className="text-muted-foreground">{settings.postsEmpty}</p>}
+            {posts[0] ? <PostCard post={posts[0]} featuredLabel={settings.featuredLabel} showSeries={!settings.homeSeries} headingLevel={levels.item} /> : <p className="text-muted-foreground">{settings.postsEmpty}</p>}
           </div>
           {posts.slice(1).map((post, i) => (
             <div key={post._id} className={cn('mt-3', i + 1 >= POSTS_STACKED && 'split:block hidden')}>
-              <PostCard post={post} featuredLabel={settings.featuredLabel} headingLevel={levels.item} />
+              <PostCard post={post} featuredLabel={settings.featuredLabel} showSeries={!settings.homeSeries} headingLevel={levels.item} />
             </div>
           ))}
         </FillColumn>
@@ -169,7 +167,7 @@ function BookDetails({ book, settings, level: Heading, withCover = false }: { bo
   const text = (
     <div className="flex flex-col items-start gap-3">
       <BookBadges status={book.status} format={book.format} />
-      <Heading className="font-serif text-3xl leading-tight font-semibold">
+      <Heading className="font-display text-4xl leading-tight">
         <TransitionLink href={href} className="hover:text-link">
           {book.title}
         </TransitionLink>
@@ -189,7 +187,8 @@ function BookDetails({ book, settings, level: Heading, withCover = false }: { bo
         text
       )}
       <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-4">
-        <BuyLinks links={book.buyLinks} label={settings.buyLabel} />
+        {/* Ember: All stories is this view's red button. */}
+        <BuyLinks links={book.buyLinks} label={settings.buyLabel} lead="ember" />
         <ButtonLink href={href} variant="link" className="px-0">
           {settings.bookDetailsLabel}
         </ButtonLink>

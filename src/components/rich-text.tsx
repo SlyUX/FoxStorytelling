@@ -5,16 +5,25 @@ import { externalHref } from '@/lib/utils'
 import type { RichText as RichTextValue, SanityImage } from '@/lib/types'
 import { urlFor } from '@/sanity/image'
 
+type Form = 'prose' | 'poetry' | 'comics'
+
+/** How wide an image can be drawn, by form: the reading measure, or wide for comics. */
+const IMAGE_MAX: Record<Form, number> = { prose: 672, poetry: 672, comics: 1152 }
+
 /**
- * Long-form reading: book descriptions, posts, pages. Set in the serif, at a
+ * Long-form reading: story descriptions, posts, pages. Set in Roboto, at a
  * size and measure for reading. Every block style allowed in
  * `schemaTypes/objects.ts → richText` has a renderer here.
+ *
+ * A post is set by its series' form. Poetry keeps every line break as typed
+ * (Shift+Enter in the Studio; Portable Text draws each as a <br>), with more
+ * air between lines and stanzas. Comics let images run to the wide measure.
  */
-const components: PortableTextComponents = {
+const componentsFor = (form: Form): PortableTextComponents => ({
   block: {
     normal: ({ children }) => <p>{children}</p>,
-    h2: ({ children }) => <h2 className="pt-6 text-3xl leading-tight font-semibold">{children}</h2>,
-    h3: ({ children }) => <h3 className="pt-3 text-2xl leading-snug font-semibold">{children}</h3>,
+    h2: ({ children }) => <h2 className="font-heading pt-6 text-3xl leading-tight font-semibold">{children}</h2>,
+    h3: ({ children }) => <h3 className="font-heading pt-3 text-2xl leading-snug font-semibold">{children}</h3>,
     blockquote: ({ children }) => <blockquote className="border-fox border-l-2 pl-5 text-2xl leading-snug italic">{children}</blockquote>,
   },
   list: {
@@ -28,7 +37,7 @@ const components: PortableTextComponents = {
       return (
         <a
           href={href}
-          className="text-link visited:text-visited decoration-link/50 hover:decoration-link underline underline-offset-4"
+          className="text-link visited:text-visited decoration-link/50 hover:decoration-link visited:decoration-visited underline underline-offset-4"
           {...(href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
         >
           {children}
@@ -50,7 +59,7 @@ const components: PortableTextComponents = {
             alt={value.alt ?? ''}
             width={width}
             height={Math.round((width * h) / w)}
-            sizes={`(max-width: 768px) 100vw, ${Math.min(672, w)}px`}
+            sizes={`(max-width: 768px) 100vw, ${Math.min(IMAGE_MAX[form], w)}px`}
             className="rounded-ui h-auto w-full"
           />
           {value.caption && <figcaption className="text-muted-foreground mt-2 text-center font-sans text-sm">{value.caption}</figcaption>}
@@ -58,13 +67,15 @@ const components: PortableTextComponents = {
       )
     },
   },
-}
+})
 
-export function RichText({ value }: { value: RichTextValue | null | undefined }) {
+const COMPONENTS: Record<Form, PortableTextComponents> = { prose: componentsFor('prose'), poetry: componentsFor('poetry'), comics: componentsFor('comics') }
+
+export function RichText({ value, form = 'prose' }: { value: RichTextValue | null | undefined; form?: Form }) {
   if (!value?.length) return null
   return (
-    <div className="space-y-5 font-serif text-xl leading-relaxed">
-      <PortableText value={value} components={components} />
+    <div className={form === 'poetry' ? 'space-y-8 text-xl leading-loose' : 'space-y-5 text-xl leading-relaxed'}>
+      <PortableText value={value} components={COMPONENTS[form]} />
     </div>
   )
 }

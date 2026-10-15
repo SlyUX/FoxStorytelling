@@ -28,7 +28,7 @@ export default async function BookPage({ params }: Props) {
       <article className="grid gap-10 md:grid-cols-[minmax(0,20rem)_minmax(0,1fr)] md:gap-14">
         <BookCover cover={book.cover} title={book.title} series={book.series} sizes="(max-width: 768px) 100vw, 320px" preload className="max-w-xs md:max-w-none" />
         <div className="flex flex-col gap-8">
-          <PageHeader title={book.title} eyebrow={book.series} intro={book.shortDescription}>
+          <PageHeader title={book.title} caps={false} eyebrow={book.series} intro={book.shortDescription}>
             <div className="mt-5">
               <BookBadges status={book.status} format={book.format} />
             </div>

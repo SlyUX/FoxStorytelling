@@ -10,7 +10,7 @@ import type { StructureResolver } from 'sanity/structure'
  */
 export const SINGLETONS = ['siteSettings']
 
-const PLACED = ['siteSettings', 'book', 'post', 'page']
+const PLACED = ['siteSettings', 'book', 'series', 'post', 'page']
 
 export const structure: StructureResolver = (S) =>
   S.list()
@@ -23,7 +23,10 @@ export const structure: StructureResolver = (S) =>
         .child(S.editor().id('siteSettings').schemaType('siteSettings').documentId('siteSettings')),
       S.divider(),
       S.documentTypeListItem('book').title('Stories'),
-      S.documentTypeListItem('post').title('Rejection Files'),
+      S.listItem()
+        .id('shortForm')
+        .title('Short Form')
+        .child(S.list().title('Short Form').items([S.documentTypeListItem('post').title('Posts'), S.documentTypeListItem('series').title('Series')])),
       S.documentTypeListItem('page').title('Pages'),
       // Anything added later still appears, at the end.
       ...S.documentTypeListItems().filter((item) => {

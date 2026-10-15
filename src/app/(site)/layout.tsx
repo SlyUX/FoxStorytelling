@@ -1,4 +1,6 @@
 import { HeaderHeight } from '@/components/header-height'
+import { PaletteIndicator } from '@/components/palette-preview'
+import { SocialLinks } from '@/components/social-links'
 import { SiteLogo } from '@/components/site-logo'
 import { SiteNav } from '@/components/site-nav'
 import { TransitionLink } from '@/components/transition-link'
@@ -20,17 +22,19 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
         Skip to content
       </a>
       {/* Sticky: pinned to the top as the page scrolls. Named for view transitions, so it holds still while pages rise and lower beneath it. */}
-      <header data-site-header className="border-border bg-background sticky top-0 z-40 border-b px-4 sm:px-6" style={{ viewTransitionName: 'site-header' }}>
+      {/* As wide as Home's split (max-w-page), with its margins inside, so the logo lines up with Home's left edge and the last social mark with its right. */}
+      <header data-site-header className="border-border bg-chrome sticky top-0 z-40 border-b" style={{ viewTransitionName: 'site-header' }}>
         <HeaderHeight />
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-8 gap-y-3 py-4">
+        <div className="max-w-page mx-auto flex items-center gap-x-10 px-4 py-4 sm:px-6 lg:px-12">
           <TransitionLink href="/" aria-label={settings.title} className="shrink-0">
             <SiteLogo />
           </TransitionLink>
           {/* aria-label is a11y-only text, not CMS copy. */}
-          <SiteNav links={settings.navigation} label="Main" />
+          <SiteNav links={settings.navigation} label="Main" social={settings.socials?.length ? <SocialLinks links={settings.socials} /> : null} />
         </div>
       </header>
       {children}
+      <PaletteIndicator />
     </div>
   )
 }
