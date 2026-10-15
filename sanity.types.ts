@@ -15,6 +15,32 @@
 export declare const internalGroqTypeReferenceTo: unique symbol;
 
 // Source: schema.json
+export type Screenplay = Array<
+  | {
+      children?: Array<{
+        marks?: Array<string>;
+        text?: string;
+        _type: "span";
+        _key: string;
+      }>;
+      style?:
+        | "normal"
+        | "scene"
+        | "character"
+        | "parenthetical"
+        | "dialogue"
+        | "transition";
+      listItem?: never;
+      markDefs?: null;
+      level?: number;
+      _type: "block";
+      _key: string;
+    }
+  | ({
+      _key: string;
+    } & ImageWithAlt)
+>;
+
 export type RichText = Array<
   | {
       children?: Array<{
@@ -54,6 +80,7 @@ export type ImageWithAlt = {
   crop?: SanityImageCrop;
   alt?: string;
   caption?: string;
+  placement?: "column" | "beside";
 };
 
 export type Link = {
@@ -100,6 +127,20 @@ export type SeriesReference = {
   [internalGroqTypeReferenceTo]?: "series";
 };
 
+export type BookReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "book";
+};
+
+export type PostReference = {
+  _ref: string;
+  _type: "reference";
+  _weak?: boolean;
+  [internalGroqTypeReferenceTo]?: "post";
+};
+
 export type Post = {
   _id: string;
   _type: "post";
@@ -118,6 +159,13 @@ export type Post = {
     _type: "image";
   };
   body?: RichText;
+  became?: {
+    story?: BookReference;
+    note?: string;
+  };
+  pitch?: RichText;
+  script?: Screenplay;
+  follows?: PostReference;
   publishedAt: string;
   featured?: boolean;
 };
@@ -175,6 +223,7 @@ export type Book = {
     } & BuyLink
   >;
   publishDate?: string;
+  isbn?: string;
   order?: number;
 };
 
@@ -225,6 +274,11 @@ export type SiteSettings = {
   shortFormTitle?: string;
   shortFormIntro?: string;
   postsEmpty?: string;
+  becameHeading?: string;
+  pitchHeading?: string;
+  scriptHeading?: string;
+  followsLabel?: string;
+  continuedLabel?: string;
   newsletterHeading?: string;
   newsletterBlurb?: string;
   newsletterForm?: string;
@@ -369,6 +423,7 @@ export type Geopoint = {
 };
 
 export type AllSanitySchemaTypes =
+  | Screenplay
   | RichText
   | SanityImageAssetReference
   | ImageWithAlt
@@ -378,6 +433,8 @@ export type AllSanitySchemaTypes =
   | Page
   | Slug
   | SeriesReference
+  | BookReference
+  | PostReference
   | Post
   | SanityImageCrop
   | SanityImageHotspot
@@ -441,6 +498,11 @@ export type SITE_SETTINGS_QUERY_RESULT = {
   shortFormTitle?: string;
   shortFormIntro?: string;
   postsEmpty?: string;
+  becameHeading?: string;
+  pitchHeading?: string;
+  scriptHeading?: string;
+  followsLabel?: string;
+  continuedLabel?: string;
   newsletterHeading?: string;
   newsletterBlurb?: string;
   newsletterForm?: string;
@@ -582,7 +644,7 @@ export type POSTS_QUERY_RESULT = Array<{
 
 // Source: src/lib/queries.ts
 // Variable: POST_QUERY
-// Query: *[_type=="post" && slug.current==$slug && series->slug.current==$series][0]{_id,title,"slug":slug.current,"series": series->{title,"slug":slug.current,form},excerpt,publishedAt,cover,body}
+// Query: *[_type=="post" && slug.current==$slug && series->slug.current==$series][0]{_id,title,"slug":slug.current,"series": series->{title,"slug":slug.current,form},excerpt,publishedAt,cover,body,pitch,script,"became": became{note,"story": story->{_id,title,"slug":slug.current,series,status,format,shortDescription,cover,buyLinks}},"follows": follows->{title,"slug":slug.current,"series":series->slug.current},"continuedIn": *[_type=="post" && defined(slug.current) && defined(series->slug.current) && follows._ref == ^._id]|order(publishedAt asc)[0]{title,"slug":slug.current,"series":series->slug.current}}
 export type POST_QUERY_RESULT = {
   _id: string;
   title: string;
@@ -602,6 +664,51 @@ export type POST_QUERY_RESULT = {
     _type: "image";
   } | null;
   body: RichText | null;
+  pitch: RichText | null;
+  script: Screenplay | null;
+  became: {
+    note: string | null;
+    story: {
+      _id: string;
+      title: string;
+      slug: string;
+      series: string | null;
+      status:
+        "Available" | "In development" | "On Kickstarter" | "Upcoming" | null;
+      format:
+        | "Art book"
+        | "Comic"
+        | "Graphic novel"
+        | "Novel"
+        | "Novella"
+        | "Series proposal"
+        | "Short stories"
+        | null;
+      shortDescription: string | null;
+      cover: {
+        asset?: SanityImageAssetReference;
+        media?: unknown;
+        hotspot?: SanityImageHotspot;
+        crop?: SanityImageCrop;
+        _type: "image";
+      } | null;
+      buyLinks: Array<
+        {
+          _key: string;
+        } & BuyLink
+      > | null;
+    } | null;
+  } | null;
+  follows: {
+    title: string;
+    slug: string;
+    series: string;
+  } | null;
+  continuedIn: {
+    title: string;
+    slug: string;
+    series: string;
+  } | null;
 } | null;
 
 // Source: src/lib/queries.ts
@@ -708,7 +815,7 @@ declare module "@sanity/client" {
     '*[_type=="book" && defined(slug.current)]|order(order asc, title asc){_id,title,"slug":slug.current,series,status,format,shortDescription,cover,buyLinks}': BOOKS_QUERY_RESULT;
     '*[_type=="book" && slug.current==$slug][0]{_id,title,"slug":slug.current,series,status,format,shortDescription,cover,buyLinks,description,publishDate}': BOOK_QUERY_RESULT;
     '*[_type=="post" && defined(slug.current) && defined(series->slug.current)]|order(publishedAt desc){_id,title,"slug":slug.current,"series": series->{title,"slug":slug.current,form},excerpt,publishedAt,cover}': POSTS_QUERY_RESULT;
-    '*[_type=="post" && slug.current==$slug && series->slug.current==$series][0]{_id,title,"slug":slug.current,"series": series->{title,"slug":slug.current,form},excerpt,publishedAt,cover,body}': POST_QUERY_RESULT;
+    '*[_type=="post" && slug.current==$slug && series->slug.current==$series][0]{_id,title,"slug":slug.current,"series": series->{title,"slug":slug.current,form},excerpt,publishedAt,cover,body,pitch,script,"became": became{note,"story": story->{_id,title,"slug":slug.current,series,status,format,shortDescription,cover,buyLinks}},"follows": follows->{title,"slug":slug.current,"series":series->slug.current},"continuedIn": *[_type=="post" && defined(slug.current) && defined(series->slug.current) && follows._ref == ^._id]|order(publishedAt asc)[0]{title,"slug":slug.current,"series":series->slug.current}}': POST_QUERY_RESULT;
     '*[_type=="series" && defined(slug.current)]|order(order asc, title asc){_id,title,"slug":slug.current,intro,form,"posts": *[_type=="post" && defined(slug.current) && defined(series->slug.current) && references(^._id)]|order(publishedAt desc)[0...4]{_id,title,"slug":slug.current,"series": series->{title,"slug":slug.current,form},excerpt,publishedAt,cover}}': SERIES_LIST_QUERY_RESULT;
     '*[_type=="series" && slug.current==$series][0]{_id,title,"slug":slug.current,intro,form,"posts": *[_type=="post" && defined(slug.current) && defined(series->slug.current) && references(^._id)]|order(publishedAt desc){_id,title,"slug":slug.current,"series": series->{title,"slug":slug.current,form},excerpt,publishedAt,cover}}': SERIES_QUERY_RESULT;
     '*[_type=="post" && defined(slug.current) && defined(series->slug.current) && (!defined(*[_id=="siteSettings"][0].homeSeries) || series._ref == *[_id=="siteSettings"][0].homeSeries._ref)]{_id,title,"slug":slug.current,"series": series->{title,"slug":slug.current,form},excerpt,publishedAt,cover,"pinned": coalesce(featured, false)}|order(pinned desc, publishedAt desc)[0...7]': HOME_POSTS_QUERY_RESULT;

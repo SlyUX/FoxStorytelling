@@ -21,6 +21,8 @@ const BOOK_CARD = `_id,title,"slug":slug.current,series,status,format,shortDescr
 const POST_SERIES = `"series": series->{title,"slug":slug.current,form}`
 const POST_CARD = `_id,title,"slug":slug.current,${POST_SERIES},excerpt,publishedAt,cover`
 const LISTED_POST = `_type=="post" && defined(slug.current) && defined(series->slug.current)`
+/** A Rejection File's other part: enough to link it. */
+const PART = `title,"slug":slug.current,"series":series->slug.current`
 const SERIES_FIELDS = `_id,title,"slug":slug.current,intro,form`
 
 export const SITE_SETTINGS_QUERY = defineQuery(`*[_type=="siteSettings" && _id=="siteSettings"][0]{
@@ -42,7 +44,9 @@ export const BOOK_QUERY = defineQuery(`*[_type=="book" && slug.current==$slug][0
 export const POSTS_QUERY = defineQuery(`*[${LISTED_POST}]|order(publishedAt desc){${POST_CARD}}`)
 
 /** A post at /short-form/[series]/[slug]: both must match, so a post is only ever at its own series' address. */
-export const POST_QUERY = defineQuery(`*[_type=="post" && slug.current==$slug && series->slug.current==$series][0]{${POST_CARD},body}`)
+export const POST_QUERY = defineQuery(
+  `*[_type=="post" && slug.current==$slug && series->slug.current==$series][0]{${POST_CARD},body,pitch,script,"became": became{note,"story": story->{${BOOK_CARD}}},"follows": follows->{${PART}},"continuedIn": *[${LISTED_POST} && follows._ref == ^._id]|order(publishedAt asc)[0]{${PART}}}`,
+)
 
 /** The Short Form page: each series in order, with its newest posts. */
 export const SERIES_LIST_QUERY = defineQuery(

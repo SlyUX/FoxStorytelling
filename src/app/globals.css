@@ -67,8 +67,9 @@
     --link on --chrome ................... 11.10  (AAA) — the current page in the nav
     white on --chrome .................... 21.00  (AAA) — the logo's letters, the menu button
     --primary on --chrome ................  2.47  decorative only — the logo's badge (logos are exempt)
-    --input on --background ..............  3.63  non-text (≥3) — form field edges
-    --input on --card ....................  3.21  non-text (≥3)
+    --input on --background ..............  4.23  non-text (≥3) — form field edges
+    --input on --card ....................  3.74  non-text (≥3)
+    --input on --muted ...................  3.18  non-text (≥3) — fields in the sign-up bar
     --fox on --background ................  4.34  large text and graphics only — spines, rules
     --primary on --background ............  2.29  FAILS for text — a ground, not a text color
     --ember on --primary .................  4.49  FAILS — never ember on red
@@ -89,7 +90,7 @@
   --muted: #2a2730;
   --muted-foreground: #aaa397;
   --border: #34303b; /* dividers and card edges: decorative, so no contrast floor */
-  --input: #6e6878; /* form field edges: must clear 3:1 against the ground */
+  --input: #78737f; /* form field edges: must clear 3:1 against every ground a field sits on, --muted included */
 
   --primary: #961b1b;
   --primary-foreground: #ffffff;

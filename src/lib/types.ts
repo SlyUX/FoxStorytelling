@@ -12,6 +12,7 @@ import type {
   SERIES_LIST_QUERY_RESULT,
   SERIES_QUERY_RESULT,
   RichText as GeneratedRichText,
+  Screenplay as GeneratedScreenplay,
 } from '../../sanity.types'
 
 /**
@@ -22,6 +23,7 @@ export type CmsLink = Link
 export type CmsBuyLink = { _key: string } & BuyLink
 export type SanityImage = ImageWithAlt
 export type RichText = GeneratedRichText
+export type Screenplay = GeneratedScreenplay
 export type BookCardData = BOOKS_QUERY_RESULT[number]
 export type BookDetail = NonNullable<BOOK_QUERY_RESULT>
 export type SpotlightBook = HOME_SPOTLIGHT_QUERY_RESULT[number]

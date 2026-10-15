@@ -39,6 +39,11 @@ const DEFAULTS = {
   // Placeholder: says what's here, and that it's free to read.
   shortFormIntro: 'Shorter work, free to read: The Rejection Files, poems, and essays.',
   postsEmpty: 'The first post is on its way.',
+  becameHeading: 'What it became',
+  pitchHeading: 'The pitch',
+  scriptHeading: 'The script',
+  followsLabel: 'Previously',
+  continuedLabel: 'Continued in',
   newsletterHeading: 'Join the list',
   newsletterBlurb: 'Get the free reader magnet and news on new books.',
   newsletterEmailLabel: 'Email address',

@@ -5,8 +5,10 @@ import { BuyLinks } from '@/components/buy-links'
 import { HomeSplit } from '@/components/home-split'
 import { Newsletter } from '@/components/newsletter'
 import { PalettePicker } from '@/components/palette-preview'
+import { PostBecame } from '@/components/post-became'
 import { PostCard, PostList } from '@/components/post-list'
 import { RichText } from '@/components/rich-text'
+import { Screenplay } from '@/components/screenplay'
 import { SocialLinks } from '@/components/social-links'
 import { ColorTokens, ContrastTable, type ContrastPair, type TokenGroup } from '@/components/styleguide/color-tokens'
 import { Specimen } from '@/components/styleguide/specimen'
@@ -15,7 +17,7 @@ import { Button, ButtonLink } from '@/components/ui/button'
 import { EmptyState, Eyebrow, PageHeader, Section, SectionHeading } from '@/components/ui/section'
 import { BOOKS_QUERY, HOME_SPOTLIGHT_QUERY, POSTS_QUERY, safeFetch } from '@/lib/queries'
 import { getSiteSettings, type SiteSettings } from '@/lib/site-settings'
-import type { BookCardData, CmsBuyLink, PostCardData, RichText as RichTextValue, SpotlightBook } from '@/lib/types'
+import type { BookCardData, CmsBuyLink, PostCardData, RichText as RichTextValue, Screenplay as ScreenplayValue, SpotlightBook } from '@/lib/types'
 
 /*
  * The styleguide documents the code itself, so its text lives here, beside
@@ -97,6 +99,7 @@ const PAIRS: ContrastPair[] = [
   { fg: 'background', bg: 'ember', use: 'Selected text', need: 'text' },
   { fg: 'input', bg: 'background', use: 'Form field edges', need: 'nontext' },
   { fg: 'input', bg: 'card', use: 'Form field edges on cards', need: 'nontext' },
+  { fg: 'input', bg: 'muted', use: 'Form field edges in the sign-up bar', need: 'nontext' },
   { fg: 'fox', bg: 'background', use: 'Spines, rules, underlines: never body text', need: 'large' },
   { fg: 'primary', bg: 'background', use: 'Never: red is a ground, not a text color', need: 'text' },
   { fg: 'ember', bg: 'primary', use: 'Never: no ember on red', need: 'text' },
@@ -127,7 +130,7 @@ const TYPE = [
 const RULES: [string, string][] = [
   ['Tokens only.', 'Colors come from the tokens above, through Tailwind; no raw hex values or palette classes in components. A new color pair must pass WCAG AA, and its ratio goes in globals.css and the table above.'],
   ['Red is for action, ember is for light.', 'One red button per view: the thing we most want done, like All stories on Home or the first store on a story’s page. A second action in the same view is ember text, underlined. Light red text and outlines mean something went wrong. Ember is the light: page titles, links, focus, and what’s on its way. The brand file’s red (--fox) is decoration and large display only; the logo’s badge wears the primary red. Never ember on red.'],
-  ['Two faces, plus the logo.', 'Titles are Special Gothic Condensed, never bold: it has one weight. Page titles (h1) are capitals, set by CSS, so they’re typed and read aloud as written; a story’s title keeps its own case wherever it’s a heading. Everything else is Roboto, with true italics: headings, reading, the interface. Montserrat sets the logo’s letters and nothing else.'],
+  ['Two faces, plus the logo.', 'Titles are Special Gothic Condensed, never bold: it has one weight. Page titles (h1) are capitals, set by CSS, so they’re typed and read aloud as written; a story’s title keeps its own case wherever it’s a heading. Everything else is Roboto, with true italics: headings, reading, the interface. Montserrat sets the logo’s letters and nothing else; scripts are set in Courier Prime, as scripts are.'],
   ['Corners are 2px.', 'Nearly square, like a book’s edge. Every element uses rounded-ui; shadcn’s radius scale derives from the same value. The one exception: the author’s portrait is round.'],
   ['One page title.', 'Each page has one h1, and headings never skip a level.'],
   ['Every card is one click target.', 'The title’s link stretches over the card, so the cover, title, and blurb all open it, with one focus ring around the whole card.'],
@@ -206,6 +209,18 @@ const SAMPLE_POEM: RichTextValue = [
   { _type: 'block', _key: 'v1', style: 'normal', markDefs: [], children: [span('t1', 'A poem keeps its lines\nexactly where they break,\nhowever short the line.')] },
   { _type: 'block', _key: 'v2', style: 'normal', markDefs: [], children: [span('t2', 'Each stanza is a paragraph,\nwith room above it.')] },
 ]
+
+type ScriptStyle = NonNullable<Extract<ScreenplayValue[number], { _type: 'block' }>['style']>
+const line = (key: string, style: ScriptStyle, text: string) => ({ _type: 'block' as const, _key: key, style, children: [span(`${key}s`, text)] })
+// From the NEX pilot (The Rejection Files): one of each element.
+const SAMPLE_SCRIPT = [
+  line('c1', 'scene', 'SCENE 1: Bobby’s Wings & Auto Repair'),
+  line('c2', 'normal', 'Int. Bobby’s Wings n’ Fries. Camera begins tight on several mugs... beer fills the mugs, the foamy head flows over the sides.'),
+  line('c3', 'character', 'BRITNEY'),
+  line('c4', 'parenthetical', '(pointing at Virgil)'),
+  line('c5', 'dialogue', 'Gotcha there, hun.'),
+  line('c6', 'transition', 'Fade to black.'),
+] satisfies ScreenplayValue
 
 export default async function StyleguidePage() {
   const [s, books, posts, spotlight] = await Promise.all([
@@ -447,7 +462,7 @@ export default async function StyleguidePage() {
             notes={[
               'An email field and a button, sending the address from the reader’s browser straight to the MailerLite form set in Site settings: the site never sees it. Hidden until that address is set; shown here with a stand-in, which turns any address away, so it shows the error.',
               'On success the thank-you replaces the form and takes focus, so it’s heard; an error is announced and the address stays to fix. The browser checks the address first. Without JavaScript, the form still posts to MailerLite in a new tab.',
-              'Two layouts: the panel, with the red button, for a band of its own; and the bar, with an outlined button, pinned under Home’s right column, where All stories holds the red. The bar sets the form beside its words when there’s room, beneath them when there isn’t.',
+              'Two layouts: the panel, with the red button, for a band of its own; and the bar, with an outlined button, pinned under Home’s right column on a band of --muted, where All stories holds the red. The bar sets the form beside its words when there’s room, beneath them when there isn’t.',
             ]}
           >
             <div className="grid gap-10">
@@ -472,7 +487,7 @@ export default async function StyleguidePage() {
             'Stories with “Show on the home page” on and home page art rotate in Stories order, one per breath: as each breath ends, with the art at its dimmest, the next book crossfades in. With none, the site’s home art (Site settings) stands with the first book, its cover beside the details.',
             'The showing book sits over the foot of its art, on night at 85% so its text holds over any image: status, title, series, blurb, where to buy, and About the book. Its first store is an ember link, since All stories is the view’s red button. The rotation’s controls tuck behind one toggle in the art’s top corner: open, pause, previous, and next slide out. On split screens the markers wait beside them, a quiet sign there’s more than one book until it opens; stacked, they slide out too. Escape closes it. Left and right arrow keys step through the books while focus is on the art, or nothing has focus.',
             'The art breathes every 20 seconds, swelling and brightening from 50% to full opacity, under a cloud drawn from noise that moves through time, from a new seed on each visit. The cloud is black unless Site settings or the book picks a color, and it eases into a new book’s color as the book changes. A book can turn its cloud off; it fades out, and back in for the next book that has one. The hotspot set in the Studio stays in view and is where the breath grows from.',
-            'The other column, centered while it fits: the description, with All stories in red and Stephen’s Bio (once there’s an About page); then the featured series’ previews under its name (white, set like an h3; Site settings → Home page → Featured series: The Rejection Files), featured posts first, up to seven. On split screens the column scrolls, with the sign-up bar pinned beneath it; the column fades into the bar, so what scrolls seems to pass under it. Stacked, three posts show, then the bar.',
+            'The other column, centered while it fits: the description, with All stories in red and Stephen’s Bio (once there’s an About page); then the featured series’ previews under its name (white, set like an h3; Site settings → Home page → Featured series: The Rejection Files), featured posts first, up to seven. On split screens the column scrolls, with the sign-up bar pinned beneath it on a band of --muted; the column fades out above the bar, so what scrolls seems to pass under it. Stacked, three posts show, then the bar, full width.',
             'On split screens, scrolling away, the art and its cloud fade into the night, gone after scrolling about a third of the screen; the book and controls stay. Stacked, the art doesn’t fade. CSS scroll-driven: browsers without it just scroll.',
             'The rotation holds while the pointer or keyboard focus is in it; pause stops it and the motion; previous, next, and a marker per book step through by hand. Reduced motion stills the art and never advances on its own.',
           ]}
@@ -541,6 +556,24 @@ export default async function StyleguidePage() {
               <PostCard post={{ ...SAMPLE_POSTS[0], _id: 'sample-no-cover', title: 'A post without a cover' }} headingLevel="h4" />
             </div>
           </Specimen>
+          <Specimen
+            name="What it became"
+            file="src/components/post-became.tsx · PostBecame"
+            notes={[
+              'A Rejection File’s epilogue, after the story: the story it became, linked as a small card, and the author’s words about it (either, or both). Below it, the pitch itself, in a band of its own, its headings a level under “The pitch.”',
+              'The headings (“What it became,” “The pitch”) are in Site settings → Short Form.',
+            ]}
+          >
+            <div className="max-w-2xl">
+              <PostBecame
+                became={{ note: 'A sentence or two on what happened to it after the rejections: here, it became a book.', story: cards[0] ?? null }}
+                heading={s.becameHeading}
+                linkLabel={s.bookDetailsLabel}
+                buyLabel={s.buyLabel}
+                headingLevel="h4"
+              />
+            </div>
+          </Specimen>
         </div>
       </Section>
 
@@ -551,7 +584,12 @@ export default async function StyleguidePage() {
         <Specimen
           name="Rich text"
           file="src/components/rich-text.tsx"
-          notes={['Every style the Studio allows: paragraphs, headings, quotes, lists, links, and images with alt text and an optional caption.', 'Set at 20px in Roboto, at a 672px measure. Pull quotes are italic, on the fox-red rule.']}
+          notes={[
+            'Every style the Studio allows: paragraphs, headings, quotes, lists, links, and images with alt text and an optional caption.',
+            'Set at 20px in Roboto, at a 672px measure. Pull quotes are italic, on the fox-red rule.',
+            'An image can sit beside the text (Placement → Beside the text): floated right, up to 416px tall and 40% of the column, centered above the text on phones; headings start below it. For character designs and other tall art.',
+            'A link to a page on this site (“/stories/monster”) opens in place, with the page transition; other sites open in a new tab.',
+          ]}
         >
           <div className="max-w-2xl">
             <RichText value={SAMPLE_PROSE} />
@@ -567,6 +605,18 @@ export default async function StyleguidePage() {
         >
           <div className="max-w-2xl">
             <RichText value={SAMPLE_POEM} form="poetry" />
+          </div>
+        </Specimen>
+        <Specimen
+          name="Script"
+          file="src/components/screenplay.tsx · Screenplay"
+          notes={[
+            'A Rejection File’s script (Post → The script), set as a script page is, in Courier Prime: scene headings in bold capitals, action across the column, the character’s name, a parenthetical, and dialogue indented beneath, transitions to the right. Each paragraph’s style in the Studio picks its element.',
+            'Storyboard images sit centered between elements, never wider than they were drawn. Courier Prime loads only where a script is shown.',
+          ]}
+        >
+          <div className="max-w-2xl">
+            <Screenplay value={SAMPLE_SCRIPT} />
           </div>
         </Specimen>
       </Section>

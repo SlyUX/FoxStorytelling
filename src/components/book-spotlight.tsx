@@ -278,8 +278,9 @@ export function BookSpotlight({
       </div>
 
       {footer && (
-        // Stacked, ruled off below the rest. Split, pinned: the column fades into it, so what scrolls seems to pass beneath.
-        <div className="border-border split:relative split:mx-0 split:shrink-0 split:px-12 split:py-5 split:before:pointer-events-none split:before:absolute split:before:inset-x-0 split:before:bottom-full split:before:h-12 split:before:bg-linear-to-t split:before:from-background split:before:to-transparent mx-6 border-t pt-8 pb-12 sm:mx-10">
+        // A band of --muted: stacked, full width below the rest; split, pinned across the column, which fades into the
+        // night above it, so what scrolls seems to pass beneath.
+        <div className="bg-muted split:relative split:shrink-0 split:px-12 split:py-5 split:before:pointer-events-none split:before:absolute split:before:inset-x-0 split:before:bottom-full split:before:h-12 split:before:bg-linear-to-t split:before:from-background split:before:to-transparent px-6 py-8 sm:px-10">
           {footer}
         </div>
       )}
