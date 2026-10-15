@@ -555,6 +555,36 @@
     }
   },
   {
+    "type": "type",
+    "name": "book.reference",
+    "value": {
+      "type": "object",
+      "attributes": {
+        "_ref": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string"
+          }
+        },
+        "_type": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "string",
+            "value": "reference"
+          }
+        },
+        "_weak": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "boolean"
+          },
+          "optional": true
+        }
+      },
+      "dereferencesTo": "book"
+    }
+  },
+  {
     "name": "post",
     "type": "document",
     "attributes": {
@@ -667,6 +697,38 @@
         "optional": true
       },
       "body": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "inline",
+          "name": "richText"
+        },
+        "optional": true
+      },
+      "became": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "object",
+          "attributes": {
+            "story": {
+              "type": "objectAttribute",
+              "value": {
+                "type": "inline",
+                "name": "book.reference"
+              },
+              "optional": true
+            },
+            "note": {
+              "type": "objectAttribute",
+              "value": {
+                "type": "string"
+              },
+              "optional": true
+            }
+          }
+        },
+        "optional": true
+      },
+      "pitch": {
         "type": "objectAttribute",
         "value": {
           "type": "inline",
@@ -1312,6 +1374,20 @@
         "optional": true
       },
       "postsEmpty": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
+      "becameHeading": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
+      "pitchHeading": {
         "type": "objectAttribute",
         "value": {
           "type": "string"

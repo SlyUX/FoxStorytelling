@@ -5,6 +5,7 @@ import { BuyLinks } from '@/components/buy-links'
 import { HomeSplit } from '@/components/home-split'
 import { Newsletter } from '@/components/newsletter'
 import { PalettePicker } from '@/components/palette-preview'
+import { PostBecame } from '@/components/post-became'
 import { PostCard, PostList } from '@/components/post-list'
 import { RichText } from '@/components/rich-text'
 import { SocialLinks } from '@/components/social-links'
@@ -540,6 +541,23 @@ export default async function StyleguidePage() {
                 <PostCard key={post._id} post={{ ...post, pinned: true }} featuredLabel={s.featuredLabel} headingLevel="h4" />
               ))}
               <PostCard post={{ ...SAMPLE_POSTS[0], _id: 'sample-no-cover', title: 'A post without a cover' }} headingLevel="h4" />
+            </div>
+          </Specimen>
+          <Specimen
+            name="What it became"
+            file="src/components/post-became.tsx · PostBecame"
+            notes={[
+              'A Rejection File’s epilogue, after the story: the story it became, linked as a small card, and the author’s words about it (either, or both). Below it, the pitch itself, in a band of its own, its headings a level under “The pitch.”',
+              'The headings (“What it became,” “The pitch”) are in Site settings → Short Form.',
+            ]}
+          >
+            <div className="max-w-2xl">
+              <PostBecame
+                became={{ note: 'A sentence or two on what happened to it after the rejections: here, it became a book.', story: cards[0] ?? null }}
+                heading={s.becameHeading}
+                linkLabel={s.bookDetailsLabel}
+                headingLevel="h4"
+              />
             </div>
           </Specimen>
         </div>

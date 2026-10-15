@@ -110,6 +110,8 @@ export default defineType({
     defineField({ name: 'shortFormTitle', title: 'Short Form page title', type: 'string', group: 'shortForm' }),
     defineField({ name: 'shortFormIntro', title: 'Short Form page intro', type: 'text', rows: 2, group: 'shortForm', description: 'Also the page’s description for search engines. The default is placeholder copy.' }),
     defineField({ name: 'postsEmpty', title: 'No posts yet', type: 'string', group: 'shortForm', description: 'Shown where posts would be, before there are any.' }),
+    defineField({ name: 'becameHeading', title: '"What it became" heading', type: 'string', group: 'shortForm', description: 'On a Rejection File, after the story.' }),
+    defineField({ name: 'pitchHeading', title: '"The pitch" heading', type: 'string', group: 'shortForm', description: 'On a Rejection File, above the pitch itself.' }),
 
     // Newsletter
     defineField({ name: 'newsletterHeading', title: 'Heading', type: 'string', group: 'newsletter' }),

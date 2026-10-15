@@ -42,7 +42,9 @@ export const BOOK_QUERY = defineQuery(`*[_type=="book" && slug.current==$slug][0
 export const POSTS_QUERY = defineQuery(`*[${LISTED_POST}]|order(publishedAt desc){${POST_CARD}}`)
 
 /** A post at /short-form/[series]/[slug]: both must match, so a post is only ever at its own series' address. */
-export const POST_QUERY = defineQuery(`*[_type=="post" && slug.current==$slug && series->slug.current==$series][0]{${POST_CARD},body}`)
+export const POST_QUERY = defineQuery(
+  `*[_type=="post" && slug.current==$slug && series->slug.current==$series][0]{${POST_CARD},body,pitch,"became": became{note,"story": story->{${BOOK_CARD}}}}`,
+)
 
 /** The Short Form page: each series in order, with its newest posts. */
 export const SERIES_LIST_QUERY = defineQuery(
