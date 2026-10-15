@@ -4,16 +4,18 @@ import { BookBadges, BookCard, BookCover, BookGrid } from '@/components/book-car
 import { BuyLinks } from '@/components/buy-links'
 import { HomeSplit } from '@/components/home-split'
 import { Newsletter } from '@/components/newsletter'
+import { PalettePicker } from '@/components/palette-preview'
 import { PostCard, PostList } from '@/components/post-list'
 import { RichText } from '@/components/rich-text'
+import { SocialLinks } from '@/components/social-links'
 import { ColorTokens, ContrastTable, type ContrastPair, type TokenGroup } from '@/components/styleguide/color-tokens'
 import { Specimen } from '@/components/styleguide/specimen'
 import { Badge } from '@/components/ui/badge'
 import { Button, ButtonLink } from '@/components/ui/button'
 import { EmptyState, Eyebrow, PageHeader, Section, SectionHeading } from '@/components/ui/section'
 import { BOOKS_QUERY, HOME_SPOTLIGHT_QUERY, POSTS_QUERY, safeFetch } from '@/lib/queries'
-import { getSiteSettings } from '@/lib/site-settings'
-import type { BookCardData, PostCardData, RichText as RichTextValue, SpotlightBook } from '@/lib/types'
+import { getSiteSettings, type SiteSettings } from '@/lib/site-settings'
+import type { BookCardData, CmsBuyLink, PostCardData, RichText as RichTextValue, SpotlightBook } from '@/lib/types'
 
 /*
  * The styleguide documents the code itself, so its text lives here, beside
@@ -34,6 +36,7 @@ const TOKENS: TokenGroup[] = [
     tokens: [
       { token: 'background', use: 'The page: night, with a faint violet from the illustrations.' },
       { token: 'surface', use: 'Alternating bands.' },
+      { token: 'chrome', use: 'Black: the header and footer, a shade deeper than the page.' },
       { token: 'card', use: 'Cards, panels, cover placeholders.' },
       { token: 'muted', use: 'Quiet fills: secondary badges and buttons, menu hovers.' },
       { token: 'border', use: 'Dividers and card edges. Decorative, so no contrast floor.' },
@@ -46,16 +49,17 @@ const TOKENS: TokenGroup[] = [
       { token: 'foreground', use: 'Bone: body text and every heading.' },
       { token: 'muted-foreground', use: 'Secondary text: intros, meta lines, captions.' },
       { token: 'link', use: 'Links and eyebrows. Ember, so it can diverge later.' },
-      { token: 'visited', use: 'Visited links in prose and post titles: dusk violet. Navigation and buttons don’t change.' },
-      { token: 'destructive', use: 'Errors. Light enough to read as text on night.' },
+      { token: 'visited', use: 'Visited links in prose and post titles: near-white, always underlined, since its color barely differs from bone. Navigation and buttons don’t change.' },
+      { token: 'destructive', use: 'Errors and destructive actions, as text and outlines. Never a fill: a filled red is the call to action.' },
+      { token: 'white', use: 'Pure white: secondary buttons, tertiary links, and block headings like Home’s featured series. Body text stays bone.' },
     ],
   },
   {
     name: 'Accents',
     tokens: [
-      { token: 'primary', use: 'The red action: primary buttons, live-Kickstarter badges. A ground, never a text color on night.' },
-      { token: 'fox', use: 'The logo’s exact red. Decoration and large display only: spines, rules, the nav underline.' },
-      { token: 'ember', use: 'The light in the dark: links, the focus ring, text selection, things on their way.' },
+      { token: 'primary', use: 'The call-to-action red: primary buttons, live-Kickstarter badges, with white text. A ground, never a text color on night.' },
+      { token: 'fox', use: 'The brand file’s red. Decoration and large display only: spines, rules, the nav underline, the browser-tab icon. The logo’s badge wears the primary red.' },
+      { token: 'ember', use: 'The light in the dark: page titles, links, the focus ring, text selection, things on their way, and the second action beside a red one.' },
       { token: 'ring', use: 'The keyboard focus ring.' },
       { token: 'cloud', use: 'The cloud that rolls over the home art: black, unless Site settings or a book picks another color. Decorative only.' },
     ],
@@ -71,14 +75,23 @@ const PAIRS: ContrastPair[] = [
   { fg: 'muted-foreground', bg: 'surface', use: 'Meta lines on bands', need: 'text' },
   { fg: 'muted-foreground', bg: 'card', use: 'Meta lines on cards', need: 'text' },
   { fg: 'muted-foreground', bg: 'muted', use: 'Secondary text on quiet fills', need: 'text' },
-  { fg: 'link', bg: 'background', use: 'Links, eyebrows, the current page in the nav', need: 'text' },
+  { fg: 'link', bg: 'background', use: 'Links, eyebrows, ember buttons, page titles (as --ember)', need: 'text' },
+  { fg: 'background', bg: 'ember', use: 'Text selection', need: 'text' },
+  { fg: 'foreground', bg: 'chrome', use: 'The header, its social marks', need: 'text' },
+  { fg: 'muted-foreground', bg: 'chrome', use: 'The footer’s line', need: 'text' },
+  { fg: 'link', bg: 'chrome', use: 'The current page in the nav', need: 'text' },
+  { fg: 'white', bg: 'chrome', use: 'The logo’s letters, the menu button', need: 'text' },
+  { fg: 'primary', bg: 'chrome', use: 'The logo’s badge: a logo, so exempt', need: 'decorative' },
   { fg: 'link', bg: 'surface', use: 'Links on bands', need: 'text' },
   { fg: 'link', bg: 'card', use: 'Links on cards', need: 'text' },
   { fg: 'visited', bg: 'background', use: 'Visited links', need: 'text' },
   { fg: 'visited', bg: 'card', use: 'Visited links on cards', need: 'text' },
-  { fg: 'destructive', bg: 'background', use: 'Errors', need: 'text' },
+  { fg: 'destructive', bg: 'background', use: 'Errors, destructive buttons (outlined)', need: 'text' },
+  { fg: 'destructive', bg: 'surface', use: 'Errors on bands', need: 'text' },
   { fg: 'destructive', bg: 'card', use: 'Errors on cards', need: 'text' },
   { fg: 'white', bg: 'primary', use: 'Primary buttons', need: 'text' },
+  { fg: 'white', bg: 'background', use: 'Secondary buttons, tertiary links', need: 'text' },
+  { fg: 'background', bg: 'white', use: 'Secondary button, hovered', need: 'text' },
   { fg: 'white', bg: 'primary', bgAlpha: 0.85, under: 'background', use: 'Primary button, hovered', need: 'text' },
   { fg: 'foreground', bg: 'primary', use: 'Bone on red', need: 'text' },
   { fg: 'background', bg: 'ember', use: 'Selected text', need: 'text' },
@@ -98,22 +111,23 @@ const TYPE = [
         <span className="font-black">Fox</span>storytelling
       </>
     ),
-    spec: 'Montserrat, the brand’s typeface: FOX in Black, STORYTELLING in Regular, run together in capitals beside the badge. The logo only.',
+    spec: 'Montserrat, the brand’s typeface: FOX in Black, STORYTELLING in Regular, run together in capitals beside the badge in fox red.',
   },
-  { role: 'Home headline', className: 'font-serif text-6xl leading-[1.05] font-semibold tracking-tight', sample: 'Redemptive horror.', spec: 'Crimson Pro, semibold: fluid 44–80px. The home page’s h1.' },
-  { role: 'Page title', className: 'font-serif text-4xl leading-tight font-semibold tracking-tight md:text-5xl', sample: 'The Rejection Files', spec: 'Crimson Pro, semibold: fluid 32–64px. One per page.' },
-  { role: 'Section heading', className: 'font-serif text-3xl font-semibold', sample: 'Latest from the Rejection Files', spec: 'Crimson Pro, semibold: fluid 26–38px. Every band and section.' },
-  { role: 'Card title', className: 'font-serif text-xl leading-snug font-semibold', sample: 'A book or post title', spec: 'Crimson Pro, semibold: 20px on book cards, 24px on posts.' },
-  { role: 'Eyebrow', className: 'text-link text-xs font-semibold tracking-[0.14em] uppercase', sample: 'Rejection Files', spec: 'Geist, 12px tracked capitals in ember: a category or series above a title.' },
-  { role: 'Prose', className: 'font-serif text-xl leading-relaxed', sample: 'Long-form reading is set in the serif, at a size and measure for reading.', spec: 'Crimson Pro, 20px, relaxed leading, 672px measure: posts, pages, book descriptions.' },
-  { role: 'Interface', className: 'leading-relaxed', sample: 'Navigation, buttons, intros, and blurbs are set in the sans.', spec: 'Geist, 16px. Page intros run 18px in the muted gray.' },
-  { role: 'Meta', className: 'text-muted-foreground text-sm', sample: 'October 12, 2026', spec: 'Geist, 14px, muted: dates, series names, captions.' },
+  { role: 'Home headline', className: 'font-display text-ember text-5xl leading-[1.05] uppercase', sample: 'Redemptive horror.', spec: 'Special Gothic Condensed, in capitals and ember, in its one weight: never bold. Fluid 40–64px. The home page’s h1.' },
+  { role: 'Page title', className: 'font-display text-ember text-4xl leading-[1.05] uppercase md:text-5xl', sample: 'The Rejection Files', spec: 'Special Gothic Condensed, in capitals and ember: fluid 32–64px. Every h1, one per page, except a story’s own.' },
+  { role: 'Story title', className: 'font-display text-4xl leading-[1.1]', sample: 'The Path: Rae’s Crusade', spec: 'Special Gothic Condensed, in the story’s own case: its page’s h1 (in ember, like every h1; fluid 32–64px), over its art on Home (32–50px), and on cards (24px).' },
+  { role: 'Section heading', className: 'font-heading text-3xl font-semibold', sample: 'Latest from the Rejection Files', spec: 'Roboto, semibold: fluid 26–38px. Every band and section; h2 through h6 are Roboto.' },
+  { role: 'Post title', className: 'font-heading text-xl leading-snug font-semibold', sample: 'A Rejection Files post', spec: 'Roboto, semibold: 20px on cards, 24px in lists.' },
+  { role: 'Eyebrow', className: 'font-heading text-link text-xs font-semibold tracking-[0.14em] uppercase', sample: 'Rejection Files', spec: 'Roboto, 12px tracked capitals in ember: a category or series above a title.' },
+  { role: 'Prose', className: 'text-xl leading-relaxed', sample: 'Long-form reading is set in Roboto too, at a size and measure for reading.', spec: 'Roboto, 20px, relaxed leading, 672px measure: posts, pages, story descriptions.' },
+  { role: 'Interface', className: 'leading-relaxed', sample: 'Navigation, buttons, intros, and blurbs are set in the sans.', spec: 'Roboto, 16px. Page intros run 18px in the muted gray.' },
+  { role: 'Meta', className: 'text-muted-foreground text-sm', sample: 'October 12, 2026', spec: 'Roboto, 14px, muted: dates, series names, captions.' },
 ]
 
 const RULES: [string, string][] = [
   ['Tokens only.', 'Colors come from the tokens above, through Tailwind; no raw hex values or palette classes in components. A new color pair must pass WCAG AA, and its ratio goes in globals.css and the table above.'],
-  ['Red is for action, ember is for light.', 'One red button per view: the thing we most want done. Ember marks links, focus, and what’s on its way. The logo’s red is decoration and large display only. Never ember on red.'],
-  ['Reading is serif, the interface is sans.', 'Titles and long-form prose are Crimson Pro; navigation, buttons, labels, and blurbs are Geist. Montserrat sets the logo and nothing else.'],
+  ['Red is for action, ember is for light.', 'One red button per view: the thing we most want done, like All stories on Home or the first store on a story’s page. A second action in the same view is ember text, underlined. Light red text and outlines mean something went wrong. Ember is the light: page titles, links, focus, and what’s on its way. The brand file’s red (--fox) is decoration and large display only; the logo’s badge wears the primary red. Never ember on red.'],
+  ['Two faces, plus the logo.', 'Titles are Special Gothic Condensed, never bold: it has one weight. Page titles (h1) are capitals, set by CSS, so they’re typed and read aloud as written; a story’s title keeps its own case wherever it’s a heading. Everything else is Roboto, with true italics: headings, reading, the interface. Montserrat sets the logo’s letters and nothing else.'],
   ['Corners are 2px.', 'Nearly square, like a book’s edge. Every element uses rounded-ui; shadcn’s radius scale derives from the same value. The one exception: the author’s portrait is round.'],
   ['One page title.', 'Each page has one h1, and headings never skip a level.'],
   ['Every card is one click target.', 'The title’s link stretches over the card, so the cover, title, and blurb all open it, with one focus ring around the whole card.'],
@@ -127,7 +141,7 @@ const RULES: [string, string][] = [
 ]
 
 const VOICE: [string, React.ReactNode][] = [
-  ['Sentence case for headings.', 'Book, series, and blog titles keep their capitals: “Latest from the Rejection Files.”'],
+  ['Sentence case for headings.', 'Book and series titles keep their capitals: “Latest from the Rejection Files.”'],
   ['Titles in italics, or quotation marks: never both.', <>Italics in body text (<em>The Path: Rae’s Crusade</em>); quotation marks where italics can’t go, like alt text and summaries.</>],
   ['Spell out “and.”', 'Keep “&” only where it’s part of a name.'],
   ['Numbers follow AP style.', 'Spell out one through nine, numerals from 10. Percentages and money are always numerals.'],
@@ -156,18 +170,38 @@ const SAMPLE_BOOKS: BookCardData[] = [
   { _id: 'sample-3', title: 'A Book on Kickstarter', slug: 'sample', series: 'Series name', status: 'On Kickstarter', format: 'Graphic novel', shortDescription: null, cover: null, buyLinks: null },
 ]
 
+const SAMPLE_BUY_LINKS: CmsBuyLink[] = [
+  { _key: 'a', _type: 'buyLink', store: 'Bookshop.org', url: 'https://bookshop.org' },
+  { _key: 'b', _type: 'buyLink', store: 'Amazon', url: 'https://www.amazon.com' },
+  { _key: 'c', _type: 'buyLink', store: 'Other', storeName: 'IngramSpark', url: 'https://www.ingramspark.com' },
+]
+
+const SAMPLE_SOCIALS: NonNullable<SiteSettings['socials']> = [
+  { _key: 'n', _type: 'socialLink', platform: 'ND Riot', url: 'https://ndriot.com' },
+  { _key: 'i', _type: 'socialLink', platform: 'Instagram', url: 'https://www.instagram.com' },
+  { _key: 'f', _type: 'socialLink', platform: 'Facebook', url: 'https://www.facebook.com' },
+  { _key: 'y', _type: 'socialLink', platform: 'YouTube', url: 'https://www.youtube.com' },
+  { _key: 'b', _type: 'socialLink', platform: 'Bluesky', url: 'https://bsky.app' },
+]
+
 const SAMPLE_POSTS: PostCardData[] = [
-  { _id: 'sample-post', title: 'A post title', slug: 'sample', category: 'Rejection Files', excerpt: 'An excerpt: a sentence or two that sets up the post.', publishedAt: '2026-10-12T12:00:00Z' },
+  { _id: 'sample-post', title: 'A post title', slug: 'sample', series: { title: 'The Rejection Files', slug: 'rejection-files', form: 'prose' }, excerpt: 'An excerpt: a sentence or two that sets up the post.', publishedAt: '2026-10-12T12:00:00Z', cover: null },
 ]
 
 const span = (key: string, text: string, marks: string[] = []) => ({ _type: 'span' as const, _key: key, text, marks })
 const SAMPLE_PROSE: RichTextValue = [
-  { _type: 'block', _key: 'p1', style: 'normal', markDefs: [{ _type: 'link', _key: 'l1', href: 'https://www.sanity.io/docs' }], children: [span('s1', 'Body text is set for reading. Links are ember and underlined, '), span('s2', 'like this one', ['l1']), span('s3', ', and turn violet once visited.')] },
+  { _type: 'block', _key: 'p1', style: 'normal', markDefs: [{ _type: 'link', _key: 'l1', href: 'https://www.sanity.io/docs' }], children: [span('s1', 'Body text is set for reading. Links are ember and underlined, '), span('s2', 'like this one', ['l1']), span('s3', ', and turn near-white once visited.')] },
   { _type: 'block', _key: 'h2', style: 'h2', markDefs: [], children: [span('s4', 'A heading')] },
   { _type: 'block', _key: 'p2', style: 'normal', markDefs: [], children: [span('s5', 'Headings break a long piece into parts. Subheadings go one level deeper.')] },
   { _type: 'block', _key: 'q1', style: 'blockquote', markDefs: [], children: [span('s6', 'A pull quote sits on the fox-red rule.')] },
   { _type: 'block', _key: 'b1', style: 'normal', listItem: 'bullet', level: 1, markDefs: [], children: [span('s7', 'Lists are bulleted')] },
   { _type: 'block', _key: 'b2', style: 'normal', listItem: 'bullet', level: 1, markDefs: [], children: [span('s8', 'or numbered')] },
+]
+
+// Placeholder lines, not a poem: they show how one is set. Each line ends in a typed line break (Shift+Enter in the Studio).
+const SAMPLE_POEM: RichTextValue = [
+  { _type: 'block', _key: 'v1', style: 'normal', markDefs: [], children: [span('t1', 'A poem keeps its lines\nexactly where they break,\nhowever short the line.')] },
+  { _type: 'block', _key: 'v2', style: 'normal', markDefs: [], children: [span('t2', 'Each stanza is a paragraph,\nwith room above it.')] },
 ]
 
 export default async function StyleguidePage() {
@@ -220,6 +254,9 @@ export default async function StyleguidePage() {
         >
           Color
         </SectionHeading>
+        <div className="mb-12">
+          <PalettePicker />
+        </div>
         <ColorTokens groups={TOKENS} />
         <h3 className="mt-14 mb-2 font-semibold">Contrast</h3>
         <p className="text-muted-foreground mb-6 max-w-3xl">
@@ -229,7 +266,7 @@ export default async function StyleguidePage() {
       </Section>
 
       <Section id="type" aria-labelledby="type-heading">
-        <SectionHeading id="type-heading" intro="Two families: Crimson Pro, a book serif sturdy enough to hold up as light type on a dark ground, for titles and reading; Geist for the interface. Montserrat, the brand’s typeface, sets the logo alone.">
+        <SectionHeading id="type-heading" intro="Two faces: Special Gothic Condensed for titles (page titles in capitals, story titles in their own case), and Roboto for everything else, from headings to long-form reading to the interface. Montserrat, the brand’s typeface, sets only the logo’s letters.">
           Type
         </SectionHeading>
         <div className="border-border bg-card rounded-ui divide-border divide-y border">
@@ -266,7 +303,7 @@ export default async function StyleguidePage() {
               ['Section heading to content', '40px.'],
               ['Book grid', '24px between columns, 48px between rows: two across on phones, four on wide screens.'],
               ['Reading measure', '672px (max-w-2xl) for posts and pages.'],
-              ['Page edges', '16px on phones, 24px from small tablets up; content stops at 1152px.'],
+              ['Page edges', '16px on phones, 24px from small tablets, 48px on desktops. Page content stops at 1152px; Home, the header, and the footer at 1920px, the header lined up with Home’s edges.'],
             ].map(([term, value]) => (
               <div key={term} className="grid gap-1 p-4 sm:grid-cols-[14rem_1fr]">
                 <dt className="font-semibold">{term}</dt>
@@ -286,19 +323,25 @@ export default async function StyleguidePage() {
             name="Buttons"
             file="src/components/ui/button.tsx"
             notes={[
-              'default: the red action. One per view.',
-              'outline: everything else that’s a button; bone, turning ember on hover. secondary, ghost, link, and destructive exist for shadcn components and dense UI.',
+              'default (primary): the call-to-action red, white text at 8.5:1. One per view.',
+              'ember: ember text, underlined, white on hover. The second action where a red one already leads the view, like a story’s first store beside All stories on Home. 10.30:1 on night.',
+              'outline (secondary): white text and edge on a clear ground, inverting to white on hover. Everything else that’s a button.',
+              'link (tertiary): white, underlined, ember on hover: About the book, All posts. secondary, ghost, and destructive exist for shadcn components and dense UI.',
               'Sizes: sm, default, lg, and icon. ButtonLink renders a link as a button: internal paths stay in the tab, full URLs open a new one.',
               'Variant and size names match shadcn’s, so added components that import buttonVariants pick these up.',
             ]}
           >
             <div className="flex flex-col gap-6">
               <div className="flex flex-wrap items-center gap-3">
-                <Button>Default</Button>
-                <Button variant="outline">Outline</Button>
-                <Button variant="secondary">Secondary</Button>
+                <Button>Primary</Button>
+                <Button variant="ember">Ember</Button>
+                <Button variant="outline">Secondary</Button>
+                <Button variant="link">Tertiary</Button>
+              </div>
+              {/* shadcn's other variants, for added components and dense UI. */}
+              <div className="flex flex-wrap items-center gap-3">
+                <Button variant="secondary">Filled</Button>
                 <Button variant="ghost">Ghost</Button>
-                <Button variant="link">Link</Button>
                 <Button variant="destructive">Destructive</Button>
               </div>
               <div className="flex flex-wrap items-center gap-3">
@@ -311,15 +354,26 @@ export default async function StyleguidePage() {
           <Specimen
             name="Buy links"
             file="src/components/buy-links.tsx"
-            notes={['The first store is the red action, the rest outlined. Each opens the retailer in a new tab, marked with the external-link icon.', 'The button text comes from Site settings: "Buy on {store}".']}
+            notes={[
+              'The first store is the red action, the rest outlined. Each opens the retailer in a new tab, marked with the external-link icon.',
+              'Where another red button already leads the view, as All stories does on Home, the first store is ember (second row).',
+              'The button text comes from Site settings: "Buy on {store}". Another store takes the name it’s given in the Studio (IngramSpark, here).',
+            ]}
           >
-            <BuyLinks
-              label={s.buyLabel}
-              links={[
-                { _key: 'a', _type: 'buyLink', store: 'Bookshop.org', url: 'https://bookshop.org' },
-                { _key: 'b', _type: 'buyLink', store: 'Amazon', url: 'https://www.amazon.com' },
-              ]}
-            />
+            <div className="flex flex-col gap-4">
+              <BuyLinks label={s.buyLabel} links={SAMPLE_BUY_LINKS} />
+              <BuyLinks label={s.buyLabel} links={SAMPLE_BUY_LINKS} lead="ember" />
+            </div>
+          </Specimen>
+          <Specimen
+            name="Social links"
+            file="src/components/social-links.tsx"
+            notes={[
+              'In the header: at its right edge on desktops, ending where the text does; beneath the links in the phone menu. In the order set in Site settings → Social links: ND Riot, Instagram, Facebook, YouTube, Bluesky.',
+              'In the text’s color rather than each brand’s, ember on hover: Simple Icons’ marks, and ND Riot’s own lockup as a stencil. Each opens in a new tab, and its name is read to screen readers. Targets are 40px tall.',
+            ]}
+          >
+            <SocialLinks links={s.socials?.length ? s.socials : SAMPLE_SOCIALS} className="text-muted-foreground -mx-2.5" />
           </Specimen>
           <Specimen
             name="Badges"
@@ -352,7 +406,7 @@ export default async function StyleguidePage() {
           <Specimen
             name="Page header"
             file="src/components/ui/section.tsx · PageHeader"
-            notes={['The page’s only h1, with an optional eyebrow above (a series or category) and intro below.']}
+            notes={['The page’s only h1, with an optional eyebrow above (a series, or the way back to Short Form) and intro below.']}
             stage="card"
           >
             <p className="text-muted-foreground text-sm">The top of this page is the live example: a page has only one.</p>
@@ -401,9 +455,9 @@ export default async function StyleguidePage() {
             'The art beside a column: two equal columns exactly filling the screen under the header on landscape screens from tablet width and 576px tall. Stacked below that: the description, then the art with its book, then the posts, in reading order too. The header is sticky.',
             'The description can carry the author’s portrait, round, beside the intro (Site settings → Home page → Author photo). The rotation is named by “Featured Stories” (Site settings): shown across from its controls on phones, and read to screen readers everywhere.',
             'Stories with “Show on the home page” on and home page art rotate in Stories order, one per breath: as each breath ends, with the art at its dimmest, the next book crossfades in. With none, the site’s home art (Site settings) stands with the first book, its cover beside the details.',
-            'The showing book sits over the foot of its art, on night at 85% so its text holds over any image: status, title, series, blurb, where to buy, and About the book. Its first store is the page’s one red action. The rotation’s controls tuck behind one toggle in the art’s top corner: open, pause, previous, and next slide out. On split screens the markers wait beside them, a quiet sign there’s more than one book until it opens; stacked, they slide out too. Escape closes it. Left and right arrow keys step through the books while focus is on the art, or nothing has focus.',
+            'The showing book sits over the foot of its art, on night at 85% so its text holds over any image: status, title, series, blurb, where to buy, and About the book. Its first store is an ember link, since All stories is the view’s red button. The rotation’s controls tuck behind one toggle in the art’s top corner: open, pause, previous, and next slide out. On split screens the markers wait beside them, a quiet sign there’s more than one book until it opens; stacked, they slide out too. Escape closes it. Left and right arrow keys step through the books while focus is on the art, or nothing has focus.',
             'The art breathes every 20 seconds, swelling and brightening from 50% to full opacity, under a cloud drawn from noise that moves through time, from a new seed on each visit. The cloud is black unless Site settings or the book picks a color, and it eases into a new book’s color as the book changes. A book can turn its cloud off; it fades out, and back in for the next book that has one. The hotspot set in the Studio stays in view and is where the breath grows from.',
-            'The other column, centered: the description, with Stephen’s Bio (once there’s an About page) and All books; then the Rejection Files previews, featured posts first, as many as fit, never cut in half; what doesn’t fit is inert, so focus skips it (FillColumn). Stacked, three posts show.',
+            'The other column, centered: the description, with All stories in red and Stephen’s Bio (once there’s an About page); then the featured series’ previews under its name (white, set like an h3; Site settings → Home page → Featured series: The Rejection Files), featured posts first, as many as fit, never cut in half; what doesn’t fit is inert, so focus skips it (FillColumn). Stacked, three posts show.',
             'On split screens, scrolling away, the art and its cloud fade into the night, gone after scrolling about a third of the screen; the book and controls stay. Stacked, the art doesn’t fade. CSS scroll-driven: browsers without it just scroll.',
             'The rotation holds while the pointer or keyboard focus is in it; pause stops it and the motion; previous, next, and a marker per book step through by hand. Reduced motion stills the art and never advances on its own.',
           ]}
@@ -452,19 +506,24 @@ export default async function StyleguidePage() {
           <Specimen
             name="Post list"
             file="src/components/post-list.tsx"
-            notes={[posts.length ? 'The latest posts from the Studio.' : 'A sample post; real ones show here once there are some.', 'Category, title, date, and excerpt, divided by rules. Visited titles turn violet.']}
+            notes={[posts.length ? 'The latest posts from the Studio.' : 'A sample post; real ones show here once there are some.', 'Series, title, date, and excerpt (never a poem’s), divided by rules; a series’ own page leaves out its name. Visited titles turn near-white and underlined.']}
           >
             <PostList posts={rows} headingLevel="h4" />
           </Specimen>
           <Specimen
             name="Post card"
             file="src/components/post-list.tsx · PostCard"
-            notes={['A compact preview for tight spaces, like the home page’s first screen: meta line, title, two lines of excerpt. One click target.', 'A featured post says so, in ember, and leads its list.']}
+            notes={[
+              'A compact preview for tight spaces, like the home page’s first screen and the Short Form page: the post’s cover in a square flush to the card’s top, left, and bottom edges, then the meta line (series and date; just the date where the series goes without saying), title, and two lines of excerpt (none on phones, and never a poem’s). One click target.',
+              'Pointing at the card or focusing it draws the cover in a little; not with reduced motion. Without a cover, the square holds the fox badge.',
+              'A featured post says so, in ember, and leads its list.',
+            ]}
           >
             <div className="grid max-w-xl gap-3">
               {rows.slice(0, 1).map((post) => (
                 <PostCard key={post._id} post={{ ...post, pinned: true }} featuredLabel={s.featuredLabel} headingLevel="h4" />
               ))}
+              <PostCard post={{ ...SAMPLE_POSTS[0], _id: 'sample-no-cover', title: 'A post without a cover' }} headingLevel="h4" />
             </div>
           </Specimen>
         </div>
@@ -477,10 +536,22 @@ export default async function StyleguidePage() {
         <Specimen
           name="Rich text"
           file="src/components/rich-text.tsx"
-          notes={['Every style the Studio allows: paragraphs, headings, quotes, lists, links, and images with alt text and an optional caption.', 'Set at 20px in the serif, at a 672px measure.']}
+          notes={['Every style the Studio allows: paragraphs, headings, quotes, lists, links, and images with alt text and an optional caption.', 'Set at 20px in Roboto, at a 672px measure. Pull quotes are italic, on the fox-red rule.']}
         >
           <div className="max-w-2xl">
             <RichText value={SAMPLE_PROSE} />
+          </div>
+        </Specimen>
+        <Specimen
+          name="Poetry"
+          file='src/components/rich-text.tsx · form="poetry"'
+          notes={[
+            'Posts in a series whose form is Poetry. Every line break is kept as typed (Shift+Enter in the Studio); each stanza is a paragraph, with more air between lines and stanzas.',
+            'Cards and lists give no excerpt of a poem: it’s read whole. A series whose form is Comics lets its images run to the wide measure instead.',
+          ]}
+        >
+          <div className="max-w-2xl">
+            <RichText value={SAMPLE_POEM} form="poetry" />
           </div>
         </Specimen>
       </Section>

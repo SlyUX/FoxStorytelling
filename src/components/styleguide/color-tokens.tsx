@@ -7,7 +7,8 @@ import { cn } from '@/lib/utils'
 /**
  * The color tokens and their contrast, read live from `globals.css`: each
  * swatch shows the token's current value, and each ratio is measured from the
- * tokens in the browser, so this page can't drift from the code.
+ * tokens in the browser, so this page can't drift from the code. Both follow
+ * a previewed palette (PalettePicker) as it changes.
  */
 
 export interface TokenGroup {
@@ -54,17 +55,22 @@ const ratio = (a: number[], b: number[]) => {
 }
 const mix = (top: number[], bottom: number[], alpha: number) => top.map((t, i) => Math.round(alpha * t + (1 - alpha) * bottom[i]))
 
-const noSubscribe = () => () => {}
+/** Tokens change only when a preview palette is picked (data-palette on <html>). */
+const subscribe = (onChange: () => void) => {
+  const observer = new MutationObserver(onChange)
+  observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-palette'] })
+  return () => observer.disconnect()
+}
 
 /**
  * Reads every `--token` from the root element in the browser (empty on the
- * server). The values never change after load, so there's nothing to subscribe
- * to; the snapshot is one string so React can compare it between renders.
+ * server), again whenever the palette changes; the snapshot is one string so
+ * React can compare it between renders.
  */
 function useTokens(names: string[]) {
   const key = names.join(',')
   const snapshot = useSyncExternalStore(
-    noSubscribe,
+    subscribe,
     () => {
       const css = getComputedStyle(document.documentElement)
       return key

@@ -1,15 +1,15 @@
 import type { Metadata } from 'next'
-import { Crimson_Pro, Geist, Montserrat } from 'next/font/google'
+import { Montserrat, Roboto, Special_Gothic_Condensed_One } from 'next/font/google'
 
 import './globals.css'
+import { PALETTE_SCRIPT } from '@/lib/palette-preview'
 import { getSiteSettings } from '@/lib/site-settings'
 import { cn } from '@/lib/utils'
 
-// The interface: nav, buttons, labels, meta lines.
-const geist = Geist({ subsets: ['latin'], variable: '--font-geist' })
-// Reading and display: titles and long-form prose. Sturdy enough at text
-// sizes that its strokes hold up as light type on a dark ground.
-const crimson = Crimson_Pro({ subsets: ['latin'], style: ['normal', 'italic'], variable: '--font-crimson' })
+// Everything but page titles and the logo: headings, reading, and the interface. Variable weight, with true italics.
+const roboto = Roboto({ subsets: ['latin'], style: ['normal', 'italic'], variable: '--font-roboto' })
+// Titles: page titles (h1) in capitals, story titles in their own case. One weight, so never set bold (a browser would fake it).
+const gothic = Special_Gothic_Condensed_One({ weight: '400', subsets: ['latin'], variable: '--font-special-gothic' })
 // The logo's letters only (see SiteLogo): the brand's typeface.
 const montserrat = Montserrat({ subsets: ['latin'], variable: '--font-montserrat' })
 
@@ -29,9 +29,15 @@ export async function generateMetadata(): Promise<Metadata> {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     // `dark`: the site is always dark (see globals.css).
-    <html lang="en" className={cn('dark', geist.variable, crimson.variable, montserrat.variable)}>
+    // suppressHydrationWarning: the palette preview sets data-palette on <html> before React loads (see below).
+    <html lang="en" suppressHydrationWarning className={cn('dark', roboto.variable, gothic.variable, montserrat.variable)}>
       {/* Browser extensions (ColorZilla's cz-shortcut-listen, for one) add attributes to <body> before React
           loads. This silences that mismatch for <body>'s own attributes only; the page inside is still checked. */}
+      <head>
+        {/* The palette preview (lib/palette-preview.ts), first thing in <head>: it runs before the page paints, so a previewed
+            palette never flashes the current one. (next/script's beforeInteractive runs later, before hydration.) */}
+        <script dangerouslySetInnerHTML={{ __html: PALETTE_SCRIPT }} />
+      </head>
       <body suppressHydrationWarning className="bg-background text-foreground min-h-screen font-sans antialiased">
         {children}
       </body>

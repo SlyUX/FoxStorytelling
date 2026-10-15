@@ -25,13 +25,17 @@
   `name-foreground` is what sits on it), so `npx shadcn add` components fit.
 
   - --background is night with a faint violet, from the illustration's darks.
-  - --fox is the logo's exact red (#E91D2D, sampled from the file). It fails
-    AA both as text on night (4.34) and under white text (4.49), so it's
-    decoration and large display only. --primary is the same hue, as deep as
-    white button text needs.
+  - --fox is the brand file's red (#E91D2D, sampled from it). It fails AA
+    both as text on night (4.34) and under white text (4.49), so it's
+    decoration and large display only: spines, rules, the browser-tab icon.
+    --primary, the call-to-action red, is deeper (#961B1B): white on it
+    clears AAA, and the logo's badge wears it.
   - --ember is the light in the dark (the firefly gold in "The Gardener"):
-    links, the focus ring, things on their way. Red is for action, ember is
-    for light. Never ember on red (3.06).
+    page titles, links, the focus ring, things on their way, and the second
+    action where a red one already leads. Red is for action, ember is for
+    light. Never ember on red (4.49).
+  - --chrome is black (#000000): the header and footer, a shade deeper than
+    the night between them.
 
   Verified contrast (WCAG 2.x):
     --foreground on --background ......... 15.69  (AAA)
@@ -45,19 +49,29 @@
     --link on --background ............... 10.30  (AAA) — links, eyebrows
     --link on --surface ..................  9.65  (AAA)
     --link on --card .....................  9.10  (AAA)
-    --visited on --background ............  8.68  (AAA) — visited links
-    --visited on --card ..................  7.67  (AAA)
-    --destructive on --background ........  7.72  (AAA) — errors
+    --visited on --background ............ 17.26  (AAA) — visited links, underlined
+    --visited on --card .................. 15.25  (AAA)
+    --destructive on --background ........  7.72  (AAA) — errors, destructive buttons (outlined)
+    --destructive on --surface ...........  7.23  (AAA)
     --destructive on --card ..............  6.82  (AA)
-    white on --primary ...................  5.79  (AA) — primary buttons
-    white on --primary at 85% ............  7.23  (AAA) — primary button hover
-    --foreground on --primary ............  4.66  (AA)
+    --background on --destructive ........  7.72  (AAA) — a fill, should a component need one
+    white on --primary ...................  8.50  (AAA) — primary buttons
+    white on --primary at 85% ............ 10.06  (AAA) — primary button hover
+    --foreground on --primary ............  6.84  (AA)
+    white on --background ................ 19.50  (AAA) — secondary buttons, tertiary links
+    --background on --white .............. 19.50  (AAA) — secondary button hover
     --background on --ember .............. 10.30  (AAA) — text selection
+    --ember on --background .............. 10.30  (AAA) — page titles (h1)
+    --foreground on --chrome ............. 16.90  (AAA) — header, social marks
+    --muted-foreground on --chrome .......  8.39  (AAA) — the footer's line
+    --link on --chrome ................... 11.10  (AAA) — the current page in the nav
+    white on --chrome .................... 21.00  (AAA) — the logo's letters, the menu button
+    --primary on --chrome ................  2.47  decorative only — the logo's badge (logos are exempt)
     --input on --background ..............  3.63  non-text (≥3) — form field edges
     --input on --card ....................  3.21  non-text (≥3)
-    --fox on --background ................  4.34  large text and graphics only
-    --primary on --background ............  3.37  FAILS for text — a ground, not a text color
-    --ember on --primary .................  3.06  FAILS — never ember on red
+    --fox on --background ................  4.34  large text and graphics only — spines, rules
+    --primary on --background ............  2.29  FAILS for text — a ground, not a text color
+    --ember on --primary .................  4.49  FAILS — never ember on red
     Home art, the book over its foot: --background at 85% over pure white, the
     worst case, holds --foreground at 10.54, --muted-foreground at 5.24, and
     --link at 6.92 (AA), so the book reads over any part of any image.
@@ -77,23 +91,96 @@
   --border: #34303b; /* dividers and card edges: decorative, so no contrast floor */
   --input: #6e6878; /* form field edges: must clear 3:1 against the ground */
 
-  --primary: #c8192a;
+  --primary: #961b1b;
   --primary-foreground: #ffffff;
   --secondary: #2a2730;
   --secondary-foreground: #ece6da;
   --accent: #2a2730; /* hover ground for menu items (shadcn) */
   --accent-foreground: #ece6da;
-  --destructive: #ff7a7a; /* errors: a light red that reads as text on night */
+  --destructive: #ff7a7a; /* errors and destructive actions: text and outlines, never a fill (a filled red means buy) */
+  --destructive-foreground: #0d0c10; /* night, should a component ever need it as a fill */
 
   --fox: #e91d2d;
   --ember: #e9b44c;
   --link: #e9b44c; /* links: ember, its own token so it can diverge */
-  --visited: #b8a3e0; /* visited links: dusk violet, from the illustration */
+  --visited: #f1f1f1; /* visited links: near-white, always underlined (color alone barely differs from bone) */
   --ring: #e9b44c;
+  --white: #ffffff; /* secondary buttons, tertiary links, and block headings; body text stays bone */
+  --chrome: #000000; /* black: the header and footer */
   --cloud: #000000; /* the cloud that rolls over the home art, unless the Studio picks another: decorative */
 
   /* Corners: nearly square, like a book's edge. shadcn's scale derives from this. */
   --radius: 2px;
+}
+
+/*
+  PREVIEW PALETTES: candidates for a new palette, not yet the design system.
+  Chosen on /styleguide (Color → Preview a palette), they repaint every page
+  in that browser until reset (see PalettePreview). The styleguide's contrast
+  table measures whichever palette is showing; these ratios aren't recorded
+  above until one is chosen. Delete the losers, then fold the winner into
+  :root.
+
+  Ink: the charcoal, two blood reds, and cool grays, with a wine from the
+  navy-to-crimson ramp for quiet chips and the cloud. White is the light:
+  links, eyebrows, and focus, so the site is black, white, and red. Bands,
+  cards, and edges are derived from the charcoal.
+*/
+:root[data-palette='ink'] {
+  --background: #2a2522;
+  --foreground: #f2f5fa;
+  --surface: #312b28;
+  --card: #38312d;
+  --card-foreground: #f2f5fa;
+  --popover: #38312d;
+  --popover-foreground: #f2f5fa;
+  --muted: #443b36;
+  --muted-foreground: #ced2dc;
+  --border: #51463f;
+  --input: #8f847b;
+  --primary: #a90015;
+  --secondary: #643047;
+  --secondary-foreground: #ffffff;
+  --accent: #443b36;
+  --accent-foreground: #f2f5fa;
+  --destructive: #ff8a8a;
+  --destructive-foreground: #2a2522;
+  --fox: #c30011;
+  --ember: #ced2dc;
+  --link: #f2f5fa;
+  --visited: #ced2dc;
+  --ring: #f2f5fa;
+  --cloud: #643047;
+}
+
+/*
+  Deep Sea: the navy-to-crimson ramp. Navy ground, slate bands, crimson
+  action, the grays from Ink for text, and the amber kept as the light, where
+  against navy it reads as lamplight. Cards and edges are derived from the
+  navy.
+*/
+:root[data-palette='deep-sea'] {
+  --background: #053c5e;
+  --foreground: #f2f5fa;
+  --surface: #1d3958;
+  --card: #0f4a70;
+  --card-foreground: #f2f5fa;
+  --popover: #0f4a70;
+  --popover-foreground: #f2f5fa;
+  --muted: #353652;
+  --muted-foreground: #ced2dc;
+  --border: #2e5f84;
+  --input: #8a9bb3;
+  --primary: #ab2836;
+  --secondary: #4c334d;
+  --secondary-foreground: #ffffff;
+  --accent: #353652;
+  --accent-foreground: #f2f5fa;
+  --destructive: #ff9b9b;
+  --destructive-foreground: #053c5e;
+  --fox: #db222a;
+  --visited: #f2f5fa;
+  --cloud: #1d3958;
 }
 
 @theme inline {
@@ -115,18 +202,25 @@
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
   --color-fox: var(--fox);
   --color-ember: var(--ember);
   --color-link: var(--link);
   --color-visited: var(--visited);
   --color-ring: var(--ring);
+  --color-white: var(--white);
+  --color-chrome: var(--chrome);
+
+  /* The widest the site gets: Home's split, and the header and footer that line up with it (max-w-page). 1920,
+     the commonest desktop width, so Home's art still meets both edges there. Pages stop sooner (see Section). */
+  --container-page: 1920px;
   --color-cloud: var(--cloud);
 
-  /* Reading is serif, the interface is sans. */
-  --font-sans: var(--font-geist);
-  --font-serif: var(--font-crimson);
-  /* The logo's letters only. */
-  --font-brand: var(--font-montserrat);
+  /* Titles are Special Gothic Condensed; everything else is Roboto. Each role has its own token, so a face is a one-line swap. */
+  --font-display: var(--font-special-gothic); /* page titles (h1, in capitals) and story titles: one weight, never bold */
+  --font-heading: var(--font-roboto); /* h2–h6 and eyebrows */
+  --font-sans: var(--font-roboto); /* reading and the interface */
+  --font-brand: var(--font-montserrat); /* the logo's letters only */
 
   --radius-ui: var(--radius);
   --radius-sm: calc(var(--radius) * 0.6);
@@ -364,6 +458,35 @@ html {
   html {
     background: var(--background);
     color: var(--foreground);
+  }
+  /* Headings get their faces even without a class: page titles in Special Gothic Condensed, the rest in Roboto. */
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    color: var(--ember);
+  }
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-heading);
+  }
+  /* Lines break evenly: headings balance their lines, and text never leaves one word alone on its last line.
+     Browsers without these wrap as usual. */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    text-wrap: balance;
+  }
+  p,
+  li,
+  blockquote,
+  figcaption {
+    text-wrap: pretty;
   }
   /* In-page links (#books) glide there; with reduced motion they jump. */
   @media (prefers-reduced-motion: no-preference) {

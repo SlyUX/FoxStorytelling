@@ -9,6 +9,8 @@ import type {
   PAGE_QUERY_RESULT,
   POST_QUERY_RESULT,
   POSTS_QUERY_RESULT,
+  SERIES_LIST_QUERY_RESULT,
+  SERIES_QUERY_RESULT,
   RichText as GeneratedRichText,
 } from '../../sanity.types'
 
@@ -27,4 +29,8 @@ export type BookStatus = NonNullable<BookCardData['status']>
 export type PostCardData = POSTS_QUERY_RESULT[number]
 export type HomePost = HOME_POSTS_QUERY_RESULT[number]
 export type PostDetail = NonNullable<POST_QUERY_RESULT>
+export type SeriesSummary = SERIES_LIST_QUERY_RESULT[number]
+export type SeriesDetail = NonNullable<SERIES_QUERY_RESULT>
+/** A post's series, as every post query brings it. */
+export type PostSeries = PostCardData['series']
 export type PageDetail = NonNullable<PAGE_QUERY_RESULT>

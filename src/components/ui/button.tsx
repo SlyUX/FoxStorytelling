@@ -10,11 +10,15 @@ import type { CmsLink } from '@/lib/types'
  * This file is ours: when the CLI offers to overwrite it, say no.
  *
  *  - default: the red action. One per view: the thing we most want done.
- *  - outline: bone edge on any ground. Everything else that's a button.
+ *  - ember: ember text, underlined; white on hover. The second action, where a
+ *    red one already leads the view (a story's first store beside All stories,
+ *    on Home). 10.30:1 on night; at worst 6.92 over Home's art.
+ *  - outline: the secondary button. White text and edge on a clear ground,
+ *    inverting to white on hover. Everything else that's a button.
  *  - secondary: a quiet filled button, for toolbars and dense UI.
  *  - ghost: no edge until hovered. Menus and icon buttons.
- *  - link: ember text, for an action that reads like a link.
- *  - destructive: light red. Rare on a reader-facing site.
+ *  - link: the tertiary action. White text, underlined; ember on hover.
+ *  - destructive: light red, outlined, in red text. Never filled: a filled red is the call to action.
  */
 export const buttonVariants = cva(
   'rounded-ui inline-flex shrink-0 items-center justify-center gap-2 border font-sans font-semibold whitespace-nowrap transition-colors disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
@@ -22,10 +26,11 @@ export const buttonVariants = cva(
     variants: {
       variant: {
         default: 'bg-primary text-primary-foreground hover:bg-primary/85 border-transparent',
-        outline: 'border-foreground/60 text-foreground hover:border-link hover:text-link bg-transparent',
+        ember: 'text-ember border-transparent bg-transparent underline underline-offset-4 hover:text-white',
+        outline: 'border-white text-white hover:bg-white hover:text-background bg-transparent',
         secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/70 border-transparent',
         ghost: 'hover:bg-accent hover:text-accent-foreground border-transparent bg-transparent',
-        link: 'text-link h-auto border-transparent bg-transparent px-0 underline-offset-4 hover:underline',
+        link: 'h-auto border-transparent bg-transparent px-0 text-white underline underline-offset-4 hover:text-link',
         destructive: 'border-destructive text-destructive hover:bg-destructive/10 bg-transparent',
       },
       size: {
@@ -35,6 +40,8 @@ export const buttonVariants = cva(
         icon: 'size-11',
       },
     },
+    // Links are text, not boxes: no size's height or padding, so they line up with what's beside them.
+    compoundVariants: [{ variant: ['link', 'ember'], className: 'h-auto px-0' }],
     defaultVariants: { variant: 'default', size: 'default' },
   },
 )

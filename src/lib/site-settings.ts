@@ -20,7 +20,7 @@ const DEFAULTS = {
   viewAllLabel: 'See all',
   navigation: [
     { _key: 'stories', _type: 'link', label: 'Stories', href: '/stories' },
-    { _key: 'blog', _type: 'link', label: 'Rejection Files', href: '/blog' },
+    { _key: 'short-form', _type: 'link', label: 'Short Form', href: '/short-form' },
     { _key: 'about', _type: 'link', label: 'About', href: '/about' },
   ],
   homeIntro: 'Dark stories with a soul — books and comics by Stephen Fox.',
@@ -35,7 +35,9 @@ const DEFAULTS = {
   booksIntro: 'Books and comics from Fox Storytelling, and where to buy them.',
   booksEmpty: 'New stories are on the way.',
   buyLabel: 'Buy on {store}',
-  blogTitle: 'The Rejection Files',
+  shortFormTitle: 'Short Form',
+  // Placeholder: says what's here, and that it's free to read.
+  shortFormIntro: 'Shorter work, free to read: The Rejection Files, poems, and essays.',
   postsEmpty: 'The first post is on its way.',
   newsletterHeading: 'Join the list',
   newsletterBlurb: 'Get the free reader magnet and news on new books.',

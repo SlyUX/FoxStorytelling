@@ -17,7 +17,7 @@ export function Newsletter({
   return (
     <aside aria-labelledby="newsletter-heading" className="bg-card border-border rounded-ui border-t-fox flex flex-col gap-6 border border-t-2 p-6 md:flex-row md:items-center md:justify-between md:p-10">
       <div>
-        <Heading id="newsletter-heading" className="font-serif text-3xl font-semibold">
+        <Heading id="newsletter-heading" className="font-heading text-3xl font-semibold">
           {settings.newsletterHeading}
         </Heading>
         <p className="text-muted-foreground mt-2 max-w-xl">{settings.newsletterBlurb}</p>

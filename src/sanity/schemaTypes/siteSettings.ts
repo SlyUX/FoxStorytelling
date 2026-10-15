@@ -17,7 +17,7 @@ export default defineType({
     { name: 'nav', title: 'Navigation' },
     { name: 'home', title: 'Home page' },
     { name: 'books', title: 'Stories' },
-    { name: 'blog', title: 'Rejection Files' },
+    { name: 'shortForm', title: 'Short Form' },
     { name: 'newsletter', title: 'Newsletter' },
   ],
   fields: [
@@ -34,7 +34,7 @@ export default defineType({
       validation: (rule) => rule.max(160).warning('Search engines cut off around 160 characters.'),
     }),
     defineField({ name: 'viewAllLabel', title: '"See all" link text', type: 'string', group: 'general', description: 'Beside section headings that preview a longer list.' }),
-    defineField({ name: 'socials', title: 'Social links', type: 'array', group: 'general', of: [{ type: 'buyLink' }] }),
+    defineField({ name: 'socials', title: 'Social links', type: 'array', group: 'general', description: 'Marks in the header (at its right edge on desktops, in the menu on phones), in this order.', of: [{ type: 'socialLink' }] }),
 
     // Navigation
     defineField({
@@ -90,7 +90,15 @@ export default defineType({
     }),
     defineField({ name: 'bioLabel', title: 'Bio button text', type: 'string', group: 'home', description: 'Under the description; opens the About page (slug "about"), and shows once that page exists.' }),
     defineField({ name: 'allBooksLabel', title: '"All stories" button text', type: 'string', group: 'home', description: 'Under the description; opens the Stories page.' }),
-    defineField({ name: 'allPostsLabel', title: '"All posts" link text', type: 'string', group: 'home', description: 'Beside the Rejection Files previews.' }),
+    defineField({
+      name: 'homeSeries',
+      title: 'Featured series',
+      type: 'reference',
+      to: [{ type: 'series' }],
+      group: 'home',
+      description: 'Its posts show beside the books, featured posts first. Without one, the newest posts from every series show.',
+    }),
+    defineField({ name: 'allPostsLabel', title: '"All posts" link text', type: 'string', group: 'home', description: 'Beside the featured series’ previews; opens its page.' }),
 
     // Stories (the fields keep their `books` names, so saved values stay put)
     defineField({ name: 'booksTitle', title: 'Stories page title', type: 'string', group: 'books' }),
@@ -98,10 +106,10 @@ export default defineType({
     defineField({ name: 'booksEmpty', title: 'No books yet', type: 'string', group: 'books', description: 'Shown where books would be, before there are any.' }),
     defineField({ name: 'buyLabel', title: 'Buy button text', type: 'string', group: 'books', description: '{store} becomes the store’s name, e.g. "Buy on {store}".' }),
 
-    // Rejection Files
-    defineField({ name: 'blogTitle', title: 'Blog title', type: 'string', group: 'blog' }),
-    defineField({ name: 'blogIntro', title: 'Blog intro', type: 'text', rows: 2, group: 'blog' }),
-    defineField({ name: 'postsEmpty', title: 'No posts yet', type: 'string', group: 'blog' }),
+    // Short Form (each series has its own title and intro, on its document)
+    defineField({ name: 'shortFormTitle', title: 'Short Form page title', type: 'string', group: 'shortForm' }),
+    defineField({ name: 'shortFormIntro', title: 'Short Form page intro', type: 'text', rows: 2, group: 'shortForm', description: 'Also the page’s description for search engines. The default is placeholder copy.' }),
+    defineField({ name: 'postsEmpty', title: 'No posts yet', type: 'string', group: 'shortForm', description: 'Shown where posts would be, before there are any.' }),
 
     // Newsletter
     defineField({ name: 'newsletterHeading', title: 'Heading', type: 'string', group: 'newsletter' }),
