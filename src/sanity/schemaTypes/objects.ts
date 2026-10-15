@@ -49,6 +49,23 @@ export const imageWithAlt = defineType({
       validation: (rule) => rule.max(160).warning('Long alt text is hard to listen to. Aim for one sentence.'),
     }),
     defineField({ name: 'caption', title: 'Caption', type: 'string', description: 'Optional. Shown under the image.' }),
+    // Only in body text (an image inside an array, like a post's Body), where there's text to sit beside.
+    defineField({
+      name: 'placement',
+      title: 'Placement',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'In the column', value: 'column' },
+          { title: 'Beside the text', value: 'beside' },
+        ],
+        layout: 'radio',
+        direction: 'horizontal',
+      },
+      initialValue: 'column',
+      description: 'Beside the text: the image sits to the right of the paragraphs that follow it (above them on phones), up to 416px tall. For character designs and other tall, narrow art.',
+      hidden: ({ path }) => !(path.length > 2 && typeof path[1] === 'object'),
+    }),
   ],
 })
 
@@ -76,7 +93,15 @@ export const richText = defineType({
             name: 'link',
             type: 'object',
             title: 'Link',
-            fields: [defineField({ name: 'href', type: 'url', title: 'URL', validation: (rule) => rule.uri({ scheme: ['http', 'https', 'mailto'] }) })],
+            fields: [
+              defineField({
+                name: 'href',
+                type: 'url',
+                title: 'URL',
+                description: 'A page on this site ("/stories/monster"), or a full address. Pages on this site open in place; other sites, in a new tab.',
+                validation: (rule) => rule.uri({ scheme: ['http', 'https', 'mailto'], allowRelative: true }),
+              }),
+            ],
           }),
         ],
       },

@@ -269,6 +269,23 @@
             "type": "string"
           },
           "optional": true
+        },
+        "placement": {
+          "type": "objectAttribute",
+          "value": {
+            "type": "union",
+            "of": [
+              {
+                "type": "string",
+                "value": "column"
+              },
+              {
+                "type": "string",
+                "value": "beside"
+              }
+            ]
+          },
+          "optional": true
         }
       }
     }

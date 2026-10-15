@@ -552,7 +552,12 @@ export default async function StyleguidePage() {
         <Specimen
           name="Rich text"
           file="src/components/rich-text.tsx"
-          notes={['Every style the Studio allows: paragraphs, headings, quotes, lists, links, and images with alt text and an optional caption.', 'Set at 20px in Roboto, at a 672px measure. Pull quotes are italic, on the fox-red rule.']}
+          notes={[
+            'Every style the Studio allows: paragraphs, headings, quotes, lists, links, and images with alt text and an optional caption.',
+            'Set at 20px in Roboto, at a 672px measure. Pull quotes are italic, on the fox-red rule.',
+            'An image can sit beside the text (Placement → Beside the text): floated right, up to 416px tall and 40% of the column, centered above the text on phones; headings start below it. For character designs and other tall art.',
+            'A link to a page on this site (“/stories/monster”) opens in place, with the page transition; other sites open in a new tab.',
+          ]}
         >
           <div className="max-w-2xl">
             <RichText value={SAMPLE_PROSE} />

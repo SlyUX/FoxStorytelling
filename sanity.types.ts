@@ -54,6 +54,7 @@ export type ImageWithAlt = {
   crop?: SanityImageCrop;
   alt?: string;
   caption?: string;
+  placement?: "column" | "beside";
 };
 
 export type Link = {
