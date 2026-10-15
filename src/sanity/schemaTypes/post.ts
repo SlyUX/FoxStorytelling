@@ -8,8 +8,6 @@ export default defineType({
     slugField('title', '/short-form/the-series/your-post-title'),
     defineField({ name: 'series', type: 'reference', to: [{ type: 'series' }], validation: (r) => r.required(),
       description: 'Where it lives in Short Form, and how it’s set (the series’ form).' }),
-    // Retired: the series replaced it. Hidden until it's cleared from saved posts, then delete this field.
-    defineField({ name: 'category', type: 'string', hidden: true }),
     defineField({ name: 'excerpt', type: 'text', rows: 3 }),
     defineField({ name: 'cover', type: 'image', options: { hotspot: true } }),
     defineField({ name: 'body', type: 'richText' }),

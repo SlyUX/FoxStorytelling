@@ -595,13 +595,6 @@
         },
         "optional": false
       },
-      "category": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "string"
-        },
-        "optional": true
-      },
       "excerpt": {
         "type": "objectAttribute",
         "value": {
@@ -1322,7 +1315,14 @@
         },
         "optional": true
       },
-      "newsletterUrl": {
+      "newsletterForm": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
+      "newsletterEmailLabel": {
         "type": "objectAttribute",
         "value": {
           "type": "string"
@@ -1330,6 +1330,20 @@
         "optional": true
       },
       "newsletterButtonLabel": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
+      "newsletterSuccess": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
+      "newsletterError": {
         "type": "objectAttribute",
         "value": {
           "type": "string"

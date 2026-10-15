@@ -45,7 +45,7 @@ Point foxstorytelling.com at Vercel in HostGator Zone Editor — **leave MX + th
 
 ## Content to add in the Studio
 - **Site settings:** every field has a sensible default, so fill in only what you want to change.
-- **Newsletter:** paste your MailerLite hosted form address into Site settings → Newsletter. The site never collects emails; the sign-up panel stays hidden until this is set.
+- **Newsletter:** in MailerLite, open Forms → your form → Embed form → HTML code, and paste the address after `action=` into Site settings → Newsletter → MailerLite form address. The site's own form sends each address from the reader's browser straight to MailerLite; the site never collects emails. Until it's set, the sign-up bar on Home stays hidden. Turn off reCAPTCHA on the MailerLite form (the site's form doesn't show it) and use double opt-in instead.
 - **About:** create a Page with the slug `about`. Once it exists, a **Stephen's Bio** button appears under the home page's description.
 - **Short Form on the home page:** the featured series' newest posts (Site settings → Home page → Featured series) preview beside the art, as many as fit; mark a post **Featured** to pin it first.
 - **A new series:** Studio → Short Form → Series. Give it a title, a slug, and a form (prose, poetry, or comics); it appears on the Short Form page with its first post.

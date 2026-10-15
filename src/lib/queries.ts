@@ -54,9 +54,9 @@ export const SERIES_QUERY = defineQuery(
   `*[_type=="series" && slug.current==$series][0]{${SERIES_FIELDS},"posts": *[${LISTED_POST} && references(^._id)]|order(publishedAt desc){${POST_CARD}}}`,
 )
 
-/** The home page's post previews, from the featured series (Site settings), or every series without one: featured posts first, then newest. */
+/** The home page's post previews, from the featured series (Site settings), or every series without one: featured posts first, then newest, up to 7. */
 export const HOME_POSTS_QUERY = defineQuery(
-  `*[${LISTED_POST} && (!defined(*[_id=="siteSettings"][0].homeSeries) || series._ref == *[_id=="siteSettings"][0].homeSeries._ref)]{${POST_CARD},"pinned": coalesce(featured, false)}|order(pinned desc, publishedAt desc)[0...6]`,
+  `*[${LISTED_POST} && (!defined(*[_id=="siteSettings"][0].homeSeries) || series._ref == *[_id=="siteSettings"][0].homeSeries._ref)]{${POST_CARD},"pinned": coalesce(featured, false)}|order(pinned desc, publishedAt desc)[0...7]`,
 )
 
 export const PAGE_QUERY = defineQuery(`*[_type=="page" && slug.current==$slug][0]{_id,title,"slug":slug.current,intro,body}`)

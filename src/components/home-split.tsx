@@ -3,7 +3,7 @@ import Image from 'next/image'
 import { BookBadges, BookCover } from '@/components/book-card'
 import { BookSpotlight, type SpotlightSlide } from '@/components/book-spotlight'
 import { BuyLinks } from '@/components/buy-links'
-import { FillColumn } from '@/components/fill-column'
+import { Newsletter } from '@/components/newsletter'
 import { PostCard } from '@/components/post-list'
 import { TransitionLink } from '@/components/transition-link'
 import { ButtonLink } from '@/components/ui/button'
@@ -15,7 +15,7 @@ import { urlFor } from '@/sanity/image'
 /** Heading levels: the page's h1, the book's title, block headings, and titles in blocks. */
 type Levels = { tagline: 'h1' | 'h4'; book: 'h2' | 'h5'; block: 'h2' | 'h5'; item: 'h3' | 'h6' }
 const PAGE_LEVELS: Levels = { tagline: 'h1', book: 'h2', block: 'h2', item: 'h3' }
-/** Below `split:`, everything flows; this many post previews show there. */
+/** Below `split:`, everything flows; this many post previews show there. Split screens show them all (up to 7, the query's cap), scrolling. */
 const POSTS_STACKED = 3
 
 /** The hotspot as a CSS position; without one, a little above center. */
@@ -44,10 +44,11 @@ function Art({ image, lqip, focus, preload }: { image: SanityImage | null | unde
  * details over the foot of its art. Without any, the site's home art (Site
  * settings) stands with the first book.
  *
- * The other column, centered: the description, with All stories (the view's
- * red button) and Stephen's Bio (once there's an About page); then the
- * featured series' previews (Site settings; The Rejection Files), as many as
- * fit (FillColumn).
+ * The other column: the description, with All stories (the view's red
+ * button) and Stephen's Bio (once there's an About page); then the featured
+ * series' previews (Site settings; The Rejection Files). On split screens it
+ * scrolls, with the sign-up bar pinned beneath it (once Site settings has a
+ * sign-up address); stacked, the bar comes last.
  */
 export function HomeSplit({
   settings,
@@ -137,9 +138,9 @@ export function HomeSplit({
         </>
       }
       rest={
-        <FillColumn>
-          {/* The heading travels with the first preview, so it never shows alone. Ruled off from the description on split
-              screens; stacked, the art's band above already draws that line. */}
+        // Stacked, inset like the description; on split screens the column insets it. Ruled off from the description
+        // on split screens; stacked, the art's band above already draws that line.
+        <div className="split:p-0 px-6 pb-12 sm:px-10">
           <div className="border-border split:border-t split:pt-8 mt-10">
             <div className="mb-4 flex items-baseline justify-between gap-4">
               {/* Set like an h3 (white, 24px), but an h2 in the outline: a main section of the page, not part of the book above it. */}
@@ -148,15 +149,21 @@ export function HomeSplit({
                 {settings.allPostsLabel}
               </ButtonLink>
             </div>
-            {posts[0] ? <PostCard post={posts[0]} featuredLabel={settings.featuredLabel} showSeries={!settings.homeSeries} headingLevel={levels.item} /> : <p className="text-muted-foreground">{settings.postsEmpty}</p>}
+            {posts.length ? (
+              <ul className="grid gap-3">
+                {posts.map((post, i) => (
+                  <li key={post._id} className={cn(i >= POSTS_STACKED && 'split:block hidden')}>
+                    <PostCard post={post} featuredLabel={settings.featuredLabel} showSeries={!settings.homeSeries} headingLevel={levels.item} />
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-muted-foreground">{settings.postsEmpty}</p>
+            )}
           </div>
-          {posts.slice(1).map((post, i) => (
-            <div key={post._id} className={cn('mt-3', i + 1 >= POSTS_STACKED && 'split:block hidden')}>
-              <PostCard post={post} featuredLabel={settings.featuredLabel} showSeries={!settings.homeSeries} headingLevel={levels.item} />
-            </div>
-          ))}
-        </FillColumn>
+        </div>
       }
+      footer={settings.newsletterForm ? <Newsletter settings={settings} layout="bar" id="subscribe-heading" headingLevel={levels.block} /> : null}
     />
   )
 }
