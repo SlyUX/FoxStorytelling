@@ -97,6 +97,7 @@ const PAIRS: ContrastPair[] = [
   { fg: 'background', bg: 'ember', use: 'Selected text', need: 'text' },
   { fg: 'input', bg: 'background', use: 'Form field edges', need: 'nontext' },
   { fg: 'input', bg: 'card', use: 'Form field edges on cards', need: 'nontext' },
+  { fg: 'input', bg: 'muted', use: 'Form field edges in the sign-up bar', need: 'nontext' },
   { fg: 'fox', bg: 'background', use: 'Spines, rules, underlines: never body text', need: 'large' },
   { fg: 'primary', bg: 'background', use: 'Never: red is a ground, not a text color', need: 'text' },
   { fg: 'ember', bg: 'primary', use: 'Never: no ember on red', need: 'text' },
@@ -447,7 +448,7 @@ export default async function StyleguidePage() {
             notes={[
               'An email field and a button, sending the address from the reader’s browser straight to the MailerLite form set in Site settings: the site never sees it. Hidden until that address is set; shown here with a stand-in, which turns any address away, so it shows the error.',
               'On success the thank-you replaces the form and takes focus, so it’s heard; an error is announced and the address stays to fix. The browser checks the address first. Without JavaScript, the form still posts to MailerLite in a new tab.',
-              'Two layouts: the panel, with the red button, for a band of its own; and the bar, with an outlined button, pinned under Home’s right column, where All stories holds the red. The bar sets the form beside its words when there’s room, beneath them when there isn’t.',
+              'Two layouts: the panel, with the red button, for a band of its own; and the bar, with an outlined button, pinned under Home’s right column on a band of --muted, where All stories holds the red. The bar sets the form beside its words when there’s room, beneath them when there isn’t.',
             ]}
           >
             <div className="grid gap-10">
@@ -472,7 +473,7 @@ export default async function StyleguidePage() {
             'Stories with “Show on the home page” on and home page art rotate in Stories order, one per breath: as each breath ends, with the art at its dimmest, the next book crossfades in. With none, the site’s home art (Site settings) stands with the first book, its cover beside the details.',
             'The showing book sits over the foot of its art, on night at 85% so its text holds over any image: status, title, series, blurb, where to buy, and About the book. Its first store is an ember link, since All stories is the view’s red button. The rotation’s controls tuck behind one toggle in the art’s top corner: open, pause, previous, and next slide out. On split screens the markers wait beside them, a quiet sign there’s more than one book until it opens; stacked, they slide out too. Escape closes it. Left and right arrow keys step through the books while focus is on the art, or nothing has focus.',
             'The art breathes every 20 seconds, swelling and brightening from 50% to full opacity, under a cloud drawn from noise that moves through time, from a new seed on each visit. The cloud is black unless Site settings or the book picks a color, and it eases into a new book’s color as the book changes. A book can turn its cloud off; it fades out, and back in for the next book that has one. The hotspot set in the Studio stays in view and is where the breath grows from.',
-            'The other column, centered while it fits: the description, with All stories in red and Stephen’s Bio (once there’s an About page); then the featured series’ previews under its name (white, set like an h3; Site settings → Home page → Featured series: The Rejection Files), featured posts first, up to seven. On split screens the column scrolls, with the sign-up bar pinned beneath it; the column fades into the bar, so what scrolls seems to pass under it. Stacked, three posts show, then the bar.',
+            'The other column, centered while it fits: the description, with All stories in red and Stephen’s Bio (once there’s an About page); then the featured series’ previews under its name (white, set like an h3; Site settings → Home page → Featured series: The Rejection Files), featured posts first, up to seven. On split screens the column scrolls, with the sign-up bar pinned beneath it on a band of --muted; the column fades out above the bar, so what scrolls seems to pass under it. Stacked, three posts show, then the bar, full width.',
             'On split screens, scrolling away, the art and its cloud fade into the night, gone after scrolling about a third of the screen; the book and controls stay. Stacked, the art doesn’t fade. CSS scroll-driven: browsers without it just scroll.',
             'The rotation holds while the pointer or keyboard focus is in it; pause stops it and the motion; previous, next, and a marker per book step through by hand. Reduced motion stills the art and never advances on its own.',
           ]}
