@@ -60,7 +60,8 @@ export function PostList({ posts, showSeries, headingLevel }: { posts: PostCardD
 /**
  * A post as a compact card, for tight spaces like the home page's first
  * screen: a square of the post's cover, flush to the card's top, left, and
- * bottom, then the meta line (series and date; just the date where the series
+ * bottom (stamped with the series' word, if it has one: REJECTED, for The
+ * Rejection Files), then the meta line (series and date; just the date where the series
  * goes without saying, `showSeries={false}`), title, and excerpt (on wider
  * screens; never a poem's). One click
  * target; pointing at it or focusing it draws the cover in a little, unless
@@ -99,6 +100,16 @@ export function PostCard({
           />
         ) : (
           <FoxBadge className="text-border absolute inset-0 m-auto size-1/3" />
+        )}
+        {post.series.stamp && (
+          // A rubber stamp, so its corners are rounded (an exception to the 2px corners), and it holds still as the cover
+          // scales. Decorative: the series is named in the meta line, or by the list it's in.
+          <span
+            aria-hidden
+            className="font-display text-fox border-fox bg-white rounded-[10px] absolute top-[42%] left-1/2 w-[80%] -translate-x-1/2 -translate-y-1/2 -rotate-20 border-[3px] py-1 text-center text-lg leading-none uppercase sm:text-2xl"
+          >
+            {post.series.stamp}
+          </span>
         )}
       </div>
       <div className="flex min-w-0 flex-1 flex-col justify-center p-4">

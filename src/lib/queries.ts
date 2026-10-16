@@ -18,7 +18,7 @@ export async function safeFetch<T>(query: string, params: Record<string, unknown
 
 const BOOK_CARD = `_id,title,"slug":slug.current,series,status,format,shortDescription,cover,buyLinks`
 /** A post's series, for its address, its label, and how it's set. Posts without one (or a series without a slug) are left out of every list. */
-const POST_SERIES = `"series": series->{title,"slug":slug.current,form}`
+const POST_SERIES = `"series": series->{title,"slug":slug.current,form,stamp}`
 const POST_CARD = `_id,title,"slug":slug.current,${POST_SERIES},excerpt,publishedAt,cover`
 const LISTED_POST = `_type=="post" && defined(slug.current) && defined(series->slug.current)`
 /** A Rejection File's other part: enough to link it. */

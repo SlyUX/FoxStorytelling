@@ -101,6 +101,7 @@ const PAIRS: ContrastPair[] = [
   { fg: 'input', bg: 'card', use: 'Form field edges on cards', need: 'nontext' },
   { fg: 'input', bg: 'muted', use: 'Form field edges in the sign-up bar', need: 'nontext' },
   { fg: 'fox', bg: 'background', use: 'Spines, rules, underlines: never body text', need: 'large' },
+  { fg: 'fox', bg: 'white', use: 'A series’ stamp (REJECTED) on post covers', need: 'large' },
   { fg: 'primary', bg: 'background', use: 'Never: red is a ground, not a text color', need: 'text' },
   { fg: 'ember', bg: 'primary', use: 'Never: no ember on red', need: 'text' },
 ]
@@ -131,7 +132,7 @@ const RULES: [string, string][] = [
   ['Tokens only.', 'Colors come from the tokens above, through Tailwind; no raw hex values or palette classes in components. A new color pair must pass WCAG AA, and its ratio goes in globals.css and the table above.'],
   ['Red is for action, ember is for light.', 'One red button per view: the thing we most want done, like All stories on Home or the first store on a story’s page. A second action in the same view is ember text, underlined. Light red text and outlines mean something went wrong. Ember is the light: page titles, links, focus, and what’s on its way. The brand file’s red (--fox) is decoration and large display only; the logo’s badge wears the primary red. Never ember on red.'],
   ['Two faces, plus the logo.', 'Titles are Special Gothic Condensed, never bold: it has one weight. Page titles (h1) are capitals, set by CSS, so they’re typed and read aloud as written; a story’s title keeps its own case wherever it’s a heading. Everything else is Roboto, with true italics: headings, reading, the interface. Montserrat sets the logo’s letters and nothing else; scripts are set in Courier Prime, as scripts are.'],
-  ['Corners are 2px.', 'Nearly square, like a book’s edge. Every element uses rounded-ui; shadcn’s radius scale derives from the same value. The one exception: the author’s portrait is round.'],
+  ['Corners are 2px.', 'Nearly square, like a book’s edge. Every element uses rounded-ui; shadcn’s radius scale derives from the same value. The exceptions: the author’s portrait is round, and a series’ stamp has a rubber stamp’s rounded corners.'],
   ['One page title.', 'Each page has one h1, and headings never skip a level.'],
   ['Every card is one click target.', 'The title’s link stretches over the card, so the cover, title, and blurb all open it, with one focus ring around the whole card.'],
   ['Covers never break.', 'A book without cover art shows its title on a card with the fox-red spine, so it can be listed before the art is final.'],
@@ -191,7 +192,7 @@ const SAMPLE_SOCIALS: NonNullable<SiteSettings['socials']> = [
 ]
 
 const SAMPLE_POSTS: PostCardData[] = [
-  { _id: 'sample-post', title: 'A post title', slug: 'sample', series: { title: 'The Rejection Files', slug: 'rejection-files', form: 'prose' }, excerpt: 'An excerpt: a sentence or two that sets up the post.', publishedAt: '2026-10-12T12:00:00Z', cover: null },
+  { _id: 'sample-post', title: 'A post title', slug: 'sample', series: { title: 'The Rejection Files', slug: 'rejection-files', form: 'prose', stamp: null }, excerpt: 'An excerpt: a sentence or two that sets up the post.', publishedAt: '2026-10-12T12:00:00Z', cover: null },
 ]
 
 const span = (key: string, text: string, marks: string[] = []) => ({ _type: 'span' as const, _key: key, text, marks })
@@ -302,7 +303,7 @@ export default async function StyleguidePage() {
       </Section>
 
       <Section id="corners-and-spacing" tone="surface" aria-labelledby="corners-heading">
-        <SectionHeading id="corners-heading" intro="Corners are 2px on everything. Spacing follows an 8px rhythm.">
+        <SectionHeading id="corners-heading" intro="Corners are 2px on nearly everything (the author’s portrait and a series’ stamp are the exceptions). Spacing follows an 8px rhythm.">
           Corners and spacing
         </SectionHeading>
         <div className="grid gap-6 md:grid-cols-[minmax(0,16rem)_1fr]">
@@ -547,6 +548,7 @@ export default async function StyleguidePage() {
               'A compact preview for tight spaces, like the home page’s first screen and the Short Form page: the post’s cover in a square flush to the card’s top, left, and bottom edges, then the meta line (series and date; just the date where the series goes without saying), title, and two lines of excerpt (none on phones, and never a poem’s). One click target.',
               'Pointing at the card or focusing it draws the cover in a little; not with reduced motion. Without a cover, the square holds the fox badge.',
               'A featured post says so, in ember, and leads its list.',
+              'A series can stamp its posts’ covers (Series → Stamp): REJECTED, for The Rejection Files, in fox red capitals on white, tilted like a rubber stamp. Decorative; it holds still as the cover scales.',
             ]}
           >
             <div className="grid max-w-xl gap-3">
@@ -554,6 +556,7 @@ export default async function StyleguidePage() {
                 <PostCard key={post._id} post={{ ...post, pinned: true }} featuredLabel={s.featuredLabel} headingLevel="h4" />
               ))}
               <PostCard post={{ ...SAMPLE_POSTS[0], _id: 'sample-no-cover', title: 'A post without a cover' }} headingLevel="h4" />
+              <PostCard post={{ ...SAMPLE_POSTS[0], _id: 'sample-stamped', title: 'A Rejection File', series: { ...SAMPLE_POSTS[0].series, stamp: 'Rejected' } }} headingLevel="h4" />
             </div>
           </Specimen>
           <Specimen
