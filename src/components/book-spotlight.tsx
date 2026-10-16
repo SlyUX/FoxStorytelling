@@ -151,8 +151,9 @@ export function BookSpotlight({
       )}
     >
       {/* The scrolling part. The art sits inside it for the reading order, but it's positioned against the whole
-          (this has no position of its own), so it neither scrolls nor clips with it. */}
-      <div className="split:flex split:min-h-0 split:flex-1 split:flex-col split:overflow-y-auto split:px-12 split:py-10 split:[scrollbar-color:var(--color-border)_transparent] split:[scrollbar-width:thin]">
+          (this has no position of its own), so it neither scrolls nor clips with it. On split screens, this and the
+          footer draw the column's left edge (--border), against the art. */}
+      <div className="split:flex split:min-h-0 split:flex-1 split:flex-col split:overflow-y-auto split:border-l split:border-border split:px-12 split:py-10 split:[scrollbar-color:var(--color-border)_transparent] split:[scrollbar-width:thin]">
         <div className="split:mt-auto split:p-0 px-6 pt-12 pb-10 sm:px-10">{intro}</div>
 
         <section
@@ -280,7 +281,7 @@ export function BookSpotlight({
       {footer && (
         // A band of --muted: stacked, full width below the rest; split, pinned across the column, which fades into the
         // night above it, so what scrolls seems to pass beneath.
-        <div className="bg-muted split:relative split:shrink-0 split:px-12 split:py-5 split:before:pointer-events-none split:before:absolute split:before:inset-x-0 split:before:bottom-full split:before:h-12 split:before:bg-linear-to-t split:before:from-background split:before:to-transparent px-6 py-8 sm:px-10">
+        <div className="bg-muted split:relative split:shrink-0 split:border-l split:border-border split:px-12 split:py-5 split:before:pointer-events-none split:before:absolute split:before:inset-x-0 split:before:bottom-full split:before:h-12 split:before:bg-linear-to-t split:before:from-background split:before:to-transparent px-6 py-8 sm:px-10">
           {footer}
         </div>
       )}
