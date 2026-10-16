@@ -22,6 +22,8 @@ export default defineType({
     defineField({ name: 'form', type: 'string', initialValue: 'prose', validation: (r) => r.required(),
       options: { list: SERIES_FORMS, layout: 'radio' },
       description: 'How its posts are set. Prose: at reading width. Poetry: every line break kept, and no excerpts on cards. Comics: images run wide.' }),
+    defineField({ name: 'stamp', type: 'string', validation: (r) => r.max(12),
+      description: 'Optional: a word stamped across the covers of this series’ posts, in red capitals (“Rejected” for The Rejection Files). Keep it short.' }),
     defineField({ name: 'order', type: 'number', description: 'Its place on the Short Form page, lowest first.' }),
   ],
   orderings: [{ title: 'Custom order', name: 'order', by: [{ field: 'order', direction: 'asc' }] }],

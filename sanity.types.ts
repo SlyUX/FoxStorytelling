@@ -298,6 +298,7 @@ export type Series = {
   slug: Slug;
   intro?: string;
   form: "prose" | "poetry" | "comics";
+  stamp?: string;
   order?: number;
 };
 
@@ -621,7 +622,7 @@ export type BOOK_QUERY_RESULT = {
 
 // Source: src/lib/queries.ts
 // Variable: POSTS_QUERY
-// Query: *[_type=="post" && defined(slug.current) && defined(series->slug.current)]|order(publishedAt desc){_id,title,"slug":slug.current,"series": series->{title,"slug":slug.current,form},excerpt,publishedAt,cover}
+// Query: *[_type=="post" && defined(slug.current) && defined(series->slug.current)]|order(publishedAt desc){_id,title,"slug":slug.current,"series": series->{title,"slug":slug.current,form,stamp},excerpt,publishedAt,cover}
 export type POSTS_QUERY_RESULT = Array<{
   _id: string;
   title: string;
@@ -630,6 +631,7 @@ export type POSTS_QUERY_RESULT = Array<{
     title: string;
     slug: string;
     form: "comics" | "poetry" | "prose";
+    stamp: string | null;
   };
   excerpt: string | null;
   publishedAt: string;
@@ -644,7 +646,7 @@ export type POSTS_QUERY_RESULT = Array<{
 
 // Source: src/lib/queries.ts
 // Variable: POST_QUERY
-// Query: *[_type=="post" && slug.current==$slug && series->slug.current==$series][0]{_id,title,"slug":slug.current,"series": series->{title,"slug":slug.current,form},excerpt,publishedAt,cover,body,pitch,script,"became": became{note,"story": story->{_id,title,"slug":slug.current,series,status,format,shortDescription,cover,buyLinks}},"follows": follows->{title,"slug":slug.current,"series":series->slug.current},"continuedIn": *[_type=="post" && defined(slug.current) && defined(series->slug.current) && follows._ref == ^._id]|order(publishedAt asc)[0]{title,"slug":slug.current,"series":series->slug.current}}
+// Query: *[_type=="post" && slug.current==$slug && series->slug.current==$series][0]{_id,title,"slug":slug.current,"series": series->{title,"slug":slug.current,form,stamp},excerpt,publishedAt,cover,body,pitch,script,"became": became{note,"story": story->{_id,title,"slug":slug.current,series,status,format,shortDescription,cover,buyLinks}},"follows": follows->{title,"slug":slug.current,"series":series->slug.current},"continuedIn": *[_type=="post" && defined(slug.current) && defined(series->slug.current) && follows._ref == ^._id]|order(publishedAt asc)[0]{title,"slug":slug.current,"series":series->slug.current}}
 export type POST_QUERY_RESULT = {
   _id: string;
   title: string;
@@ -653,6 +655,7 @@ export type POST_QUERY_RESULT = {
     title: string;
     slug: string;
     form: "comics" | "poetry" | "prose";
+    stamp: string | null;
   };
   excerpt: string | null;
   publishedAt: string;
@@ -713,7 +716,7 @@ export type POST_QUERY_RESULT = {
 
 // Source: src/lib/queries.ts
 // Variable: SERIES_LIST_QUERY
-// Query: *[_type=="series" && defined(slug.current)]|order(order asc, title asc){_id,title,"slug":slug.current,intro,form,"posts": *[_type=="post" && defined(slug.current) && defined(series->slug.current) && references(^._id)]|order(publishedAt desc)[0...4]{_id,title,"slug":slug.current,"series": series->{title,"slug":slug.current,form},excerpt,publishedAt,cover}}
+// Query: *[_type=="series" && defined(slug.current)]|order(order asc, title asc){_id,title,"slug":slug.current,intro,form,"posts": *[_type=="post" && defined(slug.current) && defined(series->slug.current) && references(^._id)]|order(publishedAt desc)[0...4]{_id,title,"slug":slug.current,"series": series->{title,"slug":slug.current,form,stamp},excerpt,publishedAt,cover}}
 export type SERIES_LIST_QUERY_RESULT = Array<{
   _id: string;
   title: string;
@@ -728,6 +731,7 @@ export type SERIES_LIST_QUERY_RESULT = Array<{
       title: string;
       slug: string;
       form: "comics" | "poetry" | "prose";
+      stamp: string | null;
     };
     excerpt: string | null;
     publishedAt: string;
@@ -743,7 +747,7 @@ export type SERIES_LIST_QUERY_RESULT = Array<{
 
 // Source: src/lib/queries.ts
 // Variable: SERIES_QUERY
-// Query: *[_type=="series" && slug.current==$series][0]{_id,title,"slug":slug.current,intro,form,"posts": *[_type=="post" && defined(slug.current) && defined(series->slug.current) && references(^._id)]|order(publishedAt desc){_id,title,"slug":slug.current,"series": series->{title,"slug":slug.current,form},excerpt,publishedAt,cover}}
+// Query: *[_type=="series" && slug.current==$series][0]{_id,title,"slug":slug.current,intro,form,"posts": *[_type=="post" && defined(slug.current) && defined(series->slug.current) && references(^._id)]|order(publishedAt desc){_id,title,"slug":slug.current,"series": series->{title,"slug":slug.current,form,stamp},excerpt,publishedAt,cover}}
 export type SERIES_QUERY_RESULT = {
   _id: string;
   title: string;
@@ -758,6 +762,7 @@ export type SERIES_QUERY_RESULT = {
       title: string;
       slug: string;
       form: "comics" | "poetry" | "prose";
+      stamp: string | null;
     };
     excerpt: string | null;
     publishedAt: string;
@@ -773,7 +778,7 @@ export type SERIES_QUERY_RESULT = {
 
 // Source: src/lib/queries.ts
 // Variable: HOME_POSTS_QUERY
-// Query: *[_type=="post" && defined(slug.current) && defined(series->slug.current) && (!defined(*[_id=="siteSettings"][0].homeSeries) || series._ref == *[_id=="siteSettings"][0].homeSeries._ref)]{_id,title,"slug":slug.current,"series": series->{title,"slug":slug.current,form},excerpt,publishedAt,cover,"pinned": coalesce(featured, false)}|order(pinned desc, publishedAt desc)[0...7]
+// Query: *[_type=="post" && defined(slug.current) && defined(series->slug.current) && (!defined(*[_id=="siteSettings"][0].homeSeries) || series._ref == *[_id=="siteSettings"][0].homeSeries._ref)]{_id,title,"slug":slug.current,"series": series->{title,"slug":slug.current,form,stamp},excerpt,publishedAt,cover,"pinned": coalesce(featured, false)}|order(pinned desc, publishedAt desc)[0...7]
 export type HOME_POSTS_QUERY_RESULT = Array<{
   _id: string;
   title: string;
@@ -782,6 +787,7 @@ export type HOME_POSTS_QUERY_RESULT = Array<{
     title: string;
     slug: string;
     form: "comics" | "poetry" | "prose";
+    stamp: string | null;
   };
   excerpt: string | null;
   publishedAt: string;
@@ -814,11 +820,11 @@ declare module "@sanity/client" {
     '*[_type=="book" && showOnHome == true && defined(homeArt.asset) && defined(slug.current)]|order(order asc, title asc){_id,title,"slug":slug.current,series,status,format,shortDescription,cover,buyLinks,homeArt,"homeArtLqip": homeArt.asset->metadata.lqip,"cloudHex": cloudColor.hex,"cloudOn": coalesce(showCloud, true)}': HOME_SPOTLIGHT_QUERY_RESULT;
     '*[_type=="book" && defined(slug.current)]|order(order asc, title asc){_id,title,"slug":slug.current,series,status,format,shortDescription,cover,buyLinks}': BOOKS_QUERY_RESULT;
     '*[_type=="book" && slug.current==$slug][0]{_id,title,"slug":slug.current,series,status,format,shortDescription,cover,buyLinks,description,publishDate}': BOOK_QUERY_RESULT;
-    '*[_type=="post" && defined(slug.current) && defined(series->slug.current)]|order(publishedAt desc){_id,title,"slug":slug.current,"series": series->{title,"slug":slug.current,form},excerpt,publishedAt,cover}': POSTS_QUERY_RESULT;
-    '*[_type=="post" && slug.current==$slug && series->slug.current==$series][0]{_id,title,"slug":slug.current,"series": series->{title,"slug":slug.current,form},excerpt,publishedAt,cover,body,pitch,script,"became": became{note,"story": story->{_id,title,"slug":slug.current,series,status,format,shortDescription,cover,buyLinks}},"follows": follows->{title,"slug":slug.current,"series":series->slug.current},"continuedIn": *[_type=="post" && defined(slug.current) && defined(series->slug.current) && follows._ref == ^._id]|order(publishedAt asc)[0]{title,"slug":slug.current,"series":series->slug.current}}': POST_QUERY_RESULT;
-    '*[_type=="series" && defined(slug.current)]|order(order asc, title asc){_id,title,"slug":slug.current,intro,form,"posts": *[_type=="post" && defined(slug.current) && defined(series->slug.current) && references(^._id)]|order(publishedAt desc)[0...4]{_id,title,"slug":slug.current,"series": series->{title,"slug":slug.current,form},excerpt,publishedAt,cover}}': SERIES_LIST_QUERY_RESULT;
-    '*[_type=="series" && slug.current==$series][0]{_id,title,"slug":slug.current,intro,form,"posts": *[_type=="post" && defined(slug.current) && defined(series->slug.current) && references(^._id)]|order(publishedAt desc){_id,title,"slug":slug.current,"series": series->{title,"slug":slug.current,form},excerpt,publishedAt,cover}}': SERIES_QUERY_RESULT;
-    '*[_type=="post" && defined(slug.current) && defined(series->slug.current) && (!defined(*[_id=="siteSettings"][0].homeSeries) || series._ref == *[_id=="siteSettings"][0].homeSeries._ref)]{_id,title,"slug":slug.current,"series": series->{title,"slug":slug.current,form},excerpt,publishedAt,cover,"pinned": coalesce(featured, false)}|order(pinned desc, publishedAt desc)[0...7]': HOME_POSTS_QUERY_RESULT;
+    '*[_type=="post" && defined(slug.current) && defined(series->slug.current)]|order(publishedAt desc){_id,title,"slug":slug.current,"series": series->{title,"slug":slug.current,form,stamp},excerpt,publishedAt,cover}': POSTS_QUERY_RESULT;
+    '*[_type=="post" && slug.current==$slug && series->slug.current==$series][0]{_id,title,"slug":slug.current,"series": series->{title,"slug":slug.current,form,stamp},excerpt,publishedAt,cover,body,pitch,script,"became": became{note,"story": story->{_id,title,"slug":slug.current,series,status,format,shortDescription,cover,buyLinks}},"follows": follows->{title,"slug":slug.current,"series":series->slug.current},"continuedIn": *[_type=="post" && defined(slug.current) && defined(series->slug.current) && follows._ref == ^._id]|order(publishedAt asc)[0]{title,"slug":slug.current,"series":series->slug.current}}': POST_QUERY_RESULT;
+    '*[_type=="series" && defined(slug.current)]|order(order asc, title asc){_id,title,"slug":slug.current,intro,form,"posts": *[_type=="post" && defined(slug.current) && defined(series->slug.current) && references(^._id)]|order(publishedAt desc)[0...4]{_id,title,"slug":slug.current,"series": series->{title,"slug":slug.current,form,stamp},excerpt,publishedAt,cover}}': SERIES_LIST_QUERY_RESULT;
+    '*[_type=="series" && slug.current==$series][0]{_id,title,"slug":slug.current,intro,form,"posts": *[_type=="post" && defined(slug.current) && defined(series->slug.current) && references(^._id)]|order(publishedAt desc){_id,title,"slug":slug.current,"series": series->{title,"slug":slug.current,form,stamp},excerpt,publishedAt,cover}}': SERIES_QUERY_RESULT;
+    '*[_type=="post" && defined(slug.current) && defined(series->slug.current) && (!defined(*[_id=="siteSettings"][0].homeSeries) || series._ref == *[_id=="siteSettings"][0].homeSeries._ref)]{_id,title,"slug":slug.current,"series": series->{title,"slug":slug.current,form,stamp},excerpt,publishedAt,cover,"pinned": coalesce(featured, false)}|order(pinned desc, publishedAt desc)[0...7]': HOME_POSTS_QUERY_RESULT;
     '*[_type=="page" && slug.current==$slug][0]{_id,title,"slug":slug.current,intro,body}': PAGE_QUERY_RESULT;
   }
 }
