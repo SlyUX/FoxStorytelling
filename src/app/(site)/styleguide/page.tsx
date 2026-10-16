@@ -150,7 +150,7 @@ const VOICE: [string, React.ReactNode][] = [
   ['Numbers follow AP style.', 'Spell out one through nine, numerals from 10. Percentages and money are always numerals.'],
   ['Ranges and separators.', 'An unspaced en dash for ranges (2024–2026), and a middle dot between items on a meta line (Series · Available).'],
   ['Empty states speak to readers.', '“New books are on the way,” not “Add a book in the Studio.”'],
-  ['Alt text is one sentence.', 'It says what the image shows and why it matters. Leave it blank for a cover beside its own title.'],
+  ['Alt text is usually one sentence.', 'It says what the image shows and why it matters, for someone listening. When the image is mostly words (an ad, a sign, a page of lettering), it carries the words. Leave it blank for a cover beside its own title.'],
   ['American English.', 'Including Studio labels.'],
 ]
 

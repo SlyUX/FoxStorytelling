@@ -45,8 +45,9 @@ export const imageWithAlt = defineType({
       title: 'Alt text',
       type: 'string',
       description:
-        'Describe what the image shows and why it matters, in one sentence; it is read aloud. Leave blank for a cover that sits right beside its own title, so a screen reader doesn’t announce it twice.',
-      validation: (rule) => rule.max(160).warning('Long alt text is hard to listen to. Aim for one sentence.'),
+        'Describe what the image shows and why it matters; it is read aloud. Usually one sentence; if the image is mostly words (an ad, a sign, a page of lettering), include the words. Leave blank for a cover that sits right beside its own title, so a screen reader doesn’t announce it twice.',
+      // Screen readers read it all; this is a nudge, not a limit. Images that are mostly words need the room.
+      validation: (rule) => rule.max(250).warning('Keep it to what a listener needs. Images that are mostly words (an ad, a sign) can run longer to include them.'),
     }),
     defineField({ name: 'caption', title: 'Caption', type: 'string', description: 'Optional. Shown under the image.' }),
     // Only in body text (an image inside an array, like a post's Body), where there's text to sit beside.
