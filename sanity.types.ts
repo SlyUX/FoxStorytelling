@@ -161,7 +161,7 @@ export type Post = {
   body?: RichText;
   became?: {
     story?: BookReference;
-    note?: string;
+    note?: RichText;
   };
   pitch?: RichText;
   script?: Screenplay;
@@ -667,7 +667,7 @@ export type POST_QUERY_RESULT = {
   pitch: RichText | null;
   script: Screenplay | null;
   became: {
-    note: string | null;
+    note: RichText | null;
     story: {
       _id: string;
       title: string;

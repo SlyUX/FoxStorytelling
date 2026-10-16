@@ -20,7 +20,7 @@ export default defineType({
       fields: [
         defineField({ name: 'story', title: 'A story on this site', type: 'reference', to: [{ type: 'book' }],
           description: 'Its cover, title, and blurb show, linking to its page.' }),
-        defineField({ name: 'note', title: 'In your words', type: 'text', rows: 4, description: 'A blank line starts a new paragraph.' }),
+        defineField({ name: 'note', title: 'In your words', type: 'richText', description: 'What happened to it. Formatted like the Body: links, emphasis, images, and quotes all work.' }),
       ] }),
     defineField({ name: 'pitch', title: 'The pitch', type: 'richText', fieldset: 'rejectionFile',
       description: 'The pitch itself, as it went out: the deck, bible, or query letter. Shown after the story, as a document of its own.' }),

@@ -560,13 +560,13 @@ export default async function StyleguidePage() {
             name="What it became"
             file="src/components/post-became.tsx · PostBecame"
             notes={[
-              'A Rejection File’s epilogue, after the story: the story it became, linked as a small card, and the author’s words about it (either, or both). Below it, the pitch itself, in a band of its own, its headings a level under “The pitch.”',
+              'A Rejection File’s epilogue, after the story: the story it became, linked as a small card, and the author’s words about it, in rich text (either, or both). Below it, the pitch itself, in a band of its own, its headings a level under “The pitch.”',
               'The headings (“What it became,” “The pitch”) are in Site settings → Short Form.',
             ]}
           >
             <div className="max-w-2xl">
               <PostBecame
-                became={{ note: 'A sentence or two on what happened to it after the rejections: here, it became a book.', story: cards[0] ?? null }}
+                became={{ note: [{ _type: 'block', _key: 'n1', style: 'normal', markDefs: [], children: [span('n1s', 'A sentence or two on what happened to it after the rejections: here, it became a book.')] }], story: cards[0] ?? null }}
                 heading={s.becameHeading}
                 linkLabel={s.bookDetailsLabel}
                 buyLabel={s.buyLabel}

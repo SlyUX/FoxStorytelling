@@ -1,5 +1,6 @@
 import { BookCover } from '@/components/book-card'
 import { BuyLinks } from '@/components/buy-links'
+import { RichText } from '@/components/rich-text'
 import { TransitionLink } from '@/components/transition-link'
 import { ButtonLink } from '@/components/ui/button'
 import type { PostDetail } from '@/lib/types'
@@ -8,8 +9,8 @@ import type { PostDetail } from '@/lib/types'
  * A Rejection File's epilogue, after the story: what the rejected work became.
  * The story it became (a book on this site), as a small card linking to its
  * page, with where to buy it (the story's own buy links, the first in ember),
- * and the author's words about it; either, or both. Renders nothing without
- * either.
+ * and the author's words about it (rich text, its headings a level under this
+ * one's); either, or both. Renders nothing without either.
  */
 export function PostBecame({
   became,
@@ -29,19 +30,27 @@ export function PostBecame({
   className?: string
 }) {
   const story = became?.story
-  const paragraphs = (became?.note ?? '').split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean)
-  if (!story && !paragraphs.length) return null
+  const note = became?.note
+  // Notes saved before this field was rich text are plain text until resaved: shown as paragraphs, a blank line apart.
+  const legacy = typeof note === 'string' ? (note as string).split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean) : []
+  const hasNote = legacy.length > 0 || (Array.isArray(note) && note.length > 0)
+  if (!story && !hasNote) return null
   const href = story ? `/stories/${story.slug}` : ''
   return (
     <section aria-labelledby="became-heading" className={className}>
       <Heading id="became-heading" className="font-heading text-3xl leading-tight font-semibold">
         {heading}
       </Heading>
-      {paragraphs.length > 0 && (
+      {legacy.length > 0 && (
         <div className="mt-5 space-y-5 text-xl leading-relaxed">
-          {paragraphs.map((p, i) => (
+          {legacy.map((p, i) => (
             <p key={i}>{p}</p>
           ))}
+        </div>
+      )}
+      {Array.isArray(note) && note.length > 0 && (
+        <div className="mt-5">
+          <RichText value={note} nested />
         </div>
       )}
       {story && (
